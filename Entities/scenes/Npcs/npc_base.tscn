@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://bfexry3355fb"]
+
+[ext_resource type="Script" path="res://Singletons/Scripts/HealthSystem/healthsystem.gd" id="1_2kil3"]
+[ext_resource type="Script" path="res://Entities/scripts/Npcs/npc_base.gd" id="1_daci5"]
+
+[node name="NpcBase" type="CharacterBody2D"]
+collision_layer = 15
+collision_mask = 15
+script = ExtResource("1_daci5")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[node name="HitBox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+
+[node name="HurtBox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+
+[node name="ChatBoxArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChatBoxArea"]
+
+[node name="HealthSystem" type="Node" parent="."]
+script = ExtResource("1_2kil3")
+
+[node name="StateTimer" type="Timer" parent="."]
+
+[connection signal="body_entered" from="ChatBoxArea" to="." method="_on_chat_box_area_body_entered"]
+[connection signal="body_exited" from="ChatBoxArea" to="." method="_on_chat_box_area_body_exited"]
+[connection signal="timeout" from="StateTimer" to="." method="_on_timer_timeout"]

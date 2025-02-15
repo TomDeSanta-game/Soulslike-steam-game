@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3 uid="uid://b35ig5icbvk7a"]
+
+[ext_resource type="Script" path="res://Entities/scripts/Enemies/enemy_base.gd" id="1_qiq53"]
+[ext_resource type="Script" path="res://Components/hitbox_component.gd" id="2_i3wp7"]
+[ext_resource type="Script" path="res://Components/frame_data_component.gd" id="2_x0i8a"]
+[ext_resource type="Script" path="res://Components/hurtbox_component.gd" id="3_2eggk"]
+[ext_resource type="Script" path="res://Components/box_flip.gd" id="5_nvv45"]
+
+[node name="EnemyBase" type="CharacterBody2D" node_paths=PackedStringArray("hitboxes", "hurtboxes") groups=["Enemy"]]
+script = ExtResource("1_qiq53")
+hitboxes = [NodePath("HitBox")]
+hurtboxes = [NodePath("HurtBox")]
+metadata/entity_name = "EnemyBase"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
+
+[node name="HitBox" type="Area2D" parent="." groups=["Enemy"]]
+unique_name_in_owner = true
+script = ExtResource("2_i3wp7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+
+[node name="HurtBox" type="Area2D" parent="." groups=["Enemy"]]
+unique_name_in_owner = true
+script = ExtResource("3_2eggk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+
+[node name="DetectionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+
+[node name="FrameDataComponent" type="Node2D" parent="." node_paths=PackedStringArray("sprite")]
+position = Vector2(-1, 0)
+script = ExtResource("2_x0i8a")
+sprite = NodePath("../AnimatedSprite2D")
+
+[node name="HitBoxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]
+script = ExtResource("5_nvv45")
+sprite = NodePath("../AnimatedSprite2D")
+box = NodePath("../HitBox")
+
+[node name="HurtBoxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]
+script = ExtResource("5_nvv45")
+sprite = NodePath("../AnimatedSprite2D")
+box = NodePath("../HurtBox")
+
+[connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
+[connection signal="body_exited" from="DetectionArea" to="." method="_on_detection_area_body_exited"]

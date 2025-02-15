@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="FrameDataResource" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://FrameData/frame_data.gd" id="1_6vtpt"]
+[ext_resource type="Script" path="res://FrameData/frame_data_resource.gd" id="2_wtq31"]
+
+[sub_resource type="Resource" id="Resource_dy0r5"]
+script = ExtResource("1_6vtpt")
+frame_number = 0
+hitboxes = {}
+hurtboxes = {
+"body": {
+"position": Vector2(0, 0),
+"size": Vector2(30, 60)
+}
+}
+damage = 25.0
+knockback = Vector2(200, -100)
+
+[sub_resource type="Resource" id="Resource_63e2v"]
+script = ExtResource("1_6vtpt")
+frame_number = 1
+hitboxes = {}
+hurtboxes = {
+"body": {
+"position": Vector2(0, 0),
+"size": Vector2(30, 60)
+}
+}
+damage = 25.0
+knockback = Vector2(200, -100)
+
+[sub_resource type="Resource" id="Resource_1qesu"]
+script = ExtResource("1_6vtpt")
+frame_number = 2
+hitboxes = {
+"claw": {
+"position": Vector2(30, 0),
+"size": Vector2(40, 30)
+}
+}
+hurtboxes = {
+"body": {
+"position": Vector2(0, 0),
+"size": Vector2(30, 60)
+}
+}
+damage = 25.0
+knockback = Vector2(200, -100)
+
+[resource]
+script = ExtResource("2_wtq31")
+animation_name = "Attack"
+frames = Array[ExtResource("1_6vtpt")]([SubResource("Resource_dy0r5"), SubResource("Resource_63e2v"), SubResource("Resource_1qesu")])

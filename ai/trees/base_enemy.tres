@@ -1,0 +1,75 @@
+[gd_resource type="BehaviorTree" load_steps=27 format=3 uid="uid://txrpep3hebjf"]
+
+[ext_resource type="Script" path="res://ai/tasks/detect_targets.gd" id="1_gjpga"]
+[ext_resource type="Script" path="res://ai/tasks/move_to_target.gd" id="2_lg2en"]
+[ext_resource type="Script" path="res://ai/tasks/patrol.gd" id="3_g0ffc"]
+[ext_resource type="Script" path="res://ai/tasks/move_to_position.gd" id="4_5ej7g"]
+[ext_resource type="Script" path="res://ai/tasks/random_move_pos.gd" id="5_h6hj5"]
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_qvcqo"]
+
+# Detect Player Sequence
+[sub_resource type="BTAction" id="BTAction_ivku1"]
+script = ExtResource("1_gjpga")
+target_type = "Player"
+target_var = &"target"
+targets_var = &"known_targets"
+detection_radius = 300.0
+
+[sub_resource type="BTAction" id="BTAction_2dp8g"]
+script = ExtResource("2_lg2en")
+target_var = &"target"
+speed = 150.0  # Increased speed when chasing player
+tolerance = 20.0
+
+[sub_resource type="BTSequence" id="BTSequence_hbayy"]
+custom_name = "Chase Player Sequence"
+children = [SubResource("BTAction_ivku1"), SubResource("BTAction_2dp8g")]
+
+# Patrol Sequence
+[sub_resource type="BTAction" id="BTAction_88ja4"]
+script = ExtResource("3_g0ffc")
+patrol_path = null  # Will be set in code
+speed = 100.0
+tolerance = 10.0
+position_var = &"pos"
+direction_var = &"dir"
+
+[sub_resource type="BTAction" id="BTAction_jv6yl"]
+script = ExtResource("4_5ej7g")
+target_pos = "pos"
+direction = "dir"
+speed = 100.0
+tolerance = 10.0
+
+[sub_resource type="BTSequence" id="BTSequence_rh2rm"]
+custom_name = "Patrol Sequence"
+children = [SubResource("BTAction_88ja4"), SubResource("BTAction_jv6yl")]
+
+# Random Move (Fallback behavior)
+[sub_resource type="BTAction" id="BTAction_2q8ex"]
+script = ExtResource("5_h6hj5")
+min_range = 40.0
+max_range = 100.0
+position_var = &"pos"
+direction_var = &"dir"
+
+[sub_resource type="BTAction" id="BTAction_u4kqy"]
+script = ExtResource("4_5ej7g")
+target_pos = "pos"
+direction = "dir"
+speed = 100.0
+tolerance = 20
+
+[sub_resource type="BTSequence" id="BTSequence_w8nsn"]
+custom_name = "Random Move Sequence"
+children = [SubResource("BTAction_2q8ex"), SubResource("BTAction_u4kqy")]
+
+# Main Selector
+[sub_resource type="BTSelector" id="BTSelector_4xxg8"]
+custom_name = "Base Enemy Selector"
+children = [SubResource("BTSequence_hbayy"), SubResource("BTSequence_rh2rm"), SubResource("BTSequence_w8nsn")]
+
+[resource]
+blackboard_plan = SubResource("BlackboardPlan_qvcqo")
+root_task = SubResource("BTSelector_4xxg8")
