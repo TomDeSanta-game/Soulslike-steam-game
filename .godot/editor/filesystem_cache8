@@ -1,12 +1,12 @@
 fc8a56933c4b1c8d796fdb8f7a9f9475
-::res://::1739721326
+::res://::1739730792
 default_bus_layout.tres::AudioBusLayout::347433539179437996::1739385105::0::1::::<><>::
 export_presets.cfg::TextFile::-1::1736774740::0::1::::<><>::
 icon.png::CompressedTexture2D::4149377442233508988::1739445102::1739445212::1::::<><>::
 override.cfg::TextFile::-1::1738248632::0::1::::<><>::
-README.MD::TextFile::-1::1739709100::0::1::::<><>::
-::res://addons/::1739721324
-limbo_console.cfg::TextFile::-1::1739721324::0::1::::<><>::
+README.MD::TextFile::-1::1739730718::0::1::::<><>::
+::res://addons/::1739730792
+limbo_console.cfg::TextFile::-1::1739730792::0::1::::<><>::
 ::res://addons/godot-rapier2d/::1739628738
 circle_mesh.tres::ArrayMesh::7174673425048804142::1736175146::0::1::::<><>::
 faucet_2d.gd::GDScript::-1::1736175146::0::1::::Faucet2D<>Fluid2D<>::
@@ -165,10 +165,10 @@ move_to_target.gd::GDScript::-1::1739384898::0::1::::<>BTAction<>::
 patrol.gd::GDScript::-1::1739640569::0::1::::<>BTAction<>::
 persistent_chase.gd::GDScript::-1::1739383852::0::1::::<>BTAction<>::
 random_move_pos.gd::GDScript::-1::1739385105::0::1::::<>BTAction<>::
-::res://ai/trees/::1739716146
+::res://ai/trees/::1739728361
 base_enemy.tres::BehaviorTree::1382127927798765195::1739639559::0::1::::<><>::res://ai/tasks/detect_targets.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/random_move_pos.gd
 ogre.tres::BehaviorTree::1245136069127851702::1739468455::0::1::::<><>::res://ai/tasks/random_move_pos.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/find_target.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/detect_targets.gd<>res://ai/tasks/persistent_chase.gd
-were_wolf.tres::BehaviorTree::6444557909031182893::1739716146::0::1::::<><>::res://ai/tasks/random_move_pos.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/find_target.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/detect_targets.gd
+were_wolf.tres::BehaviorTree::6444557909031182893::1739728361::0::1::::<><>::res://ai/tasks/random_move_pos.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/find_target.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/detect_targets.gd
 ::res://assets/::1739721696
 Sprite-0001.png::CompressedTexture2D::1198012509339392585::1739196839::1739196842::1::::<><>::
 ::res://assets/explosion_pack/::1739628738
@@ -1349,7 +1349,7 @@ run_attack.wav::AudioStreamWAV::4441934990603410780::1739534456::1739534493::1::
 ::res://assets/sounds/Player/_Sword_Attacks/Sword_Slash/::1739628738
 _attack.mp3::AudioStreamMP3::4074734261461627096::1739475413::1739475447::1::::<><>::
 attack.wav::AudioStreamWAV::3145336126768062915::1739467213::1739467378::1::::<><>::
-::res://assets/sounds/Player/Dash/::1739721704
+::res://assets/sounds/Player/Dash/::1739721775
 dash.ogg::AudioStreamOggVorbis::4926673800877424774::1739721677::1739721775::1::::<><>::
 ::res://assets/sounds/Player/Death/::1739628738
 death.wav::AudioStreamWAV::1417822364568386020::1739385105::1739467378::1::::<><>::
@@ -1406,30 +1406,30 @@ hitbox_component.gd::GDScript::-1::1739705486::0::1::::HitboxComponent<>Area2D<>
 hurtbox_component.gd::GDScript::-1::1739705501::0::1::::HurtboxComponent<>Area2D<>::
 ::res://Entities/::1739628738
 ::res://Entities/scenes/::1739643854
-::res://Entities/scenes/Enemies/::1739707485
-enemy_base.tscn::PackedScene::4414137677037347040::1739707485::0::1::::<><>::res://Entities/scripts/Enemies/enemy_base.gd<>res://Components/hitbox_component.gd<>res://Components/frame_data_component.gd<>res://Components/hurtbox_component.gd<>res://Components/box_flip.gd
+::res://Entities/scenes/Enemies/::1739721781
+enemy_base.tscn::PackedScene::4414137677037347040::1739721781::0::1::::<><>::res://Entities/scripts/Enemies/enemy_base.gd<>res://Components/hitbox_component.gd<>res://Components/frame_data_component.gd<>res://Components/hurtbox_component.gd<>res://Components/box_flip.gd
 ::res://Entities/scenes/Enemies/Ogre/::1739628738
 ogre.tscn::PackedScene::5707137705608600961::1739445367::0::1::::<><>::uid://b35ig5icbvk7a::::res://Entities/scenes/Enemies/enemy_base.tscn<>res://Entities/scripts/Enemies/Ogre/ogre.gd<>uid://bi3o46c4nhha5::::res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-attack.png<>res://Shaders/Enemies/enemy_damage.gdshader<>uid://c7fdb5e75skgb::::res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-idle.png<>res://Shaders/Enemies/enemy_death.gdshader<>uid://hjtvvyxnpxy5::::res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-idle-unarmed.png<>uid://bno82xp7tkfsa::::res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-walk.png<>uid://d1mofg5jknf66::::res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-walk-unarmed.png<>uid://r0fhd1d2703k::::res://ai/trees/ogre.tres<>res://Components/frame_data_component.gd
-::res://Entities/scenes/Enemies/WereWolf/::1739716146
-were_wolf.tscn::PackedScene::5871774284997041581::1739716146::0::1::::<><>::uid://b35ig5icbvk7a::::res://Entities/scenes/Enemies/enemy_base.tscn<>res://Entities/scripts/Enemies/WereWolf/were_wolf.gd<>uid://t7i68hagiep0::::res://assets/explosion_pack/Explosions pack/explosion-1-g/spritesheet.png<>uid://d360avbyx87wf::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-fall.png<>uid://c17uutq8aitoe::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run2.png<>uid://c1of210euagwa::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run4.png<>uid://cmb6mqtp55v7q::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-idle.png<>uid://bejk0nekljdcs::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run5.png<>uid://dnh8d3akrjjqi::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-jump.png<>uid://cagnsoorvebmy::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-run.png<>uid://desdeflwecnme::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run1.png<>uid://cx216r3w2m4on::::res://ai/trees/were_wolf.tres
-::res://Entities/scenes/GhostPlayer/::1739628738
-ghost_player.tscn::PackedScene::2413888834584527557::1739385105::0::1::::<><>::res://ghost_player/ghost_player.gd<>res://player/player_ghost.gdshader<>uid://dvub0pyni30x2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Sword Slash.png<>uid://csycho12jo5y2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Crouch.png<>uid://c1elceliby44h::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png<>uid://chtuuua8qisn3::::res://assets/Legacy Collection/Characters/Terrible Knight/Sprites/Hurt/frame3.png<>uid://cbh18hpu4cech::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Hurt.png<>uid://b6mf7udiwdvxt::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Idle.png<>uid://c7p2dsrlq3m03::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png<>uid://74ahhwvwvpcu::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-JumpAttack.png<>uid://cw54bxyb65sjk::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png<>uid://d1dcj5pnmve62::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png<>uid://2cet2eupuug3::::res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf<>uid://dq875rvykq0wg::::res://shooter/shooter.tscn<>res://camera/camera.gd
+::res://Entities/scenes/Enemies/WereWolf/::1739721788
+were_wolf.tscn::PackedScene::5871774284997041581::1739721788::0::1::::<><>::uid://b35ig5icbvk7a::::res://Entities/scenes/Enemies/enemy_base.tscn<>res://Entities/scripts/Enemies/WereWolf/were_wolf.gd<>uid://t7i68hagiep0::::res://assets/explosion_pack/Explosions pack/explosion-1-g/spritesheet.png<>uid://d360avbyx87wf::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-fall.png<>uid://c17uutq8aitoe::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run2.png<>uid://c1of210euagwa::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run4.png<>uid://cmb6mqtp55v7q::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-idle.png<>uid://bejk0nekljdcs::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run5.png<>uid://dnh8d3akrjjqi::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-jump.png<>uid://cagnsoorvebmy::::res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-run.png<>uid://desdeflwecnme::::res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run1.png<>uid://cx216r3w2m4on::::res://ai/trees/were_wolf.tres
+::res://Entities/scenes/GhostPlayer/::1739722920
+ghost_player.tscn::PackedScene::2413888834584527557::1739722920::0::1::::<><>::res://Entities/scripts/GhostPlayer/ghost_player.gd<>res://Shaders/Player/player_ghost.gdshader<>uid://dvub0pyni30x2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Sword Slash.png<>uid://csycho12jo5y2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Crouch.png<>uid://c1elceliby44h::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png<>uid://chtuuua8qisn3::::res://assets/Legacy Collection/Characters/Terrible Knight/Sprites/Hurt/frame3.png<>uid://cbh18hpu4cech::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Hurt.png<>uid://b6mf7udiwdvxt::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Idle.png<>uid://c7p2dsrlq3m03::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png<>uid://74ahhwvwvpcu::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-JumpAttack.png<>uid://cw54bxyb65sjk::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png<>uid://d1dcj5pnmve62::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png<>uid://2cet2eupuug3::::res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf<>res://Singletons/Scripts/Shooter/shooter.gd<>res://camera/camera.gd
 ::res://Entities/scenes/Npcs/::1739628738
 npc_base.tscn::PackedScene::80795604922291411::1739468826::0::1::::<><>::res://Singletons/Scripts/HealthSystem/healthsystem.gd<>res://Entities/scripts/Npcs/npc_base.gd
 ::res://Entities/scenes/Npcs/Bipedal/::1739628738
 npc.tscn::PackedScene::5012964831980088838::1739468813::0::1::::<><>::uid://bfexry3355fb::::res://Entities/scenes/Npcs/npc_base.tscn<>res://Entities/scripts/Npcs/Bipedal/npc.gd<>res://Shaders/NPC/npc.gdshader<>uid://bnueqonf1cykr::::res://assets/Legacy Collection/Characters/bipedal-Unit/spritesheet.png<>uid://myoef0ys7ugh::::res://assets/Legacy Collection/Characters/bipedal-Unit/sprites/bipedal-unit1.png
-::res://Entities/scenes/Player/::1739653233
-player.tscn::PackedScene::1505711428902279044::1739653233::0::1::::<><>::res://Entities/scripts/Player/player.gd<>res://Shaders/Player/player_damage.gdshader<>res://Components/hitbox_component.gd<>uid://dvub0pyni30x2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Sword Slash.png<>uid://csycho12jo5y2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Crouch.png<>uid://b6mf7udiwdvxt::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Idle.png<>res://Components/hurtbox_component.gd<>res://Shaders/Player/player_death.gdshader<>uid://c1elceliby44h::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png<>uid://c7p2dsrlq3m03::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png<>uid://cw54bxyb65sjk::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png<>uid://cbh18hpu4cech::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Hurt.png<>uid://74ahhwvwvpcu::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-JumpAttack.png<>uid://d1dcj5pnmve62::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png<>uid://2cet2eupuug3::::res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf<>uid://bhjnaf7qxfop2::::res://assets/fonts/PressStart2P-Regular.ttf<>res://Components/frame_data_component.gd<>res://camera/camera.gd<>res://Singletons/Scripts/Shooter/shooter.gd<>res://Components/box_flip.gd
-::res://Entities/scenes/Projectiles/::1739707485
-proj_base.tscn::PackedScene::5705395219129908403::1739707485::0::1::::<><>::res://Entities/scripts/Projectiles/proj_base.gd
-::res://Entities/scenes/Projectiles/Explosion/::1739707485
-explosion_proj.tscn::PackedScene::7546122380673278696::1739707485::0::1::::<><>::uid://cnj0a4x0abenb::::res://Entities/scenes/Projectiles/proj_base.tscn<>uid://cixj0i0421kqy::::res://assets/Legacy Collection/Misc/Explosion/spritesheet/explosion-animation.png
-::res://Entities/scenes/Traps/::1739707485
-trap_base.tscn::PackedScene::8654764987731997723::1739707485::0::1::::<><>::res://Entities/scripts/Traps/trap_base.gd
-::res://Entities/scenes/Traps/Shuriken_Trap/::1739707485
-shuriken_trap.tscn::PackedScene::3885045355014408411::1739707485::0::1::::<><>::uid://dvkoyknj2aiv8::::res://Entities/scenes/Traps/trap_base.tscn<>uid://dc0i85im7mpkg::::res://assets/trap/Suriken.png
-::res://Entities/scripts/::1739644057
-character_base.gd::GDScript::-1::1739629838::0::1::::CharacterBase<>CharacterBody2D<>::
+::res://Entities/scenes/Player/::1739730718
+player.tscn::PackedScene::1505711428902279044::1739730718::0::1::::<><>::res://Entities/scripts/Player/player.gd<>res://Shaders/Player/player_damage.gdshader<>res://Components/hitbox_component.gd<>uid://dvub0pyni30x2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Sword Slash.png<>uid://csycho12jo5y2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Crouch.png<>uid://b6mf7udiwdvxt::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Idle.png<>res://Components/hurtbox_component.gd<>res://Shaders/Player/player_death.gdshader<>res://Shaders/Player/player_dash.gdshader<>uid://c1elceliby44h::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png<>uid://c7p2dsrlq3m03::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png<>uid://cw54bxyb65sjk::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png<>uid://cbh18hpu4cech::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Hurt.png<>uid://74ahhwvwvpcu::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-JumpAttack.png<>uid://d1dcj5pnmve62::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png<>uid://2cet2eupuug3::::res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf<>uid://bhjnaf7qxfop2::::res://assets/fonts/PressStart2P-Regular.ttf<>res://Components/frame_data_component.gd<>res://camera/camera.gd<>res://Singletons/Scripts/Shooter/shooter.gd<>res://Components/box_flip.gd
+::res://Entities/scenes/Projectiles/::1739721780
+proj_base.tscn::PackedScene::5705395219129908403::1739721780::0::1::::<><>::res://Entities/scripts/Projectiles/proj_base.gd
+::res://Entities/scenes/Projectiles/Explosion/::1739721780
+explosion_proj.tscn::PackedScene::7546122380673278696::1739721780::0::1::::<><>::uid://cnj0a4x0abenb::::res://Entities/scenes/Projectiles/proj_base.tscn<>uid://cixj0i0421kqy::::res://assets/Legacy Collection/Misc/Explosion/spritesheet/explosion-animation.png
+::res://Entities/scenes/Traps/::1739721780
+trap_base.tscn::PackedScene::8654764987731997723::1739721780::0::1::::<><>::res://Entities/scripts/Traps/trap_base.gd
+::res://Entities/scenes/Traps/Shuriken_Trap/::1739721780
+shuriken_trap.tscn::PackedScene::3885045355014408411::1739721780::0::1::::<><>::uid://dvkoyknj2aiv8::::res://Entities/scenes/Traps/trap_base.tscn<>uid://dc0i85im7mpkg::::res://assets/trap/Suriken.png
+::res://Entities/scripts/::1739730718
+character_base.gd::GDScript::-1::1739730718::0::1::::CharacterBase<>CharacterBody2D<>::
 ::res://Entities/scripts/Enemies/::1739652901
 enemy_base.gd::GDScript::-1::1739707411::0::1::::EnemyBase<>CharacterBase<>::
 ::res://Entities/scripts/Enemies/Ogre/::1739628738
@@ -1442,9 +1442,9 @@ ghost_player.gd::GDScript::-1::1739547077::0::1::::GhostPlayer<>CharacterBase<>:
 npc_base.gd::GDScript::-1::1739629029::0::1::::NpcBase<>CharacterBase<>::
 ::res://Entities/scripts/Npcs/Bipedal/::1739628738
 npc.gd::GDScript::-1::1739479028::0::1::::<>NpcBase<>::
-::res://Entities/scripts/Player/::1739640752
-player.gd::GDScript::-1::1739721638::0::1::::<>CharacterBase<>::
-player_state_machine.gd::GDScript::-1::1739553795::0::1::::PlayerStateMachine<>LimboHSM<>::
+::res://Entities/scripts/Player/::1739730718
+player.gd::GDScript::-1::1739730718::0::1::::<>CharacterBase<>::
+player_state_machine.gd::GDScript::-1::1739730718::0::1::::PlayerStateMachine<>LimboHSM<>::
 ::res://Entities/scripts/Projectiles/::1739645245
 proj_base.gd::GDScript::-1::1739645245::0::1::::ProjectileBase<>Area2D<>::
 ::res://Entities/scripts/Projectiles/Explosion/::1739628738
@@ -1458,33 +1458,32 @@ frame_data_resource.gd::GDScript::-1::1739531866::0::1::::FrameDataResource<>Res
 ::res://FrameDataResources/::1739628738
 attack_frames.tres::Resource/FrameDataResource::-1::1739553773::0::1::::<><>::res://FrameData/frame_data.gd<>res://FrameData/frame_data_resource.gd
 werewolf_attack_frames.tres::Resource/FrameDataResource::-1::1739553773::0::1::::<><>::res://FrameData/frame_data.gd<>res://FrameData/frame_data_resource.gd
-::res://Globals/::1739648960
+::res://Globals/::1739730718
 character_health_manager.gd::GDScript::-1::1739629823::0::1::::<>Node<>::
-sound.gd::GDScript::-1::1739721767::0::1::::<>Node<>::
+sound.gd::GDScript::-1::1739730718::0::1::::<>Node<>::
 types.gd::GDScript::-1::1739648960::0::1::::Types<>Node<>::
 ::res://levels/::1739628738
-::res://levels/level_1/::1739642765
-level.tscn::PackedScene::2667715318710500220::1739642765::0::1::::<><>::res://levels/level_1/level_1.gd<>uid://7fal73nhmb20::::res://assets/fonts/static/Oswald-Bold.ttf<>uid://rclddgstmadt::::res://assets/Sprite-0001.png<>uid://cpwli84yoikt6::::res://Entities/scenes/Enemies/WereWolf/were_wolf.tscn
-level_1.gd::GDScript::-1::1739479087::0::1::::<>Node2D<>::
+::res://levels/level_1/::1739730718
+level.tscn::PackedScene::2667715318710500220::1739730642::0::1::::<><>::res://levels/level_1/level_1.gd<>uid://7fal73nhmb20::::res://assets/fonts/static/Oswald-Bold.ttf<>uid://rclddgstmadt::::res://assets/Sprite-0001.png<>uid://cpwli84yoikt6::::res://Entities/scenes/Enemies/WereWolf/were_wolf.tscn
+level_1.gd::GDScript::-1::1739730718::0::1::::<>Node2D<>::
 ::res://main/::1739642765
 main.gd::GDScript::-1::1739385105::0::1::::<>Node2D<>::
 main.tscn::PackedScene::6628024293653602156::1739642765::0::1::::<><>::res://main/main.gd<>uid://beai48cdctfy7::::res://levels/level_1/level.tscn<>uid://vpm32ogo31eu::::res://Entities/scenes/Player/player.tscn
-::res://Resources/::1739639905
+::res://Resources/::1739730718
 patrol_path.gd::GDScript::-1::1739639905::0::1::::PatrolPath<>Resource<>::
 ::res://Shaders/::1739628738
 ::res://Shaders/NPC/::1739628738
 npc.gdshader::Shader::-1::1739385104::0::1::::<><>::
-::res://Shaders/Player/::1739628738
+::res://Shaders/Player/::1739722013
 player_damage.gdshader::Shader::-1::1739385105::0::1::::<><>::
+player_dash.gdshader::Shader::-1::1739722013::0::1::::<><>::
 player_death.gdshader::Shader::-1::1739385105::0::1::::<><>::
 player_ghost.gdshader::Shader::-1::1739385105::0::1::::<><>::
 ::res://Singletons/::1739628738
-::res://Singletons/Scenes/::1739628738
-::res://Singletons/Scenes/ObjectMaker/::1739628738
-object_maker.tscn::PackedScene::5663185294325373609::1739385105::0::1::::<><>::res://ObjectMaker/object_maker.gd
-::res://Singletons/Scenes/Shooter/::1739642764
-shooter.tscn::PackedScene::8352405459199784886::1739642764::0::1::::<><>::res://Singletons/Scripts/Shooter/shooter.gd
-::res://Singletons/Scripts/::1739628738
+::res://Singletons/Scenes/::1739722928
+::res://Singletons/Scenes/ObjectMaker/::1739722779
+object_maker.tscn::PackedScene::5663185294325373609::1739722779::0::1::::<><>::res://Singletons/Scripts/ObjectMaker/object_maker.gd
+::res://Singletons/Scripts/::1739730718
 ::res://Singletons/Scripts/DateTime/::1739628738
 datetime.gd::GDScript::-1::1739385222::0::1::::DateTime<>Resource<>::
 ::res://Singletons/Scripts/HealthSystem/::1739628738
@@ -1492,8 +1491,8 @@ healthsystem.gd::GDScript::-1::1739445580::0::1::::HealthSystem<>Node<>::
 ::res://Singletons/Scripts/ObjectMaker/::1739715735
 object_maker.gd::GDScript::-1::1739715735::0::1::::<>Node2D<>::
 ::res://Singletons/Scripts/PauseManager/::1739628738
-pause_manager.gd::GDScript::-1::1739385105::0::1::::<>Node<>::
-::res://Singletons/Scripts/Shooter/::1739628738
-shooter.gd::GDScript::-1::1739468318::0::1::::Shooter<>Node2D<>::
+pause_manager.gd::GDScript::-1::1739722335::0::1::::<>Node<>::
+::res://Singletons/Scripts/Shooter/::1739722744
+shooter.gd::GDScript::-1::1739722744::0::1::::Shooter<>Node2D<>::
 ::res://Singletons/Scripts/TimeSystem/::1739628738
 timesystem.gd::GDScript::-1::1739385105::0::1::::TimeSystem<>Node<>::

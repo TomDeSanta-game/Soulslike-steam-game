@@ -1,4 +1,4 @@
-[gd_scene load_steps=76 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=78 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -405,12 +405,24 @@ shadow_size = 10
 shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_7xvhv"]
-color = Color(0, 1, 0, 1)
+color = Color(1, 0, 0, 1)
 grow_begin = 100.0
 grow_end = 100.0
 thickness = 5
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_10v5d"]
+color = Color(1, 0, 0, 1)
+grow_begin = 100.0
+grow_end = 100.0
+thickness = 5
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_4vyvw"]
+color = Color(0, 1, 0, 1)
+grow_begin = 100.0
+grow_end = 100.0
+thickness = 5
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_3cxff"]
 color = Color(0, 1, 0, 1)
 grow_begin = 100.0
 grow_end = 100.0
@@ -498,6 +510,16 @@ offset_bottom = -212.0
 theme_override_fonts/font = ExtResource("14_j5s4l")
 theme_override_styles/background = SubResource("StyleBoxLine_7xvhv")
 theme_override_styles/fill = SubResource("StyleBoxLine_10v5d")
+value = 100.0
+
+[node name="StaminaBar" type="ProgressBar" parent="."]
+offset_left = -280.0
+offset_top = -210.0
+offset_right = -276.0
+offset_bottom = -183.0
+theme_override_fonts/font = ExtResource("14_j5s4l")
+theme_override_styles/background = SubResource("StyleBoxLine_4vyvw")
+theme_override_styles/fill = SubResource("StyleBoxLine_3cxff")
 value = 100.0
 
 [node name="Hitbox" type="Area2D" parent="." groups=["Player"]]

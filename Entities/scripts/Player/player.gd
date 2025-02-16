@@ -9,7 +9,13 @@ const STATS: Dictionary = {
 	"MAX_LIFESTEAL_AMOUNT": 25.0,  # Maximum amount of health restored per hit
 	"DASH_SPEED": 800.0,  # Speed during dash
 	"DASH_DURATION": 0.2,  # Duration of dash in seconds
-	"DASH_COOLDOWN": 0.5  # Time before can dash again
+	"DASH_COOLDOWN": 0.5,  # Time before can dash again
+	"MAX_STAMINA": 100.0,
+	"STAMINA_REGEN_RATE": 20.0,  # Stamina points per second
+	"ATTACK_STAMINA_COST": 10.0,
+	"RUN_ATTACK_STAMINA_COST": 20.0,
+	"JUMP_ATTACK_STAMINA_COST": 40.0,
+	"RUN_STAMINA_DRAIN_RATE": 5.55  # Drains full stamina in 30 seconds
 }
 
 const ANIMATIONS: Dictionary = {
@@ -29,6 +35,7 @@ const ANIMATIONS: Dictionary = {
 @onready var label: Label = $Label
 @onready var shooter: Shooter = $Shooter
 @onready var health_bar: ProgressBar = $ProgressBar
+@onready var stamina_bar: ProgressBar = $StaminaBar
 @onready var camera: Camera2D = $Camera2D
 
 # Types Global
@@ -49,6 +56,7 @@ const ANIMATIONS: Dictionary = {
 
 # Player state
 var magic: float = STATS.MAX_MAGIC
+var stamina: float = STATS.MAX_STAMINA
 var direction: float = 0.0
 var is_attacking: bool = false
 var is_crouching: bool = false
@@ -111,6 +119,9 @@ var is_dashing: bool = false
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 
+# Save Engine
+@onready var save_engine: Node = get_node("/root/SaveEngine")
+
 
 func _ready() -> void:
 	super._ready()  # Call parent _ready to initialize health system
@@ -132,6 +143,11 @@ func _ready() -> void:
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_bar.min_value = 0
+
+	# Setup stamina bar
+	stamina_bar.max_value = STATS.MAX_STAMINA
+	stamina_bar.value = stamina
+	stamina_bar.min_value = 0
 
 	# Setup hitbox and hurtbox with correct layers
 	if hitbox:
@@ -198,6 +214,10 @@ func _ready() -> void:
 	_frame_data_init()
 	frame_data_component.update_frame_data()  # Initial frame data update
 
+	# Load saved game data if it exists
+	if save_engine.load_game():
+		_load_player_state(save_engine.get_save_data())
+
 
 func _process(delta: float) -> void:
 	if effect_timer > 0.0:
@@ -220,9 +240,11 @@ func _process(delta: float) -> void:
 			pass
 
 	_health_regen(delta)
+	_stamina_regen(delta)
 	_update_player_state()
 	_update_ui()
 	_update_health_bar()
+	_update_stamina_bar()
 
 
 func _physics_process(delta: float) -> void:
@@ -251,6 +273,10 @@ func _physics_process(delta: float) -> void:
 			velocity.x = dash_direction * STATS.DASH_SPEED
 			# Disable gravity during dash
 			velocity.y = 0
+
+	# Handle running stamina drain
+	if _is_running():
+		_use_stamina(STATS.RUN_STAMINA_DRAIN_RATE * delta)
 
 	if not is_dashing:
 		_handle_movement()
@@ -378,11 +404,17 @@ func _handle_input(event: InputEvent) -> void:
 	if event.is_action_released("ATTACK"):
 		if is_on_floor():
 			if abs(velocity.x) > 0:  # If moving on ground
-				state_machine.dispatch(&"run_attack")
+				if _has_enough_stamina(STATS.RUN_ATTACK_STAMINA_COST):
+					_use_stamina(STATS.RUN_ATTACK_STAMINA_COST)
+					state_machine.dispatch(&"run_attack")
 			else:
-				state_machine.dispatch(&"attack")
+				if _has_enough_stamina(STATS.ATTACK_STAMINA_COST):
+					_use_stamina(STATS.ATTACK_STAMINA_COST)
+					state_machine.dispatch(&"attack")
 		else:
-			state_machine.dispatch(&"jump_attack")
+			if _has_enough_stamina(STATS.JUMP_ATTACK_STAMINA_COST):
+				_use_stamina(STATS.JUMP_ATTACK_STAMINA_COST)
+				state_machine.dispatch(&"jump_attack")
 	elif event.is_action_released("CROUCH"):
 		state_machine.dispatch(&"crouch")
 	elif event.is_action_released("SHOOT"):
@@ -503,17 +535,16 @@ func _check_health() -> void:
 
 # UI System
 func _update_ui() -> void:
-	label.text = (
-		"Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nAnimation: %s"
-		% [
-			"None",
-			Engine.get_frames_per_second(),
-			current_health,
-			max_health,
-			health_percent,
-			animated_sprite.animation
-		]
-	)
+	label.text = ("Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nStamina: %.1f/%s\nAnimation: %s" % [
+		"None",
+		Engine.get_frames_per_second(),
+		current_health,
+		max_health,
+		health_percent,
+		stamina,
+		STATS.MAX_STAMINA,
+		animated_sprite.animation
+	])
 
 
 func _connect_signals() -> void:
@@ -643,6 +674,52 @@ func _on_attack_started() -> void:
 func _on_attack_ended() -> void:
 	frame_data_component.clear_active_boxes()
 
+
+# Stamina System
+func _stamina_regen(delta: float) -> void:
+	if not is_attacking and not _is_running():
+		stamina = min(stamina + STATS.STAMINA_REGEN_RATE * delta, STATS.MAX_STAMINA)
+
+func _is_running() -> bool:
+	return abs(velocity.x) > 0 and not is_crouching
+
+func _update_stamina_bar() -> void:
+	stamina_bar.value = stamina
+
+func _has_enough_stamina(cost: float) -> bool:
+	return stamina >= cost
+
+func _use_stamina(amount: float) -> void:
+	stamina = max(0.0, stamina - amount)
+
+# Save System
+func _load_player_state(save_data: SaveData) -> void:
+	# Only load position if we don't have a last bonfire position
+	if save_data.last_bonfire_position == Vector2.ZERO:
+		position = save_data.player_position
+	else:
+		position = save_data.last_bonfire_position
+
+	current_health = save_data.current_health
+	stamina = save_data.current_stamina
+	magic = save_data.current_magic
+
+	# Update UI
+	_update_health_bar()
+	_update_stamina_bar()
+	_update_ui()
+
+func save_player_state() -> void:
+	save_engine.update_save_data(self)
+	save_engine.save_game()
+
+func respawn_at_bonfire() -> void:
+	var bonfire_pos = save_engine.get_last_bonfire_position()
+	if bonfire_pos != Vector2.ZERO:
+		position = bonfire_pos
+		_heal(max_health)  # Full heal on respawn
+		stamina = STATS.MAX_STAMINA  # Full stamina on respawn
+		magic = STATS.MAX_MAGIC  # Full magic on respawn
 
 func _start_dash() -> void:
 	is_dashing = true
