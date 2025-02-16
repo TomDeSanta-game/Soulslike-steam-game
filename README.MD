@@ -10,6 +10,12 @@ A 2D action-platformer game developed in Godot 4, inspired by the Soulslike genr
   - Precise jump mechanics with jump-cutting
   - Multiple movement states (walk, run, crouch)
   - State-based animations
+  - **Enhanced Jump System**
+    - Variable jump height control
+    - Coyote time (brief window to jump after leaving platform)
+    - Jump buffering (early jump input queuing)
+    - Jump cutting for precise height control
+    - Landing feedback with sound effects
 
 ### Combat System
 - **Frame-Perfect Combat**
@@ -54,6 +60,28 @@ A 2D action-platformer game developed in Godot 4, inspired by the Soulslike genr
   - Shader-based damage effects
   - Death fade effect
   - Debug visualization for hitboxes/hurtboxes
+
+### Stamina System
+- Dynamic stamina management (100 points max)
+- Different stamina costs for actions:
+  - Basic Attack: 10 stamina
+  - Run Attack: 20 stamina
+  - Jump Attack: 40 stamina
+  - Running: Gradually drains stamina (30 seconds to empty)
+- Automatic stamina regeneration when not attacking or running
+- Actions blocked when insufficient stamina
+
+### Checkpoint System
+- Dark Souls inspired bonfire checkpoints
+- Save and load system using both Resource and JSON formats
+- Automatic state saving at bonfires
+- Player spawns 5 units left of the last activated bonfire
+- Full health/stamina/magic restoration at bonfires
+
+### Audio
+- Dynamic sound effects for all actions
+- Atmospheric background music
+- Positional audio for enhanced immersion
 
 ## 🏗️ Project Structure
 
@@ -123,6 +151,23 @@ Features a physics-based movement system with:
 - Lifesteal-based health recovery
 - Death sequence management
 - UI health display
+
+### Stamina Management
+- Dynamic stamina management (100 points max)
+- Different stamina costs for actions:
+  - Basic Attack: 10 stamina
+  - Run Attack: 20 stamina
+  - Jump Attack: 40 stamina
+  - Running: Gradually drains stamina (30 seconds to empty)
+- Automatic stamina regeneration when not attacking or running
+- Actions blocked when insufficient stamina
+
+### Checkpoint System
+- Dark Souls inspired bonfire checkpoints
+- Save and load system using both Resource and JSON formats
+- Automatic state saving at bonfires
+- Player spawns 5 units left of the last activated bonfire
+- Full health/stamina/magic restoration at bonfires
 
 ## 🚀 Getting Started
 

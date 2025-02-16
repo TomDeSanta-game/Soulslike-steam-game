@@ -128,17 +128,19 @@ func run_attack_update(_delta: float) -> void:
 
 func jump_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.JUMP)
-	player.velocity.y = player.jump_power  # Set the initial jump velocity
 
 
 func jump_update(_delta: float) -> void:
 	if player.is_on_floor():
-		player.is_jump_active = false
-		player.jump_timer.stop()
+		if player.was_in_air:  # Only play sound if we were actually in the air
+			SoundManager.play_sound(Sound.landing, "SFX")  # Play proper landing sound
+		
 		if abs(player.velocity.x) > 0:
 			dispatch(&"run")  # Transition to RUN if moving horizontally
 		else:
 			dispatch(&"state_ended")  # Transition to IDLE if not moving
+	elif Input.is_action_just_pressed("ATTACK"):
+		dispatch(&"jump_attack")  # Allow transitioning to jump attack
 
 
 func attack_start() -> void:
