@@ -1,4 +1,3 @@
-res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets
 res://Shaders/Player
 res://Entities/scripts/GhostPlayer
 res://Singletons/Scripts/ObjectMaker
@@ -7,6 +6,7 @@ res://Entities/scripts/Traps
 res://Entities/scenes/Traps/Shuriken_Trap
 res://assets/trap
 res://Entities/scenes/Traps
+res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets
 res://assets/fonts/static
 res://assets/fonts
 res://Entities/scripts/Npcs/Bipedal

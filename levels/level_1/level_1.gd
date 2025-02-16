@@ -2,7 +2,7 @@ extends Node2D
 
 
 func _ready() -> void:
-	$Were_Wolf.queue_free()
+	pass
 
 
 func _process(_delta: float) -> void:

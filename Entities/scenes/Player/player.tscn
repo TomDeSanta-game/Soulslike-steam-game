@@ -1,4 +1,4 @@
-[gd_scene load_steps=96 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=76 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -13,12 +13,8 @@
 [ext_resource type="Texture2D" uid="uid://c7p2dsrlq3m03" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png" id="4_vdon8"]
 [ext_resource type="Texture2D" uid="uid://cw54bxyb65sjk" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png" id="5_5lp5q"]
 [ext_resource type="Texture2D" uid="uid://cbh18hpu4cech" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Hurt.png" id="5_8hcg5"]
-[ext_resource type="Texture2D" uid="uid://c3d465i4pe4xc" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AttackSide.png" id="6_i6owh"]
 [ext_resource type="Texture2D" uid="uid://74ahhwvwvpcu" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-JumpAttack.png" id="7_aqw0d"]
-[ext_resource type="Texture2D" uid="uid://bv55w6var7exn" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Up.png" id="7_uyso8"]
-[ext_resource type="Texture2D" uid="uid://vvari7bpnk72" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-ClimbLedge.png" id="8_oh4r7"]
 [ext_resource type="Texture2D" uid="uid://d1dcj5pnmve62" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png" id="9_50sk3"]
-[ext_resource type="Texture2D" uid="uid://cwugdr2noe1da" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-CrouchSwordSlash.png" id="11_hiu65"]
 [ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="12_trxkp"]
 [ext_resource type="FontFile" uid="uid://bhjnaf7qxfop2" path="res://assets/fonts/PressStart2P-Regular.ttf" id="14_j5s4l"]
 [ext_resource type="Script" path="res://Components/frame_data_component.gd" id="16_qqvvs"]
@@ -68,46 +64,6 @@ region = Rect2(512, 0, 128, 96)
 atlas = ExtResource("2_m2d2i")
 region = Rect2(640, 0, 128, 96)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_4rxuw"]
-atlas = ExtResource("6_i6owh")
-region = Rect2(0, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6ljql"]
-atlas = ExtResource("6_i6owh")
-region = Rect2(128, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_nbnnl"]
-atlas = ExtResource("7_uyso8")
-region = Rect2(0, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c47o2"]
-atlas = ExtResource("7_uyso8")
-region = Rect2(128, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_adx2l"]
-atlas = ExtResource("7_uyso8")
-region = Rect2(256, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_o78xt"]
-atlas = ExtResource("8_oh4r7")
-region = Rect2(0, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_b3aj6"]
-atlas = ExtResource("8_oh4r7")
-region = Rect2(128, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_78mh4"]
-atlas = ExtResource("8_oh4r7")
-region = Rect2(256, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2j2ma"]
-atlas = ExtResource("8_oh4r7")
-region = Rect2(384, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_um1pl"]
-atlas = ExtResource("8_oh4r7")
-region = Rect2(512, 0, 128, 96)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_05oea"]
 atlas = ExtResource("3_1hw1k")
 region = Rect2(0, 0, 128, 96)
@@ -127,22 +83,6 @@ region = Rect2(128, 0, 128, 96)
 [sub_resource type="AtlasTexture" id="AtlasTexture_h8i6o"]
 atlas = ExtResource("4_shxcr")
 region = Rect2(256, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_qj6px"]
-atlas = ExtResource("11_hiu65")
-region = Rect2(0, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_npb21"]
-atlas = ExtResource("11_hiu65")
-region = Rect2(128, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ylst4"]
-atlas = ExtResource("11_hiu65")
-region = Rect2(256, 0, 128, 96)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_63l21"]
-atlas = ExtResource("11_hiu65")
-region = Rect2(384, 0, 128, 96)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ev2ri"]
 atlas = ExtResource("5_8hcg5")
@@ -299,51 +239,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_4rxuw")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6ljql")
-}],
-"loop": false,
-"name": &"Attack_Side",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_nbnnl")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c47o2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_adx2l")
-}],
-"loop": false,
-"name": &"Attack_Up",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_o78xt")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_b3aj6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_78mh4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2j2ma")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_um1pl")
-}],
-"loop": false,
-"name": &"Climb_Ledge",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_05oea")
 }, {
 "duration": 1.0,
@@ -365,23 +260,6 @@ animations = [{
 }],
 "loop": false,
 "name": &"Crouch_Attack",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qj6px")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_npb21")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ylst4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_63l21")
-}],
-"loop": false,
-"name": &"Crouch_Slash",
 "speed": 5.0
 }, {
 "frames": [{
@@ -527,24 +405,12 @@ shadow_size = 10
 shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_7xvhv"]
-color = Color(1, 0, 0.0166664, 1)
-grow_begin = 100.0
-grow_end = 100.0
-thickness = 5
-
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_10v5d"]
-color = Color(1, 0, 0.0166664, 1)
-grow_begin = 100.0
-grow_end = 100.0
-thickness = 5
-
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_ph2fn"]
 color = Color(0, 1, 0, 1)
 grow_begin = 100.0
 grow_end = 100.0
 thickness = 5
 
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_v54k4"]
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_10v5d"]
 color = Color(0, 1, 0, 1)
 grow_begin = 100.0
 grow_end = 100.0
@@ -571,6 +437,7 @@ metadata/entity_name = "Player"
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_lg6k6")
 animation = &"Attack"
+frame = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -582,7 +449,7 @@ offset_left = -70.0
 offset_top = -70.0
 offset_right = -22.0
 offset_bottom = -47.0
-text = "69"
+text = "000"
 label_settings = SubResource("LabelSettings_3fvdd")
 
 [node name="GameOverLabel" type="Label" parent="."]
@@ -631,16 +498,6 @@ offset_bottom = -212.0
 theme_override_fonts/font = ExtResource("14_j5s4l")
 theme_override_styles/background = SubResource("StyleBoxLine_7xvhv")
 theme_override_styles/fill = SubResource("StyleBoxLine_10v5d")
-value = 100.0
-
-[node name="StaminaBar" type="ProgressBar" parent="."]
-offset_left = -280.0
-offset_top = -210.0
-offset_right = -276.0
-offset_bottom = -182.0
-theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxLine_ph2fn")
-theme_override_styles/fill = SubResource("StyleBoxLine_v54k4")
 value = 100.0
 
 [node name="Hitbox" type="Area2D" parent="." groups=["Player"]]

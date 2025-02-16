@@ -99,12 +99,12 @@ func set_hit_stun(duration: float) -> void:
 	await get_tree().create_timer(duration).timeout
 	is_in_hit_stun = false
 
-@warning_ignore("unused_parameter")
+
 func _on_hit_landed(hurtbox: HurtboxComponent) -> void:
 	# Override in child classes to handle hit effects
 	pass
 
-@warning_ignore("unused_parameter")
+
 func _on_hit_taken(hitbox: HitboxComponent) -> void:
 	# Override in child classes to handle being hit
 	pass

@@ -1,16 +1,34 @@
 extends CharacterBase
 
 # Constants and Configuration
-const STATS: Dictionary = {"MAX_MAGIC": 100.0, "MAGIC_COST": 10.0, "LIFESTEAL_PERCENT": 15.0, "MIN_LIFESTEAL_AMOUNT": 1.0, "MAX_LIFESTEAL_AMOUNT": 25.0, "DASH_SPEED": 800.0, "DASH_DURATION": 0.2, "DASH_COOLDOWN": 0.5, "MAX_STAMINA": 100.0, "STAMINA_REGEN_RATE": 20.0, "ATTACK_STAMINA_COST": 10.0, "RUN_ATTACK_STAMINA_COST": 20.0, "JUMP_ATTACK_STAMINA_COST": 40.0, "RUN_STAMINA_DRAIN_RATE": 3.33, "COYOTE_TIME": 0.15, "JUMP_BUFFER_TIME": 0.1}  # Percentage of damage dealt that will be returned as health  # Minimum amount of health restored per hit  # Maximum amount of health restored per hit  # Speed during dash  # Duration of dash in seconds  # Time before can dash again  # Maximum stamina points  # Stamina points per second  # Stamina cost for attack  # Stamina cost for run attack  # Stamina cost for jump attack  # Stamina drain rate per second  # Coyote time  # Jump buffer time
+const STATS: Dictionary = {
+	"MAX_MAGIC": 100.0,
+	"MAGIC_COST": 10.0,
+	"LIFESTEAL_PERCENT": 15.0,  # Percentage of damage dealt that will be returned as health
+	"MIN_LIFESTEAL_AMOUNT": 1.0,  # Minimum amount of health restored per hit
+	"MAX_LIFESTEAL_AMOUNT": 25.0,  # Maximum amount of health restored per hit
+	"DASH_SPEED": 800.0,  # Speed during dash
+	"DASH_DURATION": 0.2,  # Duration of dash in seconds
+	"DASH_COOLDOWN": 0.5  # Time before can dash again
+}
 
-const ANIMATIONS: Dictionary = {"IDLE": "Idle", "RUN": "Run", "JUMP": "Jump", "ATTACK": "Attack", "CROUCH": "Crouch", "CROUCH_ATTACK": "Crouch_Attack", "HURT": "Hurt", "JUMP_ATTACK": "Jump_Attack", "RUN_ATTACK": "Run_Attack"}
+const ANIMATIONS: Dictionary = {
+	"IDLE": "Idle",
+	"RUN": "Run",
+	"JUMP": "Jump",
+	"ATTACK": "Attack",
+	"CROUCH": "Crouch",
+	"CROUCH_ATTACK": "Crouch_Attack",
+	"HURT": "Hurt",
+	"JUMP_ATTACK": "Jump_Attack",
+	"RUN_ATTACK": "Run_Attack"
+}
 
 # Node references
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var label: Label = $Label
 @onready var shooter: Shooter = $Shooter
 @onready var health_bar: ProgressBar = $ProgressBar
-@onready var stamina_bar: ProgressBar = $StaminaBar
 @onready var camera: Camera2D = $Camera2D
 
 # Types Global
@@ -31,7 +49,6 @@ const ANIMATIONS: Dictionary = {"IDLE": "Idle", "RUN": "Run", "JUMP": "Jump", "A
 
 # Player state
 var magic: float = STATS.MAX_MAGIC
-var stamina: float = STATS.MAX_STAMINA
 var direction: float = 0.0
 var is_attacking: bool = false
 var is_crouching: bool = false
@@ -65,14 +82,9 @@ var effect_timer: float = 0.0  # Timer for the effect
 var current_animation: String = ""
 var current_frame: int = 0
 
-# Jump System Variables
+# Jump-Cutting System
 var is_jump_held: bool = false
 var is_jump_active: bool = false
-var coyote_timer: float = 0.0
-var jump_buffer_timer: float = 0.0
-var was_on_floor: bool = false
-var was_in_air: bool = false  # Track if we were in the air last frame
-var jump_cut_multiplier: float = 0.4  # Controls how much the jump is cut when releasing early
 
 # Jump Timer
 @onready var jump_timer: Timer = Timer.new()
@@ -99,16 +111,10 @@ var is_dashing: bool = false
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 
-# Add after extends CharacterBase
-@onready var save_engine: Node = get_node("/root/SaveEngine")
-
 
 func _ready() -> void:
 	super._ready()  # Call parent _ready to initialize health system
 	types.player = self
-
-	# Set better jump power
-	jump_power = -275.0  # Reduced from -500 for better control
 
 	# Initialize health system first
 	health_system = HealthSystem.new()
@@ -126,15 +132,6 @@ func _ready() -> void:
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_bar.min_value = 0
-
-	# Setup stamina bar
-	stamina_bar.max_value = STATS.MAX_STAMINA
-	stamina_bar.value = stamina
-	stamina_bar.min_value = 0
-
-	# Load saved game data if it exists
-	if save_engine.load_game():
-		_load_player_state(save_engine.get_save_data())
 
 	# Setup hitbox and hurtbox with correct layers
 	if hitbox:
@@ -223,49 +220,20 @@ func _process(delta: float) -> void:
 			pass
 
 	_health_regen(delta)
-	_stamina_regen(delta)
 	_update_player_state()
 	_update_ui()
 	_update_health_bar()
-	_update_stamina_bar()
 
 
 func _physics_process(delta: float) -> void:
-	was_on_floor = is_on_floor()
-	
 	if !is_on_floor():
-		was_in_air = true
 		velocity.y += Types.GRAVITY_CONSTANT * delta
-		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.JUMP:
-			animated_sprite.play(ANIMATIONS.JUMP)  # Play jump animation when falling
-	elif was_in_air:
-		was_in_air = false  # Reset the flag after landing
-	
-	# Handle coyote time
-	if was_on_floor and !is_on_floor():
-		coyote_timer = STATS.COYOTE_TIME
-	elif is_on_floor():
-		coyote_timer = 0.0
-		if velocity.y >= 0:  # Only transition if we're not jumping up
-			if abs(velocity.x) > 0:
-				state_machine.dispatch(&"run")
-			else:
-				state_machine.dispatch(&"state_ended")
-	else:
-		coyote_timer = max(0.0, coyote_timer - delta)
-	
-	# Decrement jump buffer timer
-	if jump_buffer_timer > 0:
-		jump_buffer_timer = max(0.0, jump_buffer_timer - delta)
-		if is_on_floor() or coyote_timer > 0:
-			_handle_jump()
-			jump_buffer_timer = 0.0
-	
+
 	# Jump cutting logic
 	if is_jump_active and not is_jump_held and velocity.y < 0:
-		velocity.y *= jump_cut_multiplier  # Cut the jump short if button is released
+		velocity.y = 0  # Stop upward movement if jump button is released
 		is_jump_active = false
-	
+
 	# Handle dash cooldown
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
@@ -286,11 +254,6 @@ func _physics_process(delta: float) -> void:
 
 	if not is_dashing:
 		_handle_movement()
-
-	# Handle running stamina drain
-	if _is_running():
-		_use_stamina(STATS.RUN_STAMINA_DRAIN_RATE * delta)
-
 	move_and_slide()
 
 
@@ -389,19 +352,24 @@ func _update_player_state() -> void:
 
 
 func _is_attack_animation() -> bool:
-	return animated_sprite.animation in [ANIMATIONS.ATTACK, ANIMATIONS.JUMP_ATTACK, ANIMATIONS.RUN_ATTACK, ANIMATIONS.CROUCH_ATTACK]
+	return (
+		animated_sprite.animation
+		in [
+			ANIMATIONS.ATTACK,
+			ANIMATIONS.JUMP_ATTACK,
+			ANIMATIONS.RUN_ATTACK,
+			ANIMATIONS.CROUCH_ATTACK
+		]
+	)
 
 
 # Input Handling
 func _handle_input(event: InputEvent) -> void:
-	if event.is_action_pressed("JUMP"):
-		is_jump_held = true
-		if is_on_floor() or coyote_timer > 0:
-			_handle_jump()
-		else:
-			jump_buffer_timer = STATS.JUMP_BUFFER_TIME  # Start jump buffer timer
+	if event.is_action_pressed("JUMP") and is_on_floor():
+		is_jump_held = true  # Jump button is being held
+		_handle_jump()
 	elif event.is_action_released("JUMP"):
-		is_jump_held = false
+		is_jump_held = false  # Jump button is released
 
 	# Handle dash input
 	if event.is_action_pressed("DASH") and can_dash and not is_dashing:
@@ -410,17 +378,11 @@ func _handle_input(event: InputEvent) -> void:
 	if event.is_action_released("ATTACK"):
 		if is_on_floor():
 			if abs(velocity.x) > 0:  # If moving on ground
-				if _has_enough_stamina(STATS.RUN_ATTACK_STAMINA_COST):
-					_use_stamina(STATS.RUN_ATTACK_STAMINA_COST)
-					state_machine.dispatch(&"run_attack")
+				state_machine.dispatch(&"run_attack")
 			else:
-				if _has_enough_stamina(STATS.ATTACK_STAMINA_COST):
-					_use_stamina(STATS.ATTACK_STAMINA_COST)
-					state_machine.dispatch(&"attack")
+				state_machine.dispatch(&"attack")
 		else:
-			if _has_enough_stamina(STATS.JUMP_ATTACK_STAMINA_COST):
-				_use_stamina(STATS.JUMP_ATTACK_STAMINA_COST)
-				state_machine.dispatch(&"jump_attack")
+			state_machine.dispatch(&"jump_attack")
 	elif event.is_action_released("CROUCH"):
 		state_machine.dispatch(&"crouch")
 	elif event.is_action_released("SHOOT"):
@@ -436,15 +398,11 @@ func _handle_input(event: InputEvent) -> void:
 
 
 func _handle_jump() -> void:
-	if is_on_floor() or coyote_timer > 0:
+	if is_on_floor():
 		velocity.y = jump_power
 		is_jump_held = true
-		is_jump_active = true
-		coyote_timer = 0.0  # Reset coyote timer on successful jump
-		jump_timer.start()
-		animated_sprite.play(ANIMATIONS.JUMP)
-		# Notify state machine
-		state_machine.dispatch(&"jump")
+		is_jump_active = true  # Jump is active
+		jump_timer.start()  # Start the jump timer
 
 
 # Combat System
@@ -543,36 +501,19 @@ func _check_health() -> void:
 		_die()
 
 
-# Stamina System
-func _stamina_regen(delta: float) -> void:
-	if not is_attacking and not _is_running():
-		stamina = min(stamina + STATS.STAMINA_REGEN_RATE * delta, STATS.MAX_STAMINA)
-
-func _is_running() -> bool:
-	return abs(velocity.x) > 0 and not is_crouching
-
-func _update_stamina_bar() -> void:
-	stamina_bar.value = stamina
-
-func _has_enough_stamina(cost: float) -> bool:
-	return stamina >= cost
-
-func _use_stamina(amount: float) -> void:
-	stamina = max(0.0, stamina - amount)
-
-
 # UI System
 func _update_ui() -> void:
-	label.text = ("Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nStamina: %.1f/%s\nAnimation: %s" % [
-		"None",
-		Engine.get_frames_per_second(),
-		current_health,
-		max_health,
-		health_percent,
-		stamina,
-		STATS.MAX_STAMINA,
-		animated_sprite.animation
-	])
+	label.text = (
+		"Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nAnimation: %s"
+		% [
+			"None",
+			Engine.get_frames_per_second(),
+			current_health,
+			max_health,
+			health_percent,
+			animated_sprite.animation
+		]
+	)
 
 
 func _connect_signals() -> void:
@@ -663,7 +604,9 @@ func _on_frame_changed() -> void:
 # Lifesteal System
 func _apply_lifesteal(damage_dealt: float) -> void:
 	var lifesteal_amount = damage_dealt * STATS.LIFESTEAL_PERCENT / 100.0
-	lifesteal_amount = clamp(lifesteal_amount, STATS.MIN_LIFESTEAL_AMOUNT, STATS.MAX_LIFESTEAL_AMOUNT)
+	lifesteal_amount = clamp(
+		lifesteal_amount, STATS.MIN_LIFESTEAL_AMOUNT, STATS.MAX_LIFESTEAL_AMOUNT
+	)
 
 	if lifesteal_amount > 0:
 		# Visual feedback for lifesteal
@@ -724,34 +667,3 @@ func _start_dash() -> void:
 
 	# Switch back to normal shader after dash starts
 	animated_sprite.material = _shader_material
-
-
-func _load_player_state(save_data: SaveData) -> void:
-	# Only load position if we don't have a last bonfire position
-	if save_data.last_bonfire_position == Vector2.ZERO:
-		position = save_data.player_position
-	else:
-		position = save_data.last_bonfire_position
-
-	current_health = save_data.current_health
-	stamina = save_data.current_stamina
-	magic = save_data.current_magic
-
-	# Update UI
-	_update_health_bar()
-	_update_stamina_bar()
-	_update_ui()
-
-
-func save_player_state() -> void:
-	save_engine.update_save_data(self)
-	save_engine.save_game()
-
-
-func respawn_at_bonfire() -> void:
-	var bonfire_pos = save_engine.get_last_bonfire_position()
-	if bonfire_pos != Vector2.ZERO:
-		position = bonfire_pos
-		_heal(max_health)  # Full heal on respawn
-		stamina = STATS.MAX_STAMINA  # Full stamina on respawn
-		magic = STATS.MAX_MAGIC  # Full magic on respawn
