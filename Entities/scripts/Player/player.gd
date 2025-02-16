@@ -6,7 +6,10 @@ const STATS: Dictionary = {
 	"MAGIC_COST": 10.0,
 	"LIFESTEAL_PERCENT": 15.0,  # Percentage of damage dealt that will be returned as health
 	"MIN_LIFESTEAL_AMOUNT": 1.0,  # Minimum amount of health restored per hit
-	"MAX_LIFESTEAL_AMOUNT": 25.0  # Maximum amount of health restored per hit
+	"MAX_LIFESTEAL_AMOUNT": 25.0,  # Maximum amount of health restored per hit
+	"DASH_SPEED": 800.0,  # Speed during dash
+	"DASH_DURATION": 0.2,  # Duration of dash in seconds
+	"DASH_COOLDOWN": 0.5  # Time before can dash again
 }
 
 const ANIMATIONS: Dictionary = {
@@ -42,6 +45,7 @@ const ANIMATIONS: Dictionary = {
 @export_group("Shaders")
 @export var _shader_material: ShaderMaterial
 @export var _death_shader_material: ShaderMaterial
+@export var _dash_shader_material: ShaderMaterial
 
 # Player state
 var magic: float = STATS.MAX_MAGIC
@@ -101,6 +105,12 @@ const DEBUG_COLORS = {"HITBOX": Color(1, 0, 0, 0.5), "HURTBOX": Color(0, 1, 0, 0
 @onready var hitbox: HitboxComponent = %Hitbox
 @onready var hurtbox: HurtboxComponent = %Hurtbox
 
+# Dash Variables
+var can_dash: bool = true
+var is_dashing: bool = false
+var dash_timer: float = 0.0
+var dash_cooldown_timer: float = 0.0
+
 
 func _ready() -> void:
 	super._ready()  # Call parent _ready to initialize health system
@@ -130,13 +140,15 @@ func _ready() -> void:
 		hitbox.knockback_force = 200.0
 		hitbox.hit_stun_duration = 0.2
 		hitbox.collision_layer = 4  # Player layer
-		hitbox.collision_mask = 2   # Enemy layer (to detect enemy hurtboxes)
+		hitbox.collision_mask = 2  # Enemy layer (to detect enemy hurtboxes)
 		hitbox.add_to_group("Hitbox")
+		hitbox.active = true  # Keep hitbox always active
 
 	if hurtbox:
 		hurtbox.hurtbox_owner = self
 		hurtbox.collision_layer = 4  # Player layer
-		hurtbox.collision_mask = 2   # Enemy layer (to detect enemy hitboxes)
+		hurtbox.collision_mask = 2  # Enemy layer (to detect enemy hitboxes)
+		hurtbox.active = true  # Keep hurtbox always active
 
 	# Add self to Player group
 	add_to_group("Player")
@@ -171,8 +183,6 @@ func _ready() -> void:
 	state_machine.attack_started.connect(_on_attack_started)
 	state_machine.attack_ended.connect(_on_attack_ended)
 
-	_frame_data_init()
-
 	# Connect frame changed signal for redrawing
 	if !animated_sprite.frame_changed.is_connected(_on_frame_changed):
 		animated_sprite.frame_changed.connect(_on_frame_changed)
@@ -184,8 +194,9 @@ func _ready() -> void:
 		if !hurtbox.hit_taken.is_connected(_on_hit_taken):
 			hurtbox.hit_taken.connect(_on_hit_taken)
 
-	# Set initial state
-	hitbox.deactivate()
+	# Initialize frame data
+	_frame_data_init()
+	frame_data_component.update_frame_data()  # Initial frame data update
 
 
 func _process(delta: float) -> void:
@@ -223,7 +234,26 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0  # Stop upward movement if jump button is released
 		is_jump_active = false
 
-	_handle_movement()
+	# Handle dash cooldown
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
+		if dash_cooldown_timer <= 0:
+			can_dash = true
+
+	# Handle active dash
+	if is_dashing:
+		dash_timer -= delta
+		if dash_timer <= 0:
+			is_dashing = false
+		else:
+			# Apply dash velocity
+			var dash_direction = -1.0 if animated_sprite.flip_h else 1.0
+			velocity.x = dash_direction * STATS.DASH_SPEED
+			# Disable gravity during dash
+			velocity.y = 0
+
+	if not is_dashing:
+		_handle_movement()
 	move_and_slide()
 
 
@@ -341,6 +371,10 @@ func _handle_input(event: InputEvent) -> void:
 	elif event.is_action_released("JUMP"):
 		is_jump_held = false  # Jump button is released
 
+	# Handle dash input
+	if event.is_action_pressed("DASH") and can_dash and not is_dashing:
+		_start_dash()
+
 	if event.is_action_released("ATTACK"):
 		if is_on_floor():
 			if abs(velocity.x) > 0:  # If moving on ground
@@ -420,7 +454,7 @@ func take_damage(damage_amount: float) -> void:
 	current_health -= damage_amount
 	current_health = clamp(current_health, 0.0, max_health)
 	health_percent = (current_health / max_health) * 100.0
-	
+
 	if current_health <= 0:
 		_die()
 	else:
@@ -608,3 +642,28 @@ func _on_attack_started() -> void:
 
 func _on_attack_ended() -> void:
 	frame_data_component.clear_active_boxes()
+
+
+func _start_dash() -> void:
+	is_dashing = true
+	can_dash = false
+	dash_timer = STATS.DASH_DURATION
+	dash_cooldown_timer = STATS.DASH_COOLDOWN
+
+	# Switch to dash shader material
+	animated_sprite.material = _dash_shader_material
+
+	# Play dash sound
+	SoundManager.play_sound(Sound.dash, "SFX")
+
+	# Enhanced screen shake for dash feedback
+	camera.shake(8, 0.15, 0.8)  # Increased intensity and duration
+
+	# Brief pause for impact - using get_parent() to get the actual CharacterBody2D node
+	var player_node = self
+	PauseManager.pause(player_node)  # Pause the player
+	await get_tree().create_timer(0.1).timeout  # Wait for 0.1 seconds
+	PauseManager.unpause(player_node)  # Unpause the player
+
+	# Switch back to normal shader after dash starts
+	animated_sprite.material = _shader_material

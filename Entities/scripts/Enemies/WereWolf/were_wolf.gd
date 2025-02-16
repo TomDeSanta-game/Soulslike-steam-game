@@ -4,7 +4,7 @@ extends EnemyBase
 @export_group("Werewolf Properties")
 @export var patrol_speed: float = 150.0
 
-@onready var attack_detector: Area2D = $HitBox
+@onready var attack_detector: HitboxComponent = $HitBox
 
 var attack_enabled: bool = true
 
@@ -33,11 +33,15 @@ func _initialize_werewolf() -> void:
 		enemy_hitbox.damage = attack_damage
 		enemy_hitbox.knockback_force = 200.0
 		enemy_hitbox.hit_stun_duration = 0.2
+		enemy_hitbox.collision_layer = 2  # Enemy layer
+		enemy_hitbox.collision_mask = 4   # Player layer (to detect player hurtboxes)
 		enemy_hitbox.active = true  # Keep hitbox always active
 
 	# Setup hurtbox for werewolf body
 	if enemy_hurtbox:
-		pass
+		enemy_hurtbox.collision_layer = 2  # Enemy layer
+		enemy_hurtbox.collision_mask = 4   # Player layer (to detect player hitboxes)
+		enemy_hurtbox.active = true
 
 
 func _setup_frame_data() -> void:
@@ -52,10 +56,15 @@ func _setup_frame_data() -> void:
 		push_error("AnimatedSprite2D not found in werewolf")
 		return
 
-	# Keep hitbox always active instead of using frame data
+	# Keep base hitbox active but still use frame data for attack animations
 	if enemy_hitbox:
 		enemy_hitbox.active = true
-		frame_data_component.clear_active_boxes()  # Clear any frame data boxes
+		frame_data_component.hitbox = enemy_hitbox
+		frame_data_component.update_frame_data()  # Initial frame data update
+
+	if enemy_hurtbox:
+		enemy_hurtbox.active = true
+		frame_data_component.hurtbox = enemy_hurtbox
 
 
 func _physics_process(delta: float) -> void:

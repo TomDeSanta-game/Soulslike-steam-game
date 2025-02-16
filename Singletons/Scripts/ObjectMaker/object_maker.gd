@@ -4,7 +4,6 @@ const OBJECT_SCENES: Dictionary = {
 	Types.ObjectType.EXPLOSION:
 	preload("res://Entities/scenes/Projectiles/Explosion/explosion_proj.tscn"),
 	Types.ObjectType.SHURIKEN:
-		push_error("FrameDataComponent: Missing required nodes"):
 	preload("res://Entities/scenes/Traps/Shuriken_Trap/shuriken_trap.tscn")
 }
 

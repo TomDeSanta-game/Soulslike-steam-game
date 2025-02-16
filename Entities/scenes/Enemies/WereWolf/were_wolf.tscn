@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://cpwli84yoikt6"]
+[gd_scene load_steps=46 format=3 uid="uid://cpwli84yoikt6"]
 
 [ext_resource type="PackedScene" uid="uid://b35ig5icbvk7a" path="res://Entities/scenes/Enemies/enemy_base.tscn" id="1_jaagu"]
 [ext_resource type="Script" path="res://Entities/scripts/Enemies/WereWolf/were_wolf.gd" id="2_y5v65"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bejk0nekljdcs" path="res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run5.png" id="5_rejea"]
 [ext_resource type="Texture2D" uid="uid://dnh8d3akrjjqi" path="res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-jump.png" id="5_sowfl"]
 [ext_resource type="Texture2D" uid="uid://cagnsoorvebmy" path="res://assets/Legacy Collection/Characters/WereWolf/Spritesheets/werewolf-run.png" id="6_pqhj6"]
+[ext_resource type="Texture2D" uid="uid://desdeflwecnme" path="res://assets/Legacy Collection/Characters/WereWolf/Sprites/run/werewolf-run1.png" id="8_7lrb8"]
 [ext_resource type="BehaviorTree" uid="uid://cx216r3w2m4on" path="res://ai/trees/were_wolf.tres" id="8_g8xu7"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jkjol"]
@@ -59,6 +60,14 @@ region = Rect2(0, 0, 96, 76)
 [sub_resource type="AtlasTexture" id="AtlasTexture_8pwan"]
 atlas = ExtResource("3_tq8m3")
 region = Rect2(96, 0, 96, 76)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_63c1r"]
+atlas = ExtResource("8_7lrb8")
+region = Rect2(0, 0, 96, 76)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bgpfi"]
+atlas = ExtResource("4_8hvqx")
+region = Rect2(0, 0, 96, 76)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ydbf5"]
 atlas = ExtResource("4_oqjcl")
@@ -167,6 +176,17 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_63c1r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bgpfi")
+}],
+"loop": false,
+"name": &"Hurt",
+"speed": 2.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_ydbf5")
 }, {
 "duration": 1.0,
@@ -222,15 +242,15 @@ animations = [{
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qtn2i"]
 radius = 17.5
-height = 35.0
+height = 51.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_eaiqa"]
 radius = 22.0
 height = 44.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5rp2x"]
-radius = 18.0
-height = 36.0
+radius = 17.5
+height = 51.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_eds1p"]
 radius = 193.662
@@ -245,11 +265,10 @@ metadata/entity_name = "WereWolf"
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_cl0pj")
-animation = &"Attack"
-frame = 2
-frame_progress = 1.0
+animation = &"Hurt"
 
 [node name="CollisionShape2D" parent="." index="1"]
+visible = false
 position = Vector2(-5.5, 19.5)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_qtn2i")
@@ -270,6 +289,7 @@ debug_color = Color(0.7, 0, 0.0116665, 0.419608)
 position = Vector2(-5.5, 19.5)
 
 [node name="CollisionShape2D" parent="HurtBox" index="0"]
+rotation = 1.5708
 shape = SubResource("CapsuleShape2D_5rp2x")
 debug_color = Color(0.0509804, 1, 0, 0.419608)
 

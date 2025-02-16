@@ -33,18 +33,10 @@ func _ready() -> void:
 	# Set collision layer and mask
 	collision_layer = 2  # Layer 2 for hitboxes
 	collision_mask = 4   # Layer 3 for hurtboxes
-
-
-func activate() -> void:
+	
+	# Ensure hitbox is active by default
 	active = true
-	_has_hit = false
-	_hit_targets.clear()
 	show()
-
-
-func deactivate() -> void:
-	active = false
-	hide()
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -72,6 +64,18 @@ func _on_area_entered(area: Area2D) -> void:
 		
 		# Spawn hit effects
 		_spawn_hit_effects(hurtbox.global_position)
+
+
+func activate() -> void:
+	active = true
+	_has_hit = false
+	_hit_targets.clear()
+	show()
+
+
+func deactivate() -> void:
+	active = false
+	hide()
 
 
 func _spawn_hit_effects(hit_position: Vector2) -> void:

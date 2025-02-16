@@ -1,6 +1,6 @@
 class_name Shooter extends Node2D
 
-@export var shoot_timer: Timer
+@onready var shoot_timer: Timer = Timer.new()
 
 @export var speed: float = 50.0
 @export var life_span: float = 10.0
@@ -15,6 +15,10 @@ var can_shoot: bool = true
 func _ready() -> void:
 	if shoot_timer:
 		shoot_timer.wait_time = shoot_delay
+
+		shoot_timer.one_shot = true
+
+		shoot_timer.timeout.connect(_on_shoot_timer_timeout)
 
 
 func shoot(dir: Vector2) -> void:

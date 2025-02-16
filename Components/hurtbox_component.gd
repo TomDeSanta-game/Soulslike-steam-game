@@ -8,7 +8,7 @@ signal invincibility_ended
 # Hurtbox properties
 @export var invincible: bool = false
 @export var invincibility_duration: float = 0.2  # Reduced from 0.5 to 0.2 seconds
-@export var team: int = 0  # For team-based collision checking
+@export var active: bool = true
 
 # Owner reference (usually the character that can be hurt)
 var hurtbox_owner: Node
@@ -29,15 +29,15 @@ func _ready() -> void:
 	_invincibility_timer.one_shot = true
 	_invincibility_timer.timeout.connect(_on_invincibility_timer_timeout)
 	add_child(_invincibility_timer)
+	
+	# Ensure hurtbox is active by default
+	active = true
+	show()
 
 
 func take_hit(hitbox: HitboxComponent, knockback_direction: Vector2) -> bool:
 	# Check if we can be hit
-	if invincible:
-		return false
-		
-	# Check if hitbox owner is on the same team
-	if hitbox.hitbox_owner.get("team") == team:
+	if invincible or not active:
 		return false
 	
 	# Apply damage if owner has health system
@@ -52,11 +52,6 @@ func take_hit(hitbox: HitboxComponent, knockback_direction: Vector2) -> bool:
 	if hurtbox_owner.has_method("set_hit_stun"):
 		hurtbox_owner.set_hit_stun(hitbox.hit_stun_duration)
 	
-	# Apply any special effects
-	for effect in hitbox.effects:
-		if hurtbox_owner.has_method("apply_effect"):
-			hurtbox_owner.apply_effect(effect)
-	
 	# Start invincibility
 	start_invincibility(invincibility_duration)
 	
@@ -66,41 +61,19 @@ func take_hit(hitbox: HitboxComponent, knockback_direction: Vector2) -> bool:
 	return true
 
 
-func _apply_knockback(hitbox: HitboxComponent, direction: Vector2) -> void:
-	var char_body = hurtbox_owner as CharacterBody2D
-	if not char_body:
-		return
-	
-	# Apply knockback force
-	char_body.velocity = direction * hitbox.knockback_force
-	
-	# Create a timer for knockback duration
-	var knockback_timer = Timer.new()
-	add_child(knockback_timer)
-	knockback_timer.wait_time = hitbox.knockback_duration
-	knockback_timer.one_shot = true
-	knockback_timer.timeout.connect(func():
-		char_body.velocity = Vector2.ZERO
-		knockback_timer.queue_free()
-	)
-	knockback_timer.start()
+func start_invincibility(duration: float = 0.2) -> void:
+	if not invincible:
+		invincible = true
+		invincibility_started.emit()
+		_invincibility_timer.start(duration)
 
 
-func start_invincibility(duration: float = -1.0) -> void:
-	if duration > 0:
-		invincibility_duration = duration
-	
-	invincible = true
-	invincibility_started.emit()
-	
-	if invincibility_duration > 0:
-		_invincibility_timer.start(invincibility_duration)
-
-
-func end_invincibility() -> void:
+func _on_invincibility_timer_timeout() -> void:
 	invincible = false
 	invincibility_ended.emit()
 
 
-func _on_invincibility_timer_timeout() -> void:
-	end_invincibility() 
+func _apply_knockback(hitbox: HitboxComponent, direction: Vector2) -> void:
+	if hurtbox_owner is CharacterBody2D:
+		var knockback = direction * hitbox.knockback_force
+		hurtbox_owner.velocity = knockback 

@@ -1,3 +1,4 @@
+Shooter
 VisibleOnScreenEnabler2D
 CollisionShape2D
 AnimatedSprite2D
@@ -11,4 +12,3 @@ LightOccluder2D
 Node
 Marker2D
 PointLight2D
-CanvasModulate

@@ -1,7 +1,7 @@
 [gd_scene load_steps=64 format=3 uid="uid://banknqjmnt5e4"]
 
-[ext_resource type="Script" path="res://ghost_player/ghost_player.gd" id="1_3q3yv"]
-[ext_resource type="Shader" path="res://player/player_ghost.gdshader" id="2_7sh1o"]
+[ext_resource type="Script" path="res://Entities/scripts/GhostPlayer/ghost_player.gd" id="1_3q3yv"]
+[ext_resource type="Shader" path="res://Shaders/Player/player_ghost.gdshader" id="2_7sh1o"]
 [ext_resource type="Texture2D" uid="uid://dvub0pyni30x2" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Sword Slash.png" id="2_qfp7c"]
 [ext_resource type="Texture2D" uid="uid://csycho12jo5y2" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Crouch.png" id="3_c1fi4"]
 [ext_resource type="Texture2D" uid="uid://c1elceliby44h" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png" id="4_s4d1k"]
@@ -13,10 +13,10 @@
 [ext_resource type="Texture2D" uid="uid://cw54bxyb65sjk" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png" id="10_vnn11"]
 [ext_resource type="Texture2D" uid="uid://d1dcj5pnmve62" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png" id="11_7g3h1"]
 [ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="14_gu1o8"]
-[ext_resource type="PackedScene" uid="uid://dq875rvykq0wg" path="res://shooter/shooter.tscn" id="15_ey5kk"]
+[ext_resource type="Script" path="res://Singletons/Scripts/Shooter/shooter.gd" id="15_wurc2"]
 [ext_resource type="Script" path="res://camera/camera.gd" id="16_thx81"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_qsfbd"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_drt34"]
 shader = ExtResource("2_7sh1o")
 shader_parameter/pulsate_speed = 1.0
 shader_parameter/pulsate_intensity = 0.5
@@ -394,10 +394,10 @@ shadow_size = 10
 shadow_color = Color(0, 0, 0, 1)
 
 [node name="ghost_player" type="CharacterBody2D" groups=["Player"]]
+material = SubResource("ShaderMaterial_drt34")
 collision_layer = 8
 collision_mask = 23
 script = ExtResource("1_3q3yv")
-_ghost_shader_material = SubResource("ShaderMaterial_qsfbd")
 metadata/entity_name = "Player"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -448,16 +448,13 @@ wait_time = 0.6
 wait_time = 1.6
 one_shot = true
 
-[node name="Shooter" parent="." instance=ExtResource("15_ey5kk")]
-speed = null
-life_span = null
-bullet_key = null
-shoot_delay = null
-
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, -35)
 zoom = Vector2(1.5, 1.5)
 position_smoothing_enabled = true
 script = ExtResource("16_thx81")
+
+[node name="Shooter" type="Node2D" parent="."]
+script = ExtResource("15_wurc2")
 
 [connection signal="timeout" from="DeathTimer" to="." method="_on_death_timer_timeout"]

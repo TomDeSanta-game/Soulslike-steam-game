@@ -13,7 +13,16 @@ A 2D action-platformer game developed in Godot 4, inspired by the Soulslike genr
 
 ### Combat System
 - **Frame-Perfect Combat**
-  - Hitbox/Hurtbox system with frame data
+  - Simplified and robust Hitbox/Hurtbox system
+    - Always-active base hitboxes and hurtboxes
+    - Proper collision layer management
+    - Automatic activation on component creation
+    - Streamlined damage and knockback handling
+  - Advanced Frame Data Integration
+    - Base hitboxes remain active for consistent collision
+    - Frame data controls hitbox positioning and properties
+    - Smooth transitions between attack animations
+    - Automatic frame updates and position management
   - Multiple attack types (standing, running, jumping, crouching)
   - Visual debugging for hitboxes and hurtboxes
   - Damage system with knockback

@@ -134,13 +134,18 @@ func move(move_direction: int, move_speed: float) -> void:
 
 
 func _update_facing_direction(face_direction: int) -> void:
+	if not is_instance_valid(animated_sprite):
+		return
+		
 	var is_facing_right: bool = face_direction > 0
 	animated_sprite.flip_h = not is_facing_right
 
 	# Update hitboxes based on direction
 	for box in hitboxes:
-		if box:
-			box.scale.x = 1 if is_facing_right else -1
+		if is_instance_valid(box):
+			var current_scale = box.scale
+			current_scale.x = 1 if is_facing_right else -1
+			box.scale = current_scale  # Set the entire scale vector at once
 
 
 func _update_animation() -> void:

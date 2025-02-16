@@ -1,4 +1,4 @@
-[gd_scene load_steps=74 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=76 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://b6mf7udiwdvxt" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Idle.png" id="3_5cdev"]
 [ext_resource type="Script" path="res://Components/hurtbox_component.gd" id="3_a2m4n"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_death.gdshader" id="3_bnvh0"]
+[ext_resource type="Shader" path="res://Shaders/Player/player_dash.gdshader" id="4_gmdld"]
 [ext_resource type="Texture2D" uid="uid://c1elceliby44h" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png" id="4_shxcr"]
 [ext_resource type="Texture2D" uid="uid://c7p2dsrlq3m03" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png" id="4_vdon8"]
 [ext_resource type="Texture2D" uid="uid://cw54bxyb65sjk" path="res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png" id="5_5lp5q"]
@@ -31,6 +32,13 @@ shader_parameter/outline_thickness = 2.0
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c6xal"]
 shader = ExtResource("3_bnvh0")
 shader_parameter/fade_progress = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_osxgm"]
+shader = ExtResource("4_gmdld")
+shader_parameter/dash_intensity = 0.5
+shader_parameter/dash_color = Vector4(1, 1, 1, 1)
+shader_parameter/dash_speed = 5.0
+shader_parameter/dash_width = 0.2
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_f0im7"]
 atlas = ExtResource("2_m2d2i")
@@ -421,6 +429,7 @@ collision_layer = 8
 script = ExtResource("1_lfhy7")
 _shader_material = SubResource("ShaderMaterial_r5sqx")
 _death_shader_material = SubResource("ShaderMaterial_c6xal")
+_dash_shader_material = SubResource("ShaderMaterial_osxgm")
 hitboxes = [NodePath("Hitbox")]
 hurtboxes = [NodePath("Hurtbox")]
 metadata/entity_name = "Player"
@@ -521,15 +530,15 @@ zoom = Vector2(1.5, 1.5)
 position_smoothing_enabled = true
 script = ExtResource("17_kn0ag")
 
-[node name="Shooter" type="Node2D" parent="."]
-script = ExtResource("18_58vw6")
-
 [node name="FrameDataComponent" type="Node2D" parent="." node_paths=PackedStringArray("sprite", "hitbox", "hurtbox")]
 unique_name_in_owner = true
 script = ExtResource("16_qqvvs")
 sprite = NodePath("../AnimatedSprite2D")
 hitbox = NodePath("../Hitbox")
 hurtbox = NodePath("../Hurtbox")
+
+[node name="Shooter" type="Node2D" parent="."]
+script = ExtResource("18_58vw6")
 
 [node name="HitboxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]
 script = ExtResource("19_box_flip")

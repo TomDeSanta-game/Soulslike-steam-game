@@ -1,9 +1,12 @@
+res://Shaders/Player
+res://Entities/scripts/GhostPlayer
+res://Singletons/Scripts/ObjectMaker
+res://assets/Legacy Collection/Characters/WereWolf/Sprites/run
 res://Entities/scripts/Traps
 res://Entities/scenes/Traps/Shuriken_Trap
 res://assets/trap
 res://Entities/scenes/Traps
 res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets
-res://assets/Legacy Collection/Characters/WereWolf/Sprites/run
 res://assets/fonts/static
 res://assets/fonts
 res://Entities/scripts/Npcs/Bipedal
@@ -17,8 +20,5 @@ res://assets
 res://Entities/scripts/Enemies/Ogre
 res://Entities/scripts/Enemies/WereWolf
 res://
-res://Singletons/Scripts/TimeSystem
-res://Entities/scripts/Player
-res://assets/Legacy Collection/Characters/bipedal-Unit
 /home/tomdesanta/Documents/Portfolio/soulslike-steam-game/player
 /home/tomdesanta/Documents/Portfolio/soulslike-steam-game
