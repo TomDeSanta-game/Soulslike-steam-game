@@ -1,3 +1,4 @@
+TileMapLayer
 ProgressBar
 Shooter
 VisibleOnScreenEnabler2D
@@ -12,4 +13,3 @@ FrameDataComponent
 LightOccluder2D
 Node
 Marker2D
-PointLight2D

@@ -47,7 +47,7 @@ func _setup_combat_system() -> void:
 			continue
 		hitbox.hitbox_owner = self
 		hitbox.hit_landed.connect(_on_hit_landed)
-	
+
 	# Setup hurtboxes
 	for hurtbox in hurtboxes:
 		if not hurtbox:
@@ -65,9 +65,17 @@ func set_vigour(value: int) -> void:
 		health_system.set_vigour(value)
 
 
+func set_jump_power(value: float) -> void:
+	jump_power = value
+
+
 # Add this function to get current vigor
 func get_vigour() -> int:
 	return initial_vigour
+
+
+func get_jump_power() -> float:
+	return jump_power
 
 
 func get_movement_speed(movement_type: String) -> float:
@@ -84,7 +92,7 @@ func get_movement_speed(movement_type: String) -> float:
 func take_damage(amount: float) -> void:
 	if is_invincible:
 		return
-		
+
 	if health_system:
 		health_system.take_damage(amount)
 

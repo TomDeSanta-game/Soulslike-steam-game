@@ -127,12 +127,14 @@ func _ready() -> void:
 	super._ready()  # Call parent _ready to initialize health system
 	types.player = self
 
+	set_jump_power(-400.0)
+
 	# Initialize health system first
 	health_system = HealthSystem.new()
 	add_child(health_system)
 	health_system._health_changed.connect(_on_health_changed)
 	health_system._character_died.connect(_on_character_died)
-	health_system.set_vigour(10)
+	set_vigour(10)
 
 	# Get initial health values
 	current_health = health_system.get_health()
@@ -535,16 +537,19 @@ func _check_health() -> void:
 
 # UI System
 func _update_ui() -> void:
-	label.text = ("Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nStamina: %.1f/%s\nAnimation: %s" % [
-		"None",
-		Engine.get_frames_per_second(),
-		current_health,
-		max_health,
-		health_percent,
-		stamina,
-		STATS.MAX_STAMINA,
-		animated_sprite.animation
-	])
+	label.text = (
+		"Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nStamina: %.1f/%s\nAnimation: %s"
+		% [
+			"None",
+			Engine.get_frames_per_second(),
+			current_health,
+			max_health,
+			health_percent,
+			stamina,
+			STATS.MAX_STAMINA,
+			animated_sprite.animation
+		]
+	)
 
 
 func _connect_signals() -> void:
@@ -680,17 +685,22 @@ func _stamina_regen(delta: float) -> void:
 	if not is_attacking and not _is_running():
 		stamina = min(stamina + STATS.STAMINA_REGEN_RATE * delta, STATS.MAX_STAMINA)
 
+
 func _is_running() -> bool:
 	return abs(velocity.x) > 0 and not is_crouching
+
 
 func _update_stamina_bar() -> void:
 	stamina_bar.value = stamina
 
+
 func _has_enough_stamina(cost: float) -> bool:
 	return stamina >= cost
 
+
 func _use_stamina(amount: float) -> void:
 	stamina = max(0.0, stamina - amount)
+
 
 # Save System
 func _load_player_state(save_data: SaveData) -> void:
@@ -709,9 +719,11 @@ func _load_player_state(save_data: SaveData) -> void:
 	_update_stamina_bar()
 	_update_ui()
 
+
 func save_player_state() -> void:
 	save_engine.update_save_data(self)
 	save_engine.save_game()
+
 
 func respawn_at_bonfire() -> void:
 	var bonfire_pos = save_engine.get_last_bonfire_position()
@@ -720,6 +732,7 @@ func respawn_at_bonfire() -> void:
 		_heal(max_health)  # Full heal on respawn
 		stamina = STATS.MAX_STAMINA  # Full stamina on respawn
 		magic = STATS.MAX_MAGIC  # Full magic on respawn
+
 
 func _start_dash() -> void:
 	is_dashing = true

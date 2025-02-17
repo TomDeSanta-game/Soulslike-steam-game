@@ -1,10 +1,6 @@
 res://Entities/scripts/Player/player.gd
+res://levels/level_1/level.tscn
 res://Entities/scenes/Player/player.tscn
 res://levels/level_1/level_1.gd
-res://Entities/scripts/Player/player_state_machine.gd
-res://Globals/sound.gd
-res://Resources/SaveData.gd
-res://Entities/scripts/character_base.gd
-res://Entities/scripts/Enemies/enemy_base.gd
-res://Singletons/Scripts/SaveManager/save_manager.gd
-res://Objects/Scripts/Bonfire/bonfire.gd
+res://main/main.gd
+res://main/main.tscn
