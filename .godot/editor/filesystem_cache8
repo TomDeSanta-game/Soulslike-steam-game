@@ -1,12 +1,12 @@
 fc8a56933c4b1c8d796fdb8f7a9f9475
-::res://::1739804425
+::res://::1739811084
 default_bus_layout.tres::AudioBusLayout::347433539179437996::1739385105::0::1::::<><>::
 export_presets.cfg::TextFile::-1::1736774740::0::1::::<><>::
 icon.png::CompressedTexture2D::4149377442233508988::1739445102::1739445212::1::::<><>::
 override.cfg::TextFile::-1::1738248632::0::1::::<><>::
-README.MD::TextFile::-1::1739731984::0::1::::<><>::
-::res://addons/::1739801216
-limbo_console.cfg::TextFile::-1::1739801216::0::1::::<><>::
+README.MD::TextFile::-1::1739810098::0::1::::<><>::
+::res://addons/::1739811084
+limbo_console.cfg::TextFile::-1::1739811084::0::1::::<><>::
 ::res://addons/godot-rapier2d/::1739628738
 circle_mesh.tres::ArrayMesh::7174673425048804142::1736175146::0::1::::<><>::
 faucet_2d.gd::GDScript::-1::1736175146::0::1::::Faucet2D<>Fluid2D<>::
@@ -169,13 +169,13 @@ random_move_pos.gd::GDScript::-1::1739385105::0::1::::<>BTAction<>::
 base_enemy.tres::BehaviorTree::1382127927798765195::1739639559::0::1::::<><>::res://ai/tasks/detect_targets.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/random_move_pos.gd
 ogre.tres::BehaviorTree::1245136069127851702::1739468455::0::1::::<><>::res://ai/tasks/random_move_pos.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/find_target.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/detect_targets.gd<>res://ai/tasks/persistent_chase.gd
 were_wolf.tres::BehaviorTree::6444557909031182893::1739796360::0::1::::<><>::res://ai/tasks/random_move_pos.gd<>res://ai/tasks/move_to_position.gd<>res://ai/tasks/find_target.gd<>res://ai/tasks/move_to_target.gd<>res://ai/tasks/patrol.gd<>res://ai/tasks/detect_targets.gd
-::res://assets/::1739804767
+::res://assets/::1739810603
 gradient_sprite.svg::CompressedTexture2D::1870348025369430998::1739802087::1739802108::1::::<><>::
 Sprite-0001.png::CompressedTexture2D::1198012509339392585::1739196839::1739196842::1::::<><>::
 ::res://assets/Colour1/::1633512432
 ::res://assets/Colour1/NoOutline/::1633519073
 ::res://assets/Colour1/NoOutline/120x80_gifs/::1633519084
-::res://assets/Colour1/NoOutline/120x80_PNGSheets/::1633519084
+::res://assets/Colour1/NoOutline/120x80_PNGSheets/::1739804772
 _Attack2.png::CompressedTexture2D::3960984542782785346::1633513262::1739804772::1::::<><>::
 _Attack2NoMovement.png::CompressedTexture2D::2178422881004897350::1633513201::1739804772::1::::<><>::
 _Attack.png::CompressedTexture2D::2247731232912584367::1633513266::1739804772::1::::<><>::
@@ -208,7 +208,7 @@ _WallHang.png::CompressedTexture2D::6586269504085151372::1633513219::1739804772:
 _WallSlide.png::CompressedTexture2D::6381229340477412535::1633513305::1739804772::1::::<><>::
 ::res://assets/Colour1/Outline/::1633519084
 ::res://assets/Colour1/Outline/120x80_gifs/::1633519106
-::res://assets/Colour1/Outline/120x80_PNGSheets/::1633519106
+::res://assets/Colour1/Outline/120x80_PNGSheets/::1739804772
 _Attack2.png::CompressedTexture2D::191923136498808158::1633512600::1739804772::1::::<><>::
 _Attack2NoMovement.png::CompressedTexture2D::2581215291973510162::1633512708::1739804772::1::::<><>::
 _Attack.png::CompressedTexture2D::6207640622271853766::1633512592::1739804772::1::::<><>::
@@ -242,7 +242,7 @@ _WallSlide.png::CompressedTexture2D::3994844050655177372::1633512554::1739804772
 ::res://assets/Colour2/::1633513963
 ::res://assets/Colour2/NoOutline/::1633519092
 ::res://assets/Colour2/NoOutline/120x80_gifs/::1633519106
-::res://assets/Colour2/NoOutline/120x80_PNGSheets/::1633519106
+::res://assets/Colour2/NoOutline/120x80_PNGSheets/::1739804772
 _Attack2.png::CompressedTexture2D::3361432914737670350::1633514576::1739804772::1::::<><>::
 _Attack2NoMovement.png::CompressedTexture2D::6331461201604789619::1633514542::1739804772::1::::<><>::
 _Attack.png::CompressedTexture2D::3603479921956327665::1633514580::1739804772::1::::<><>::
@@ -275,7 +275,7 @@ _WallHang.png::CompressedTexture2D::3572763758930924396::1633514551::1739804772:
 _WallSlide.png::CompressedTexture2D::719909796398015046::1633514616::1739804772::1::::<><>::
 ::res://assets/Colour2/Outline/::1633519101
 ::res://assets/Colour2/Outline/120x80_gifs/::1633519127
-::res://assets/Colour2/Outline/120x80_PNGSheets/::1633519127
+::res://assets/Colour2/Outline/120x80_PNGSheets/::1739804772
 _Attack2.png::CompressedTexture2D::6568633488691054987::1633514227::1739804772::1::::<><>::
 _Attack2NoMovement.png::CompressedTexture2D::2614534611403063787::1633514282::1739804772::1::::<><>::
 _Attack.png::CompressedTexture2D::1523676473662057780::1633514222::1739804772::1::::<><>::
@@ -1466,6 +1466,13 @@ spritesheet.png::CompressedTexture2D::5108101005652407558::1690521307::173953894
 frame1.png::CompressedTexture2D::6211187813612632735::1730940077::1739538940::1::::<><>::
 frame2.png::CompressedTexture2D::913467662331468195::1730940077::1739538940::1::::<><>::
 frame3.png::CompressedTexture2D::4046235013575689462::1730940077::1739538940::1::::<><>::
+::res://assets/Mossy Tileset/::1739810610
+Mossy - BackgroundDecoration.png::CompressedTexture2D::82211245731725023::1597095134::1739810609::1::::<><>::
+Mossy - Decorations&Hazards.png::CompressedTexture2D::7961656009855335230::1597672754::1739810610::1::::<><>::
+Mossy - FloatingPlatforms.png::CompressedTexture2D::716942331703762035::1597502093::1739810607::1::::<><>::
+Mossy - Hanging Plants.png::CompressedTexture2D::5037254464320650914::1597672658::1739810607::1::::<><>::
+Mossy - MossyHills.png::CompressedTexture2D::7674919973431028938::1597674446::1739810607::1::::<><>::
+Mossy - TileSet.png::CompressedTexture2D::8461191481955076843::1597322980::1739810608::1::::<><>::
 ::res://assets/sounds/::1739721698
 ::res://assets/sounds/Monster/::1739706812
 ::res://assets/sounds/Monster/Attack/::1739631514
@@ -1553,8 +1560,8 @@ ghost_player.tscn::PackedScene::2413888834584527557::1739722920::0::1::::<><>::r
 npc_base.tscn::PackedScene::80795604922291411::1739468826::0::1::::<><>::res://Singletons/Scripts/HealthSystem/healthsystem.gd<>res://Entities/scripts/Npcs/npc_base.gd
 ::res://Entities/scenes/Npcs/Bipedal/::1739628738
 npc.tscn::PackedScene::5012964831980088838::1739468813::0::1::::<><>::uid://bfexry3355fb::::res://Entities/scenes/Npcs/npc_base.tscn<>res://Entities/scripts/Npcs/Bipedal/npc.gd<>res://Shaders/NPC/npc.gdshader<>uid://bnueqonf1cykr::::res://assets/Legacy Collection/Characters/bipedal-Unit/spritesheet.png<>uid://myoef0ys7ugh::::res://assets/Legacy Collection/Characters/bipedal-Unit/sprites/bipedal-unit1.png
-::res://Entities/scenes/Player/::1739804480
-player.tscn::PackedScene::1505711428902279044::1739804480::0::1::::<><>::res://Entities/scripts/Player/player.gd<>res://Shaders/Player/player_damage.gdshader<>res://Components/hitbox_component.gd<>uid://dvub0pyni30x2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Sword Slash.png<>uid://csycho12jo5y2::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Crouch.png<>uid://b6mf7udiwdvxt::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Idle.png<>res://Components/hurtbox_component.gd<>res://Shaders/Player/player_death.gdshader<>res://Shaders/Player/player_dash.gdshader<>uid://c1elceliby44h::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Attack Crouch.png<>uid://c7p2dsrlq3m03::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Jump.png<>uid://cw54bxyb65sjk::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Run.png<>uid://cbh18hpu4cech::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-Hurt.png<>uid://74ahhwvwvpcu::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-JumpAttack.png<>uid://d1dcj5pnmve62::::res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets/player-AirSwordSlash.png<>uid://2cet2eupuug3::::res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf<>uid://bhjnaf7qxfop2::::res://assets/fonts/PressStart2P-Regular.ttf<>res://Components/frame_data_component.gd<>res://camera/camera.gd<>res://Singletons/Scripts/Shooter/shooter.gd<>res://Components/box_flip.gd
+::res://Entities/scenes/Player/::1739810567
+player.tscn::PackedScene::1505711428902279044::1739810567::0::1::::<><>::res://Entities/scripts/Player/player.gd<>res://Shaders/Player/player_damage.gdshader<>res://Components/hitbox_component.gd<>res://Components/hurtbox_component.gd<>res://Shaders/Player/player_death.gdshader<>res://Shaders/Player/player_dash.gdshader<>uid://7a22mub0hkxr::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Attack.png<>uid://cyf47upjdor7::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Crouch.png<>uid://bsj2i2hmtyg8g::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_AttackCombo.png<>uid://1yi3ldfbbu6r::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_CrouchAttack.png<>uid://bndfgoty2dx05::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Hit.png<>uid://bgkphu3s7a08d::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_CrouchTransition.png<>uid://cwbk1t3f64hku::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Idle.png<>uid://csricjkxkxcg::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_CrouchWalk.png<>uid://cc7gbg5g1s6n6::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Jump.png<>uid://bxdt84e7ulu61::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Dash.png<>uid://dtlr6wflb4h50::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Death.png<>uid://ibjwfbwfdsqh::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Run.png<>uid://dwqqe8ephm2dg::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Fall.png<>uid://2cet2eupuug3::::res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf<>uid://bhjnaf7qxfop2::::res://assets/fonts/PressStart2P-Regular.ttf<>uid://wav3lxp18eu2::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Roll.png<>res://Components/frame_data_component.gd<>res://camera/camera.gd<>res://Singletons/Scripts/Shooter/shooter.gd<>uid://bwoy3pifdnpy5::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Attack2.png<>uid://bhj6hyi5hs3sn::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_Slide.png<>res://Components/box_flip.gd<>uid://dew6ut7y5o828::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_SlideTransitionEnd.png<>uid://b1ts72ysddhr5::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_SlideTransitionStart.png<>uid://brys3w5o5og0c::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_TurnAround.png<>uid://s1ssddjdmy1e::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_WallClimb.png<>uid://c03o5qkye4f3y::::res://assets/Colour1/NoOutline/120x80_PNGSheets/_WallHang.png
 ::res://Entities/scenes/Projectiles/::1739721780
 proj_base.tscn::PackedScene::5705395219129908403::1739721780::0::1::::<><>::res://Entities/scripts/Projectiles/proj_base.gd
 ::res://Entities/scenes/Projectiles/Explosion/::1739721780
@@ -1577,9 +1584,9 @@ ghost_player.gd::GDScript::-1::1739547077::0::1::::GhostPlayer<>CharacterBase<>:
 npc_base.gd::GDScript::-1::1739629029::0::1::::NpcBase<>CharacterBase<>::
 ::res://Entities/scripts/Npcs/Bipedal/::1739628738
 npc.gd::GDScript::-1::1739479028::0::1::::<>NpcBase<>::
-::res://Entities/scripts/Player/::1739785609
-player.gd::GDScript::-1::1739785609::0::1::::<>CharacterBase<>::
-player_state_machine.gd::GDScript::-1::1739731984::0::1::::PlayerStateMachine<>LimboHSM<>::
+::res://Entities/scripts/Player/::1739810559
+player.gd::GDScript::-1::1739809282::0::1::::<>CharacterBase<>::
+player_state_machine.gd::GDScript::-1::1739810559::0::1::::PlayerStateMachine<>LimboHSM<>::
 ::res://Entities/scripts/Projectiles/::1739645245
 proj_base.gd::GDScript::-1::1739645245::0::1::::ProjectileBase<>Area2D<>::
 ::res://Entities/scripts/Projectiles/Explosion/::1739628738
@@ -1598,12 +1605,12 @@ character_health_manager.gd::GDScript::-1::1739629823::0::1::::<>Node<>::
 sound.gd::GDScript::-1::1739731608::0::1::::<>Node<>::
 types.gd::GDScript::-1::1739648960::0::1::::Types<>Node<>::
 ::res://levels/::1739628738
-::res://levels/level_1/::1739804487
-level.tscn::PackedScene::2667715318710500220::1739804487::0::1::::<><>::res://levels/level_1/level_1.gd<>uid://7fal73nhmb20::::res://assets/fonts/static/Oswald-Bold.ttf<>uid://1wamgw84mtyk::::res://assets/gradient_sprite.svg<>uid://rclddgstmadt::::res://assets/Sprite-0001.png
+::res://levels/level_1/::1739810676
+level.tscn::PackedScene::2667715318710500220::1739810676::0::1::::<><>::res://levels/level_1/level_1.gd<>uid://7fal73nhmb20::::res://assets/fonts/static/Oswald-Bold.ttf<>uid://1wamgw84mtyk::::res://assets/gradient_sprite.svg<>uid://dsswt8ft1l3gx::::res://assets/Mossy Tileset/Mossy - TileSet.png<>uid://rclddgstmadt::::res://assets/Sprite-0001.png
 level_1.gd::GDScript::-1::1739802168::0::1::::<>Node2D<>::
-::res://main/::1739804480
+::res://main/::1739810561
 main.gd::GDScript::-1::1739385105::0::1::::<>Node2D<>::
-main.tscn::PackedScene::6628024293653602156::1739804480::0::1::::<><>::res://main/main.gd<>uid://beai48cdctfy7::::res://levels/level_1/level.tscn<>uid://vpm32ogo31eu::::res://Entities/scenes/Player/player.tscn
+main.tscn::PackedScene::6628024293653602156::1739810561::0::1::::<><>::res://main/main.gd<>uid://beai48cdctfy7::::res://levels/level_1/level.tscn<>uid://vpm32ogo31eu::::res://Entities/scenes/Player/player.tscn
 ::res://Objects/::1739730952
 ::res://Objects/Scripts/::1739730952
 ::res://Objects/Scripts/Bonfire/::1739730952

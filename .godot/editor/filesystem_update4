@@ -1,6 +1,2 @@
-res://Entities/scripts/Player/player.gd
+res://Entities/scripts/Player/player_state_machine.gd
 res://levels/level_1/level.tscn
-res://Entities/scenes/Player/player.tscn
-res://levels/level_1/level_1.gd
-res://main/main.gd
-res://main/main.tscn

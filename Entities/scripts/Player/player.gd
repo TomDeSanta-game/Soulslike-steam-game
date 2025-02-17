@@ -23,11 +23,24 @@ const ANIMATIONS: Dictionary = {
 	"RUN": "Run",
 	"JUMP": "Jump",
 	"ATTACK": "Attack",
+	"ATTACK_COMBO": "Attack_Combo",
 	"CROUCH": "Crouch",
 	"CROUCH_ATTACK": "Crouch_Attack",
+	"CROUCH_RUN": "Crouch_Run",
+	"CROUCH_TRANSITION": "Crouch_Start_&_End",
+	"DASH": "Dash",
+	"DEATH": "Death",
+	"FALL": "Fall",
 	"HURT": "Hurt",
 	"JUMP_ATTACK": "Jump_Attack",
-	"RUN_ATTACK": "Run_Attack"
+	"ROLL": "Roll",
+	"RUN_ATTACK": "Run_Attack",
+	"SLIDE": "Slide",
+	"SLIDE_END": "Slide_End",
+	"SLIDE_START": "Slide_Start",
+	"TURN_AROUND": "Turn_Around",
+	"WALL_CLIMB": "Wall_Climb",
+	"WALL_HANG": "Wall_Hang"
 }
 
 # Node references
@@ -252,6 +265,9 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	if !is_on_floor():
 		velocity.y += Types.GRAVITY_CONSTANT * delta
+		# Play fall animation when moving downward
+		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.FALL:
+			animated_sprite.play(ANIMATIONS.FALL)
 
 	# Jump cutting logic
 	if is_jump_active and not is_jump_held and velocity.y < 0:
@@ -384,6 +400,7 @@ func _is_attack_animation() -> bool:
 		animated_sprite.animation
 		in [
 			ANIMATIONS.ATTACK,
+			ANIMATIONS.ATTACK_COMBO,
 			ANIMATIONS.JUMP_ATTACK,
 			ANIMATIONS.RUN_ATTACK,
 			ANIMATIONS.CROUCH_ATTACK
@@ -401,7 +418,15 @@ func _handle_input(event: InputEvent) -> void:
 
 	# Handle dash input
 	if event.is_action_pressed("DASH") and can_dash and not is_dashing:
-		_start_dash()
+		state_machine.dispatch(&"dash")
+
+	# Handle roll input
+	if event.is_action_pressed("ROLL") and is_on_floor():
+		state_machine.dispatch(&"roll")
+
+	# Handle slide input
+	if event.is_action_pressed("SLIDE") and abs(velocity.x) > 0:
+		state_machine.dispatch(&"slide")
 
 	if event.is_action_released("ATTACK"):
 		if is_on_floor():
@@ -413,14 +438,17 @@ func _handle_input(event: InputEvent) -> void:
 				if _has_enough_stamina(STATS.ATTACK_STAMINA_COST):
 					_use_stamina(STATS.ATTACK_STAMINA_COST)
 					state_machine.dispatch(&"attack")
-		else:
-			if _has_enough_stamina(STATS.JUMP_ATTACK_STAMINA_COST):
-				_use_stamina(STATS.JUMP_ATTACK_STAMINA_COST)
-				state_machine.dispatch(&"jump_attack")
 	elif event.is_action_released("CROUCH"):
 		state_machine.dispatch(&"crouch")
 	elif event.is_action_released("SHOOT"):
 		_shoot()
+
+	# Wall interactions
+	if is_on_wall():
+		if event.is_action_pressed("GRAB"):
+			state_machine.dispatch(&"wall_hang")
+		elif event.is_action_pressed("UP") and state_machine.current_state.name == "wall_hang":
+			state_machine.dispatch(&"wall_climb")
 
 	# Health
 	if event.is_action_released("HEALTH_DOWN"):
@@ -448,8 +476,10 @@ func _shoot() -> void:
 # Override parent's die function
 func _die() -> void:
 	state_machine.set_active(false)
-
 	set_physics_process(false)
+
+	# Play death animation
+	animated_sprite.play(ANIMATIONS.DEATH)
 
 	# Switch to the death shader material
 	animated_sprite.material = _death_shader_material
@@ -599,37 +629,84 @@ func _on_hurtbox_area_entered(_area: Area2D) -> void:
 
 
 func _on_animation_changed() -> void:
-	if animated_sprite.animation == ANIMATIONS.IDLE:
-		animated_sprite.play(ANIMATIONS.IDLE)
-	if animated_sprite.animation == ANIMATIONS.RUN:
-		animated_sprite.play(ANIMATIONS.RUN)
-	if animated_sprite.animation == ANIMATIONS.RUN_ATTACK:
-		animated_sprite.play(ANIMATIONS.RUN_ATTACK)
-	if animated_sprite.animation == ANIMATIONS.CROUCH:
-		animated_sprite.play(ANIMATIONS.CROUCH, 1.0, false)
-	if animated_sprite.animation == ANIMATIONS.CROUCH_ATTACK:
-		animated_sprite.play(ANIMATIONS.CROUCH_ATTACK)
-	if animated_sprite.animation == ANIMATIONS.JUMP:
-		animated_sprite.play(ANIMATIONS.JUMP)
-	if animated_sprite.animation == ANIMATIONS.JUMP_ATTACK:
-		animated_sprite.play(ANIMATIONS.JUMP_ATTACK)
-	if animated_sprite.animation == ANIMATIONS.ATTACK:
-		animated_sprite.play(ANIMATIONS.ATTACK)
+	match animated_sprite.animation:
+		ANIMATIONS.IDLE:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.RUN:
+			animated_sprite.play(ANIMATIONS.RUN)
+		ANIMATIONS.RUN_ATTACK:
+			animated_sprite.play(ANIMATIONS.RUN_ATTACK)
+		ANIMATIONS.CROUCH:
+			animated_sprite.play(ANIMATIONS.CROUCH)
+		ANIMATIONS.CROUCH_ATTACK:
+			animated_sprite.play(ANIMATIONS.CROUCH_ATTACK)
+		ANIMATIONS.CROUCH_RUN:
+			animated_sprite.play(ANIMATIONS.CROUCH_RUN)
+		ANIMATIONS.CROUCH_TRANSITION:
+			animated_sprite.play(ANIMATIONS.CROUCH_TRANSITION)
+		ANIMATIONS.JUMP:
+			animated_sprite.play(ANIMATIONS.JUMP)
+		ANIMATIONS.JUMP_ATTACK:
+			animated_sprite.play(ANIMATIONS.JUMP_ATTACK)
+		ANIMATIONS.ATTACK:
+			animated_sprite.play(ANIMATIONS.ATTACK)
+		ANIMATIONS.ATTACK_COMBO:
+			animated_sprite.play(ANIMATIONS.ATTACK_COMBO)
+		ANIMATIONS.DASH:
+			animated_sprite.play(ANIMATIONS.DASH)
+		ANIMATIONS.DEATH:
+			animated_sprite.play(ANIMATIONS.DEATH)
+		ANIMATIONS.FALL:
+			animated_sprite.play(ANIMATIONS.FALL)
+		ANIMATIONS.ROLL:
+			animated_sprite.play(ANIMATIONS.ROLL)
+		ANIMATIONS.SLIDE:
+			animated_sprite.play(ANIMATIONS.SLIDE)
+		ANIMATIONS.SLIDE_START:
+			animated_sprite.play(ANIMATIONS.SLIDE_START)
+		ANIMATIONS.SLIDE_END:
+			animated_sprite.play(ANIMATIONS.SLIDE_END)
+		ANIMATIONS.TURN_AROUND:
+			animated_sprite.play(ANIMATIONS.TURN_AROUND)
+		ANIMATIONS.WALL_CLIMB:
+			animated_sprite.play(ANIMATIONS.WALL_CLIMB)
+		ANIMATIONS.WALL_HANG:
+			animated_sprite.play(ANIMATIONS.WALL_HANG)
 
 
 func _on_animation_finished() -> void:
-	if animated_sprite.animation == ANIMATIONS.RUN:
-		animated_sprite.play(ANIMATIONS.IDLE)
-	if animated_sprite.animation == ANIMATIONS.RUN_ATTACK:
-		animated_sprite.play(ANIMATIONS.RUN)
-	if animated_sprite.animation == ANIMATIONS.CROUCH_ATTACK:
-		animated_sprite.play(ANIMATIONS.CROUCH, 1.0, false)
-	if animated_sprite.animation == ANIMATIONS.JUMP:
-		animated_sprite.play(ANIMATIONS.IDLE)
-	if animated_sprite.animation == ANIMATIONS.JUMP_ATTACK:
-		animated_sprite.play(ANIMATIONS.JUMP)
-	if animated_sprite.animation == ANIMATIONS.ATTACK:
-		animated_sprite.play(ANIMATIONS.IDLE)
+	match animated_sprite.animation:
+		ANIMATIONS.RUN:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.RUN_ATTACK:
+			animated_sprite.play(ANIMATIONS.RUN)
+		ANIMATIONS.CROUCH_ATTACK:
+			animated_sprite.play(ANIMATIONS.CROUCH)
+		ANIMATIONS.JUMP:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.JUMP_ATTACK:
+			animated_sprite.play(ANIMATIONS.JUMP)
+		ANIMATIONS.ATTACK:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.ATTACK_COMBO:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.DASH:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.DEATH:
+			# Death animation stays on last frame
+			pass
+		ANIMATIONS.ROLL:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.SLIDE:
+			animated_sprite.play(ANIMATIONS.SLIDE_END)
+		ANIMATIONS.SLIDE_END:
+			animated_sprite.play(ANIMATIONS.IDLE)
+		ANIMATIONS.SLIDE_START:
+			animated_sprite.play(ANIMATIONS.SLIDE)
+		ANIMATIONS.TURN_AROUND:
+			state_machine._on_turn_around_finished()
+		ANIMATIONS.WALL_CLIMB:
+			animated_sprite.play(ANIMATIONS.WALL_HANG)
 
 
 func _on_frame_changed() -> void:

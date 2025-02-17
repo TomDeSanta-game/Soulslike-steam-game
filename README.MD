@@ -10,6 +10,10 @@ A 2D action-platformer game developed in Godot 4, inspired by the Soulslike genr
   - Precise jump mechanics with jump-cutting
   - Multiple movement states (walk, run, crouch)
   - State-based animations
+  - Fluid direction changes with turn around animation
+    - Smooth transition when changing direction while running
+    - Animation plays before sprite flip for natural movement
+    - Maintains momentum during direction change
 
 ### Combat System
 - **Frame-Perfect Combat**
@@ -73,5 +77,3 @@ A 2D action-platformer game developed in Godot 4, inspired by the Soulslike genr
 - Full health/stamina/magic restoration at bonfires
 
 ## ��️ Project Structure
-
-``

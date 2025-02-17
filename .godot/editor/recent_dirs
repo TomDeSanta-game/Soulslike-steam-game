@@ -1,3 +1,4 @@
+res://assets/Mossy Tileset
 res://assets/Colour1/NoOutline/120x80_PNGSheets
 res://assets
 res://Shaders/Player
@@ -19,6 +20,5 @@ res://Singletons/Scripts/Shooter
 res://Globals
 res://Singletons/Scripts/PauseManager
 res://Entities/scripts/Enemies/Ogre
-res://Entities/scripts/Enemies/WereWolf
 /home/tomdesanta/Documents/Portfolio/soulslike-steam-game/player
 /home/tomdesanta/Documents/Portfolio/soulslike-steam-game
