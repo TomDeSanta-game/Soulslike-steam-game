@@ -1,13 +1,14 @@
-res://assets/Mossy Tileset
-res://assets/Colour1/NoOutline/120x80_PNGSheets
+res://Singletons/Scripts/SignalBus
+res://Singletons/Scripts/InputBuffer
 res://assets
+res://assets/trap
+res://assets/Colour1/NoOutline/120x80_PNGSheets
 res://Shaders/Player
 res://Entities/scripts/GhostPlayer
 res://Singletons/Scripts/ObjectMaker
 res://assets/Legacy Collection/Characters/WereWolf/Sprites/run
 res://Entities/scripts/Traps
 res://Entities/scenes/Traps/Shuriken_Trap
-res://assets/trap
 res://Entities/scenes/Traps
 res://assets/Legacy Collection/Characters/Terrible Knight/Spritesheets
 res://assets/fonts/static
@@ -19,6 +20,5 @@ res://Singletons/Scripts/HealthSystem
 res://Singletons/Scripts/Shooter
 res://Globals
 res://Singletons/Scripts/PauseManager
-res://Entities/scripts/Enemies/Ogre
 /home/tomdesanta/Documents/Portfolio/soulslike-steam-game/player
 /home/tomdesanta/Documents/Portfolio/soulslike-steam-game

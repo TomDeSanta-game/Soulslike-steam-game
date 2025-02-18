@@ -48,7 +48,7 @@ func stop_recording() -> void:
 func save_frame_data() -> void:
 	var save_path = "res://frame_data/" + recording_animation + "_frames.tres"
 	if ResourceSaver.save(frame_data_resource, save_path) == OK:
-		print("Frame data saved successfully!")
+		Log.info("Frame data saved successfully!")
 
 
 func _on_animation_changed() -> void:

@@ -16,6 +16,7 @@ const STATE_IDLE: String = "idle"
 const STATE_RUN: String = "run"
 const STATE_RUN_ATTACK: String = "run_attack"
 const STATE_JUMP: String = "jump"
+const STATE_FALL: String = "fall"
 const STATE_ATTACK: String = "attack"
 const STATE_CROUCH: String = "crouch"
 const STATE_CROUCH_ATTACK: String = "crouch_attack"
@@ -43,6 +44,7 @@ func init(player_node: CharacterBody2D) -> void:
 		STATE_RUN: _create_state(STATE_RUN, run_start, run_update),
 		STATE_RUN_ATTACK: _create_state(STATE_RUN_ATTACK, run_attack_start, run_attack_update),
 		STATE_JUMP: _create_state(STATE_JUMP, jump_start, jump_update),
+		STATE_FALL: _create_state(STATE_FALL, fall_start, fall_update),
 		STATE_ATTACK: _create_state(STATE_ATTACK, attack_start, attack_update),
 		STATE_CROUCH: _create_state(STATE_CROUCH, crouch_start, crouch_update),
 		STATE_CROUCH_ATTACK:
@@ -79,15 +81,19 @@ func _setup_transitions() -> void:
 		[states[STATE_IDLE], states[STATE_RUN], &"run"],
 		[states[STATE_IDLE], states[STATE_ATTACK], &"attack"],
 		[states[STATE_IDLE], states[STATE_JUMP], &"jump"],
+		[states[STATE_IDLE], states[STATE_FALL], &"fall"],
 		[states[STATE_IDLE], states[STATE_CROUCH], &"crouch"],
 		[states[STATE_IDLE], states[STATE_ROLL], &"roll"],
 		[states[STATE_IDLE], states[STATE_DASH], &"dash"],
 		[ANYSTATE, states[STATE_IDLE], &"state_ended"],
 		[states[STATE_RUN], states[STATE_JUMP], &"jump"],
+		[states[STATE_RUN], states[STATE_FALL], &"fall"],
 		[states[STATE_RUN], states[STATE_ATTACK], &"attack"],
 		[states[STATE_RUN], states[STATE_CROUCH], &"crouch"],
 		[states[STATE_RUN], states[STATE_RUN_ATTACK], &"run_attack"],
 		[states[STATE_RUN], states[STATE_SLIDE], &"slide"],
+		[states[STATE_JUMP], states[STATE_FALL], &"fall"],
+		[states[STATE_FALL], states[STATE_IDLE], &"state_ended"],
 		[states[STATE_RUN_ATTACK], states[STATE_RUN], &"state_ended"],
 		[states[STATE_CROUCH], states[STATE_CROUCH_ATTACK], &"crouch_attack"],
 		[states[STATE_CROUCH], states[STATE_IDLE], &"state_ended"],
@@ -114,11 +120,16 @@ func idle_start() -> void:
 
 
 func idle_update(_delta: float) -> void:
-	if Input.is_action_pressed("CROUCH"):
+	if InputBuffer.has_buffered_jump():
+		player._handle_jump()
+		dispatch(&"jump")
+	elif Input.is_action_pressed("CROUCH"):
 		dispatch(&"crouch")
 	elif player.velocity.x != 0:
 		dispatch(&"run")
-	elif player.velocity.y != 0:
+	elif not player.is_on_floor() and player.velocity.y > 0:
+		dispatch(&"fall")
+	elif player.velocity.y < 0:
 		dispatch(&"jump")
 
 
@@ -166,21 +177,23 @@ func jump_update(_delta: float) -> void:
 		player.is_jump_active = false
 		player.jump_timer.stop()
 		if abs(player.velocity.x) > 0:
-			dispatch(&"run")  # Transition to RUN if moving horizontally
+			dispatch(&"run")
 		else:
-			dispatch(&"state_ended")  # Transition to IDLE if not moving
+			dispatch(&"state_ended")
+	elif player.velocity.y > 0:  # If we're moving downward
+		dispatch(&"fall")
 
 
 func attack_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.ATTACK)
 	SoundManager.play_sound(Sound._attack, "SFX")
 	player.attack_timer.start()
-	emit_signal("attack_started")
+	SignalBus.attack_started.emit(player)
 
 
 func attack_update(_delta: float) -> void:
 	if player.attack_timer.is_stopped():
-		emit_signal("attack_ended")
+		SignalBus.attack_ended.emit(player)
 		dispatch(&"state_ended")
 
 
@@ -227,13 +240,13 @@ func _on_uncrouch_transition_finished() -> void:
 func crouch_attack_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.CROUCH_ATTACK)
 	player.crouch_attack_timer.start()
-	emit_signal("attack_started")
+	SignalBus.attack_started.emit(player)
 
 
 func crouch_attack_update(_delta: float) -> void:
 	# Only check for state changes after both animation and timer are done
 	if player.crouch_attack_timer.is_stopped() and not player.animated_sprite.is_playing():
-		emit_signal("attack_ended")
+		SignalBus.attack_ended.emit(player)
 		# If still holding crouch, go back to crouch state
 		if Input.is_action_pressed("CROUCH"):
 			dispatch(&"crouch")
@@ -313,3 +326,18 @@ func _on_turn_around_finished() -> void:
 		player.animated_sprite.play(player.ANIMATIONS.RUN)
 	else:
 		player.animated_sprite.play(player.ANIMATIONS.IDLE)
+
+
+func fall_start() -> void:
+	player.animated_sprite.play(player.ANIMATIONS.FALL)
+
+
+func fall_update(_delta: float) -> void:
+	if player.is_on_floor():
+		if InputBuffer.has_buffered_jump():
+			player._handle_jump()
+			dispatch(&"jump")
+		elif abs(player.velocity.x) > 0:
+			dispatch(&"run")
+		else:
+			dispatch(&"state_ended")

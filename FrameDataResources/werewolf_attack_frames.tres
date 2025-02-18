@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FrameDataResource" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="FrameDataResource" load_steps=6 format=3 uid="uid://pf3c8c0xmgj5"]
 
 [ext_resource type="Script" path="res://FrameData/frame_data.gd" id="1_6vtpt"]
 [ext_resource type="Script" path="res://FrameData/frame_data_resource.gd" id="2_wtq31"]

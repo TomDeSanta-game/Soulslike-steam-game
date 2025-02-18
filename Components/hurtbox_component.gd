@@ -1,79 +1,46 @@
 extends Area2D
 class_name HurtboxComponent
 
-signal hit_taken(hitbox: HitboxComponent)
+signal hit_taken(hitbox: Node)
 signal invincibility_started
 signal invincibility_ended
 
-# Hurtbox properties
-@export var invincible: bool = false
-@export var invincibility_duration: float = 0.2  # Reduced from 0.5 to 0.2 seconds
-@export var active: bool = true
+var hurtbox_owner: Node2D
+var active: bool = true
+var invincible: bool = false
 
-# Owner reference (usually the character that can be hurt)
-var hurtbox_owner: Node
-
-# Invincibility timer
-var _invincibility_timer: Timer
+@onready var invincibility_timer: Timer = Timer.new()
 
 func _ready() -> void:
+	add_child(invincibility_timer)
+	invincibility_timer.one_shot = true
+	invincibility_timer.timeout.connect(_on_invincibility_timer_timeout)
+	add_to_group("Hurtbox")
+	
 	# Set collision layer and mask
-	collision_layer = 4  # Layer 3 for hurtboxes
+	collision_layer = 4  # Layer 4 for hurtboxes
 	collision_mask = 2   # Layer 2 for hitboxes
-	
-	# Get owner reference
-	hurtbox_owner = get_parent()
-	
-	# Setup invincibility timer
-	_invincibility_timer = Timer.new()
-	_invincibility_timer.one_shot = true
-	_invincibility_timer.timeout.connect(_on_invincibility_timer_timeout)
-	add_child(_invincibility_timer)
-	
-	# Ensure hurtbox is active by default
-	active = true
-	show()
 
+func take_hit(hitbox: Node) -> void:
+	if not active or invincible:
+		return
 
-func take_hit(hitbox: HitboxComponent, knockback_direction: Vector2) -> bool:
-	# Check if we can be hit
-	if invincible or not active:
-		return false
+	hit_taken.emit(hitbox)  # Emit local signal
+	SignalBus.hit_taken.emit(hitbox, self)  # Emit global signal
 	
-	# Apply damage if owner has health system
-	if hurtbox_owner.has_method("take_damage"):
-		hurtbox_owner.take_damage(hitbox.damage)
-	
-	# Apply knockback if owner is a physics body
-	if hurtbox_owner is CharacterBody2D:
-		_apply_knockback(hitbox, knockback_direction)
-	
-	# Apply hit stun if owner has a state machine
-	if hurtbox_owner.has_method("set_hit_stun"):
-		hurtbox_owner.set_hit_stun(hitbox.hit_stun_duration)
-	
-	# Start invincibility
-	start_invincibility(invincibility_duration)
-	
-	# Emit hit signal
-	hit_taken.emit(hitbox)
-	
-	return true
+	if hurtbox_owner and hurtbox_owner.has_method("take_damage"):
+		if hitbox.has_method("get_damage"):
+			hurtbox_owner.take_damage(hitbox.get_damage())
+		elif hitbox.has_property("damage"):
+			hurtbox_owner.take_damage(hitbox.damage)
 
-
-func start_invincibility(duration: float = 0.2) -> void:
-	if not invincible:
-		invincible = true
-		invincibility_started.emit()
-		_invincibility_timer.start(duration)
-
+func start_invincibility(duration: float = 0.5) -> void:
+	invincible = true
+	invincibility_started.emit()  # Emit local signal
+	SignalBus.invincibility_started.emit(hurtbox_owner)  # Emit global signal
+	invincibility_timer.start(duration)
 
 func _on_invincibility_timer_timeout() -> void:
 	invincible = false
-	invincibility_ended.emit()
-
-
-func _apply_knockback(hitbox: HitboxComponent, direction: Vector2) -> void:
-	if hurtbox_owner is CharacterBody2D:
-		var knockback = direction * hitbox.knockback_force
-		hurtbox_owner.velocity = knockback 
+	invincibility_ended.emit()  # Emit local signal
+	SignalBus.invincibility_ended.emit(hurtbox_owner)  # Emit global signal 

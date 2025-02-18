@@ -11,3 +11,9 @@ script = ExtResource("1_wb4y3")
 
 [node name="player" parent="." instance=ExtResource("3_mubwf")]
 position = Vector2(0, -40)
+initial_health = null
+initial_vigour = null
+base_run_speed = null
+base_crouch_speed = null
+jump_power = null
+team = null

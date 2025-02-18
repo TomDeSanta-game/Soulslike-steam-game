@@ -1,25 +1,21 @@
 extends Area2D
 class_name HitboxComponent
 
-signal hit_landed(hurtbox: HurtboxComponent)
+signal hit_landed(hurtbox: Node)
 
 # Hitbox properties
 @export var damage: float = 10.0
-@export var knockback_force: float = 100.0
+@export var knockback_force: float = 200.0
+@export var hit_stun_duration: float = 0.2
 @export var knockback_duration: float = 0.2
-@export var hit_stun_duration: float = 0.1
-@export var active: bool = true
 @export var one_shot: bool = false  # If true, deactivates after first hit
-
-# Optional properties for special attacks
 @export var damage_type: String = "physical"
 @export var effects: Array[String] = []
 @export var hit_sound: AudioStream
 @export var hit_particles: PackedScene
 
-# Owner reference
-var hitbox_owner: Node
-
+var hitbox_owner: Node2D
+var active: bool = true
 var _has_hit: bool = false
 var _hit_targets: Array[NodePath] = []
 
@@ -37,13 +33,21 @@ func _ready() -> void:
 	# Ensure hitbox is active by default
 	active = true
 	show()
+	
+	add_to_group("Hitbox")
 
+func get_damage() -> float:
+	return damage
 
 func _on_area_entered(area: Area2D) -> void:
 	if not active or not area is HurtboxComponent:
 		return
 		
 	var hurtbox = area as HurtboxComponent
+	
+	# Prevent self-damage
+	if hurtbox.hurtbox_owner == hitbox_owner:
+		return
 	
 	# Check if we've already hit this target
 	if one_shot and _hit_targets.has(hurtbox.get_path()):
@@ -53,9 +57,11 @@ func _on_area_entered(area: Area2D) -> void:
 	var knockback_dir = (hurtbox.global_position - global_position).normalized()
 	
 	# Apply damage and effects
-	if hurtbox.take_hit(self, knockback_dir):
+	if hurtbox.active:
 		_hit_targets.append(hurtbox.get_path())
-		hit_landed.emit(hurtbox)
+		hit_landed.emit(hurtbox)  # Emit local signal
+		SignalBus.hit_landed.emit(self, hurtbox)  # Emit global signal
+		hurtbox.take_hit(self)
 		
 		# Handle one-shot behavior
 		if one_shot:
@@ -65,18 +71,15 @@ func _on_area_entered(area: Area2D) -> void:
 		# Spawn hit effects
 		_spawn_hit_effects(hurtbox.global_position)
 
-
 func activate() -> void:
 	active = true
 	_has_hit = false
 	_hit_targets.clear()
 	show()
 
-
 func deactivate() -> void:
 	active = false
 	hide()
-
 
 func _spawn_hit_effects(hit_position: Vector2) -> void:
 	# Play hit sound

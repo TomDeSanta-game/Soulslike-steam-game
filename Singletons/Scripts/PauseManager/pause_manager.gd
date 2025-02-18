@@ -18,7 +18,7 @@ func pause(node: Node):
 	elif node is Node2D:
 		node.set_process(false)  # Stop processing (any logic inside _process)
 	else:
-		print("Unsupported node type:", node)
+		Log.warn("Unsupported node type: " + str(node))
 
 
 func choose(array: Array):
@@ -39,4 +39,4 @@ func unpause(node: Node):
 	elif node is Node2D:
 		node.set_process(true)  # Restore processing
 	else:
-		print("Unsupported node type:", node)
+		Log.warn("Unsupported node type: " + str(node))

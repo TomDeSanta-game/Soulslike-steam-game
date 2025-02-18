@@ -94,7 +94,7 @@ func _setup_console_commands() -> void:
 
 func _change_direction(new_direction: int) -> void:
 	current_direction = sign(new_direction)
-	print("Direction set to: ", current_direction)
+	Log.debug("Direction set to: " + str(current_direction))
 
 
 func cks() -> void:

@@ -1,3 +1,4 @@
+Sprite2D
 TileMapLayer
 ProgressBar
 Shooter
@@ -12,4 +13,3 @@ HitboxComponent
 FrameDataComponent
 LightOccluder2D
 Node
-Marker2D

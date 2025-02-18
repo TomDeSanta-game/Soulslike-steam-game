@@ -49,7 +49,7 @@ func change_state(new_state_str: String) -> void:
 			push_warning("Invalid state: %s" % new_state_str)
 			return
 
-	print("Current State: ", Types.CharacterState.keys()[current_state])
+	Log.info("Current State: ", Types.CharacterState.keys()[current_state])
 
 
 func _physics_process(delta: float) -> void:

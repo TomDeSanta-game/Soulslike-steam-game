@@ -15,7 +15,8 @@ const STATS: Dictionary = {
 	"ATTACK_STAMINA_COST": 10.0,
 	"RUN_ATTACK_STAMINA_COST": 20.0,
 	"JUMP_ATTACK_STAMINA_COST": 40.0,
-	"RUN_STAMINA_DRAIN_RATE": 5.55  # Drains full stamina in 30 seconds
+	"RUN_STAMINA_DRAIN_RATE": 5.55,  # Drains full stamina in 30 seconds
+	"COYOTE_TIME": 0.15,  # 150ms of coyote time
 }
 
 const ANIMATIONS: Dictionary = {
@@ -134,6 +135,10 @@ var dash_cooldown_timer: float = 0.0
 
 # Save Engine
 @onready var save_engine: Node = get_node("/root/SaveEngine")
+
+# Coyote Time Variables
+var coyote_timer: float = 0.0
+var has_coyote_time: bool = false
 
 
 func _ready() -> void:
@@ -263,11 +268,25 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	var was_on_floor = is_on_floor()
+
 	if !is_on_floor():
 		velocity.y += Types.GRAVITY_CONSTANT * delta
-		# Play fall animation when moving downward
-		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.FALL:
+		# Only play fall animation when moving downward and not in a jump state
+		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.FALL and !is_jump_active:
 			animated_sprite.play(ANIMATIONS.FALL)
+
+	# Handle coyote time
+	if was_on_floor and !is_on_floor():
+		coyote_timer = STATS.COYOTE_TIME
+		has_coyote_time = true
+	elif is_on_floor():
+		has_coyote_time = false
+		coyote_timer = 0.0
+	elif coyote_timer > 0:
+		coyote_timer -= delta
+		if coyote_timer <= 0:
+			has_coyote_time = false
 
 	# Jump cutting logic
 	if is_jump_active and not is_jump_held and velocity.y < 0:
@@ -410,11 +429,15 @@ func _is_attack_animation() -> bool:
 
 # Input Handling
 func _handle_input(event: InputEvent) -> void:
-	if event.is_action_pressed("JUMP") and is_on_floor():
-		is_jump_held = true  # Jump button is being held
-		_handle_jump()
+	if event.is_action_pressed("JUMP"):
+		is_jump_held = true
+		if is_on_floor() or has_coyote_time:
+			_handle_jump()
+		else:
+			# Buffer the jump input
+			InputBuffer.buffer_jump()
 	elif event.is_action_released("JUMP"):
-		is_jump_held = false  # Jump button is released
+		is_jump_held = false
 
 	# Handle dash input
 	if event.is_action_pressed("DASH") and can_dash and not is_dashing:
@@ -460,11 +483,15 @@ func _handle_input(event: InputEvent) -> void:
 
 
 func _handle_jump() -> void:
-	if is_on_floor():
+	if is_on_floor() or has_coyote_time:
 		velocity.y = jump_power
 		is_jump_held = true
-		is_jump_active = true  # Jump is active
-		jump_timer.start()  # Start the jump timer
+		is_jump_active = true
+		has_coyote_time = false  # Consume coyote time
+		coyote_timer = 0.0
+		jump_timer.start()
+		animated_sprite.play(ANIMATIONS.JUMP)
+		InputBuffer.consume_jump_buffer()  # Consume any buffered jump
 
 
 # Combat System
@@ -611,7 +638,7 @@ func _jump_timer_timeout() -> void:
 	velocity.y = 0
 
 
-func _on_hit_landed(target_hurtbox: HurtboxComponent) -> void:
+func _on_hit_landed(target_hurtbox: Node) -> void:
 	if target_hurtbox.hurtbox_owner and target_hurtbox.hurtbox_owner.is_in_group("Enemy"):
 		# Play hit effect or sound
 		SoundManager.play_sound(Sound.hit, "SFX")
@@ -619,7 +646,7 @@ func _on_hit_landed(target_hurtbox: HurtboxComponent) -> void:
 		_apply_lifesteal(hitbox.damage)
 
 
-func _on_hit_taken(attacker_hitbox: HitboxComponent) -> void:
+func _on_hit_taken(attacker_hitbox: Node) -> void:
 	if attacker_hitbox.hitbox_owner and attacker_hitbox.hitbox_owner.is_in_group("Enemy"):
 		take_damage(attacker_hitbox.damage)
 

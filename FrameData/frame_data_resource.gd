@@ -6,9 +6,9 @@ class_name FrameDataResource
 
 
 func get_frame(number: int) -> FrameData:
-	print("Looking for frame: ", number)  # Debug print
+	Log.debug("Looking for frame: " + str(number))
 	for frame in frames:
-		print("Checking frame: ", frame.frame_number)  # Debug print
+		Log.debug("Checking frame: " + str(frame.frame_number))
 		if frame.frame_number == number:
 			return frame
 	return null
