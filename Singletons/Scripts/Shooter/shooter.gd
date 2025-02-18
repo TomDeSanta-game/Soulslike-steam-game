@@ -13,6 +13,7 @@ var can_shoot: bool = true
 
 
 func _ready() -> void:
+	add_child(shoot_timer)
 	if shoot_timer:
 		shoot_timer.wait_time = shoot_delay
 

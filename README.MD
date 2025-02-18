@@ -10,7 +10,6 @@ A 2D action-platformer game developed in Godot 4.
   - Jump buffering (150ms to press jump before landing)
   - Variable jump height
 - Walk, run, and crouch
-- Direction changes with turn animation
 
 ### Combat
 - Basic attacks (standing, running, jumping, crouching)
@@ -24,6 +23,12 @@ A 2D action-platformer game developed in Godot 4.
   - Attack costs: Basic (10), Run (20), Jump (40)
   - Running drains stamina
   - Auto regeneration when not attacking/running
+
+### Collectibles
+- Celestial Tears:
+  - Restore health and stamina on collection
+  - Visual and sound effects on pickup
+  - Automatic cleanup after collection
 
 ### Save System
 - Bonfire checkpoints

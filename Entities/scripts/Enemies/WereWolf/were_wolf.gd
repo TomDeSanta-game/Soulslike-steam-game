@@ -127,11 +127,11 @@ func die() -> void:
 
 
 # Override parent's combat functions for werewolf-specific behavior
-func _on_hit_landed(target_hurtbox: HurtboxComponent) -> void:
+func _on_hit_landed(target_hurtbox: Node) -> void:
 	super._on_hit_landed(target_hurtbox)
 	
 	# Add werewolf-specific hit effects
-	if target_hurtbox.hurtbox_owner.is_in_group("Player"):
+	if target_hurtbox is HurtboxComponent and target_hurtbox.hurtbox_owner.is_in_group("Player"):
 		# Play attack sound
 		SoundManager.play_sound(Sound.monster_attack, "SFX")
 		
@@ -141,11 +141,11 @@ func _on_hit_landed(target_hurtbox: HurtboxComponent) -> void:
 			camera.shake(15.0, 0.3, 0.7)
 
 
-func _on_hit_taken(attacker_hitbox: HitboxComponent) -> void:
+func _on_hit_taken(attacker_hitbox: Node) -> void:
 	super._on_hit_taken(attacker_hitbox)
 	
 	# Add werewolf-specific hurt effects
-	if attacker_hitbox.hitbox_owner.is_in_group("Player"):
+	if attacker_hitbox is HitboxComponent and attacker_hitbox.hitbox_owner.is_in_group("Player"):
 		# Play hurt animation with blood effect
 		animated_sprite.play(&"Hurt")
 		

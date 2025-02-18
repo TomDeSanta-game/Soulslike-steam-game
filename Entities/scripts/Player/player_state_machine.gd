@@ -7,10 +7,6 @@ var player: CharacterBody2D
 # State configurations
 var states: Dictionary = {}
 
-# Track previous flip state
-var was_flipped: bool = false
-var is_turning: bool = false
-
 # Constants for state names
 const STATE_IDLE: String = "idle"
 const STATE_RUN: String = "run"
@@ -143,17 +139,6 @@ func run_update(_delta: float) -> void:
 		dispatch(&"state_ended")
 	elif player.velocity.y != 0:
 		dispatch(&"jump")
-	else:
-		# Check for direction change
-		var moving_left = player.velocity.x < 0
-		var facing_left = player.animated_sprite.flip_h
-
-		if moving_left != facing_left and not is_turning:
-			# Start turn around animation without flipping
-			player.animated_sprite.play(player.ANIMATIONS.TURN_AROUND)
-			is_turning = true
-			# Store the direction we want to end up facing
-			was_flipped = moving_left
 
 
 func run_attack_start() -> void:
@@ -198,11 +183,7 @@ func attack_update(_delta: float) -> void:
 
 
 func crouch_start() -> void:
-	# Play transition animation first
-	player.animated_sprite.play(player.ANIMATIONS.CROUCH_TRANSITION)
-	player.animated_sprite.animation_finished.connect(
-		_on_crouch_transition_finished, CONNECT_ONE_SHOT
-	)
+	player.animated_sprite.play(player.ANIMATIONS.CROUCH)
 	player.is_crouching = true
 	player.current_speed = player.base_crouch_speed
 
@@ -210,31 +191,15 @@ func crouch_start() -> void:
 func crouch_update(_delta: float) -> void:
 	if Input.is_action_just_pressed("ATTACK"):
 		dispatch(&"crouch_attack")
-	elif not Input.is_action_pressed("CROUCH"):
-		# Play transition animation in reverse when uncrouch
-		player.animated_sprite.play(player.ANIMATIONS.CROUCH_TRANSITION)
-		if !player.animated_sprite.animation_finished.is_connected(
-			_on_uncrouch_transition_finished
-		):
-			player.animated_sprite.animation_finished.connect(
-				_on_uncrouch_transition_finished, CONNECT_ONE_SHOT
-			)
+	elif !Input.is_action_pressed("CROUCH"):
+		player.is_crouching = false
+		dispatch(&"state_ended")
 	else:
 		# Handle crouch movement
 		if abs(player.velocity.x) > 0:
 			player.animated_sprite.play(player.ANIMATIONS.CROUCH_RUN)
-		elif player.animated_sprite.animation != player.ANIMATIONS.CROUCH_TRANSITION:
+		else:
 			player.animated_sprite.play(player.ANIMATIONS.CROUCH)
-
-
-func _on_crouch_transition_finished() -> void:
-	if player.is_crouching:
-		player.animated_sprite.play(player.ANIMATIONS.CROUCH)
-
-
-func _on_uncrouch_transition_finished() -> void:
-	player.is_crouching = false
-	dispatch(&"state_ended")
 
 
 func crouch_attack_start() -> void:
@@ -289,11 +254,25 @@ func roll_update(_delta: float) -> void:
 
 
 func slide_start() -> void:
-	player.animated_sprite.play(player.ANIMATIONS.SLIDE_START)
+	# Check if player has enough stamina to slide
+	if player.stamina >= 40.0:
+		player.animated_sprite.play(player.ANIMATIONS.SLIDE)
+		# Add slide movement boost
+		var slide_direction = -1.0 if player.animated_sprite.flip_h else 1.0
+		player.velocity.x = slide_direction * player.base_run_speed * 1.5  # 1.5x speed boost during slide
+		# Consume stamina
+		player._use_stamina(40.0)
+	else:
+		# If not enough stamina, go back to idle
+		dispatch(&"state_ended")
 
 
 func slide_update(_delta: float) -> void:
-	if not player.animated_sprite.is_playing():
+	# Gradually slow down during slide
+	player.velocity.x = move_toward(player.velocity.x, 0, player.base_run_speed * 0.05)
+	
+	# End slide if nearly stopped or animation finished
+	if abs(player.velocity.x) < 50 or not player.animated_sprite.is_playing():
 		dispatch(&"state_ended")
 
 
@@ -315,17 +294,6 @@ func wall_hang_update(_delta: float) -> void:
 		dispatch(&"state_ended")
 	elif Input.is_action_just_pressed("UP"):
 		dispatch(&"wall_climb")
-
-
-# Add this new function to handle turn completion
-func _on_turn_around_finished() -> void:
-	is_turning = false
-	# Apply the stored flip state after animation completes
-	player.animated_sprite.flip_h = was_flipped
-	if abs(player.velocity.x) > 0:
-		player.animated_sprite.play(player.ANIMATIONS.RUN)
-	else:
-		player.animated_sprite.play(player.ANIMATIONS.IDLE)
 
 
 func fall_start() -> void:

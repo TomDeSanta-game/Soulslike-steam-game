@@ -1,0 +1,72 @@
+[gd_scene load_steps=9 format=3 uid="uid://da7xh2hu5kb70"]
+
+[ext_resource type="PackedScene" uid="uid://c637fr3a5igbv" path="res://Objects/Scenes/Collectibles/collectible_base.tscn" id="1_5hg3k"]
+[ext_resource type="Script" path="res://Objects/Scripts/Collectibles/CelestialTear/celestial_tear.gd" id="2_flhox"]
+[ext_resource type="Texture2D" uid="uid://pbkduv7khdky" path="res://assets/Sprite-0003.png" id="2_iv5qb"]
+[ext_resource type="Shader" path="res://Shaders/Collectibles/glow_effect.gdshader" id="3_bxvw8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tyxpa"]
+shader = ExtResource("3_bxvw8")
+shader_parameter/glow_color = Color(1, 1, 1, 1)
+shader_parameter/glow_intensity = 1.0
+shader_parameter/glow_scale = 1.0
+shader_parameter/pulse_speed = 2.0
+shader_parameter/outer_radius = 0.4
+shader_parameter/inner_radius = 0.1
+shader_parameter/light_intensity = 0.5
+
+[sub_resource type="Animation" id="Animation_1l703"]
+resource_name = "ANIMATION"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0333333, 0.266667, 0.566667, 1.03333),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1, 0.5), Vector2(1, 0.7), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_un45o"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_83414"]
+_data = {
+"ANIMATION": SubResource("Animation_1l703"),
+"RESET": SubResource("Animation_un45o")
+}
+
+[node name="Celestial_Tear" instance=ExtResource("1_5hg3k")]
+material = SubResource("ShaderMaterial_tyxpa")
+script = ExtResource("2_flhox")
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("2_iv5qb")
+
+[node name="CollisionPolygon2D" parent="." index="1"]
+visible = false
+polygon = PackedVector2Array(-1, 8, 1, 8, 1, 7, 2, 7, 2, 5, 3, 5, 3, 4, 4, 4, 4, 3, 5, 3, 5, 1, 6, 1, 6, -4, 5, -4, 5, -5, 4, -5, 4, -6, 3, -6, 3, -7, 4, -7, 4, -8, -4, -8, -4, -7, -3, -7, -3, -6, -4, -6, -4, -5, -5, -5, -5, -4, -6, -4, -6, 1, -5, 1, -5, 3, -4, 3, -4, 4, -3, 4, -3, 5, -2, 5, -2, 7, -1, 7)
+
+[node name="VisibleOnScreenEnabler2D" parent="." index="2"]
+scale = Vector2(0.6, 0.8)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="3"]
+libraries = {
+"": SubResource("AnimationLibrary_83414")
+}

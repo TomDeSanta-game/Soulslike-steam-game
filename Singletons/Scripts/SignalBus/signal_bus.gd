@@ -64,5 +64,9 @@ signal invincibility_started(entity: Node)
 @warning_ignore("unused_signal")
 signal invincibility_ended(entity: Node)
 
+# Collectible Signals
+@warning_ignore("unused_signal")
+signal collectible_collected(collectible: Node)
+
 func _ready() -> void:
 	Log.info("SignalBus initialized and ready to handle game signals")

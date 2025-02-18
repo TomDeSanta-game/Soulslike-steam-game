@@ -28,6 +28,8 @@ var monster_attack: AudioStream = preload("res://assets/sounds/Monster/Attack/mo
 var explosion: AudioStream = preload("res://assets/sounds/Projectile/Explosion/explosion.mp3")
 var projectile_hit: AudioStream = preload("res://assets/sounds/Projectile/Hit/proj_hit.wav")
 
+# Collectible Sounds
+var collect: AudioStream = preload("res://assets/sounds/Collectible/Collect/collect.mp3")
+
 # Other Sounds
 var heal: AudioStream = preload("res://assets/sounds/Other/Heal/heal.mp3")
-

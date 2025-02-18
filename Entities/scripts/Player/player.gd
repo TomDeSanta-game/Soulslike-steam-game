@@ -14,8 +14,8 @@ const STATS: Dictionary = {
 	"STAMINA_REGEN_RATE": 20.0,  # Stamina points per second
 	"ATTACK_STAMINA_COST": 10.0,
 	"RUN_ATTACK_STAMINA_COST": 20.0,
-	"JUMP_ATTACK_STAMINA_COST": 40.0,
-	"RUN_STAMINA_DRAIN_RATE": 5.55,  # Drains full stamina in 30 seconds
+	"JUMP_STAMINA_COST": 35.0,
+	"RUN_STAMINA_DRAIN_RATE": 5.55,  # Drains full stamina if running too long
 	"COYOTE_TIME": 0.15,  # 150ms of coyote time
 }
 
@@ -37,9 +37,6 @@ const ANIMATIONS: Dictionary = {
 	"ROLL": "Roll",
 	"RUN_ATTACK": "Run_Attack",
 	"SLIDE": "Slide",
-	"SLIDE_END": "Slide_End",
-	"SLIDE_START": "Slide_Start",
-	"TURN_AROUND": "Turn_Around",
 	"WALL_CLIMB": "Wall_Climb",
 	"WALL_HANG": "Wall_Hang"
 }
@@ -142,10 +139,33 @@ var has_coyote_time: bool = false
 
 
 func _ready() -> void:
+	add_to_group("Player")
 	super._ready()  # Call parent _ready to initialize health system
 	types.player = self
 
-	set_jump_power(-400.0)
+	# Set collision layers and masks
+	# Layer 4 (1 << 3 because it's zero-based)
+	self.collision_layer = Constants.LAYER_PLAYER
+	self.collision_mask = Constants.LAYER_WORLD  # Or Constants.MASK_PLAYER if you want multiple
+
+	# Also set the hitbox and hurtbox layers/masks
+	if hitbox:
+		hitbox.hitbox_owner = self
+		hitbox.damage = 15.0
+		hitbox.knockback_force = 200.0
+		hitbox.hit_stun_duration = 0.2
+		hitbox.collision_layer = Constants.LAYER_HITBOX
+		hitbox.collision_mask = Constants.LAYER_HURTBOX
+		hitbox.add_to_group("Hitbox")
+		hitbox.active = true
+
+	if hurtbox:
+		hurtbox.hurtbox_owner = self
+		hurtbox.collision_layer = Constants.LAYER_HURTBOX
+		hurtbox.collision_mask = Constants.LAYER_HITBOX
+		hurtbox.active = true
+
+	set_jump_power(-450.0)
 
 	# Initialize health system first
 	health_system = HealthSystem.new()
@@ -168,23 +188,6 @@ func _ready() -> void:
 	stamina_bar.max_value = STATS.MAX_STAMINA
 	stamina_bar.value = stamina
 	stamina_bar.min_value = 0
-
-	# Setup hitbox and hurtbox with correct layers
-	if hitbox:
-		hitbox.hitbox_owner = self
-		hitbox.damage = 15.0
-		hitbox.knockback_force = 200.0
-		hitbox.hit_stun_duration = 0.2
-		hitbox.collision_layer = 4  # Player layer
-		hitbox.collision_mask = 2  # Enemy layer (to detect enemy hurtboxes)
-		hitbox.add_to_group("Hitbox")
-		hitbox.active = true  # Keep hitbox always active
-
-	if hurtbox:
-		hurtbox.hurtbox_owner = self
-		hurtbox.collision_layer = 4  # Player layer
-		hurtbox.collision_mask = 2  # Enemy layer (to detect enemy hitboxes)
-		hurtbox.active = true  # Keep hurtbox always active
 
 	# Add self to Player group
 	add_to_group("Player")
@@ -383,8 +386,10 @@ func _handle_movement() -> void:
 func _get_current_speed() -> float:
 	# Return different speeds based on current state
 	if is_crouching:
-		return base_crouch_speed
-	return base_run_speed
+		return MOVEMENT_SPEEDS.CROUCH
+	elif _is_running():
+		return MOVEMENT_SPEEDS.RUN
+	return MOVEMENT_SPEEDS.WALK
 
 
 func _update_movement_state() -> void:
@@ -483,7 +488,11 @@ func _handle_input(event: InputEvent) -> void:
 
 
 func _handle_jump() -> void:
+	if not _has_enough_stamina(STATS.JUMP_STAMINA_COST):
+		return  # Don't jump if not enough stamina
+
 	if is_on_floor() or has_coyote_time:
+		_use_stamina(STATS.JUMP_STAMINA_COST)  # Consume stamina for jump
 		velocity.y = jump_power
 		is_jump_held = true
 		is_jump_active = true
@@ -689,12 +698,6 @@ func _on_animation_changed() -> void:
 			animated_sprite.play(ANIMATIONS.ROLL)
 		ANIMATIONS.SLIDE:
 			animated_sprite.play(ANIMATIONS.SLIDE)
-		ANIMATIONS.SLIDE_START:
-			animated_sprite.play(ANIMATIONS.SLIDE_START)
-		ANIMATIONS.SLIDE_END:
-			animated_sprite.play(ANIMATIONS.SLIDE_END)
-		ANIMATIONS.TURN_AROUND:
-			animated_sprite.play(ANIMATIONS.TURN_AROUND)
 		ANIMATIONS.WALL_CLIMB:
 			animated_sprite.play(ANIMATIONS.WALL_CLIMB)
 		ANIMATIONS.WALL_HANG:
@@ -725,13 +728,7 @@ func _on_animation_finished() -> void:
 		ANIMATIONS.ROLL:
 			animated_sprite.play(ANIMATIONS.IDLE)
 		ANIMATIONS.SLIDE:
-			animated_sprite.play(ANIMATIONS.SLIDE_END)
-		ANIMATIONS.SLIDE_END:
-			animated_sprite.play(ANIMATIONS.IDLE)
-		ANIMATIONS.SLIDE_START:
 			animated_sprite.play(ANIMATIONS.SLIDE)
-		ANIMATIONS.TURN_AROUND:
-			state_machine._on_turn_around_finished()
 		ANIMATIONS.WALL_CLIMB:
 			animated_sprite.play(ANIMATIONS.WALL_HANG)
 
@@ -861,3 +858,18 @@ func _start_dash() -> void:
 
 	# Switch back to normal shader after dash starts
 	animated_sprite.material = _shader_material
+
+
+# Add these methods to the player class
+func get_max_health() -> float:
+	return max_health
+
+func get_max_stamina() -> float:
+	return STATS.MAX_STAMINA
+
+func restore_stamina(amount: float) -> void:
+	stamina = min(stamina + amount, STATS.MAX_STAMINA)
+	_update_stamina_bar()
+
+func heal(amount: float) -> void:
+	_heal(amount)  # Use existing heal method
