@@ -1,4 +1,4 @@
-[gd_scene load_steps=143 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=145 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -7,6 +7,7 @@
 [ext_resource type="Shader" path="res://Shaders/Player/player_death.gdshader" id="3_bnvh0"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_dash.gdshader" id="4_gmdld"]
 [ext_resource type="Texture2D" uid="uid://7a22mub0hkxr" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_Attack.png" id="5_3kpkf"]
+[ext_resource type="Shader" path="res://Shaders/Player/player_invicibility.gdshader" id="5_vd2vt"]
 [ext_resource type="Texture2D" uid="uid://cyf47upjdor7" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_Crouch.png" id="6_4lwto"]
 [ext_resource type="Texture2D" uid="uid://bsj2i2hmtyg8g" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_AttackCombo.png" id="6_kldj7"]
 [ext_resource type="Texture2D" uid="uid://1yi3ldfbbu6r" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_CrouchAttack.png" id="7_yjjir"]
@@ -48,6 +49,13 @@ shader_parameter/dash_intensity = 0.5
 shader_parameter/dash_color = Vector4(1, 1, 1, 1)
 shader_parameter/dash_speed = 5.0
 shader_parameter/dash_width = 0.2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1t8bt"]
+shader = ExtResource("5_vd2vt")
+shader_parameter/time_elapsed = 0.0
+shader_parameter/base_visible_duration = 0.2
+shader_parameter/base_invisible_duration = 0.1
+shader_parameter/duration_increase_rate = 0.001
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g6xil"]
 atlas = ExtResource("5_3kpkf")
@@ -454,7 +462,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"Attack",
-"speed": 6.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -833,33 +841,21 @@ font_size = 50
 shadow_size = 10
 shadow_color = Color(0, 0, 0, 1)
 
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_7xvhv"]
-color = Color(1, 0, 0, 1)
-grow_begin = 100.0
-grow_end = 100.0
-thickness = 5
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q7x2p"]
+bg_color = Color(0.129412, 0.145098, 0.160784, 1)
 
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_10v5d"]
-color = Color(1, 0, 0, 1)
-grow_begin = 100.0
-grow_end = 100.0
-thickness = 5
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_413gc"]
+bg_color = Color(0.815686, 0, 0, 1)
 
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_4vyvw"]
-color = Color(0, 1, 0, 1)
-grow_begin = 100.0
-grow_end = 100.0
-thickness = 5
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2s43"]
+bg_color = Color(0.129412, 0.145098, 0.160784, 1)
 
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_3cxff"]
-color = Color(0, 1, 0, 1)
-grow_begin = 100.0
-grow_end = 100.0
-thickness = 5
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46tl0"]
+bg_color = Color(0.501961, 0.929412, 0.6, 1)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mmdt5"]
-radius = 17.0
-height = 46.0
+radius = 22.0
+height = 58.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4hfov"]
 radius = 6.0
@@ -867,24 +863,22 @@ radius = 6.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o87r6"]
 radius = 6.0
 
-[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("hitboxes", "hurtboxes")]
-collision_layer = 8
+[node name="player" type="CharacterBody2D"]
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("1_lfhy7")
 _shader_material = SubResource("ShaderMaterial_r5sqx")
 _death_shader_material = SubResource("ShaderMaterial_c6xal")
 _dash_shader_material = SubResource("ShaderMaterial_osxgm")
-hitboxes = [NodePath("Hitbox")]
-hurtboxes = [NodePath("Hurtbox")]
+_invincibility_shader_material = SubResource("ShaderMaterial_1t8bt")
 metadata/entity_name = "Player"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_lg6k6")
-animation = &"Slide"
-frame = 4
-frame_progress = 1.0
+animation = &"Run_Attack"
+frame = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(-5, 25)
 shape = SubResource("CapsuleShape2D_ilo5v")
 
@@ -941,30 +935,30 @@ wait_time = 3.5
 one_shot = true
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
-offset_left = -280.0
+offset_left = -380.0
 offset_top = -240.0
-offset_right = -276.0
-offset_bottom = -212.0
+offset_right = -180.0
+offset_bottom = -210.0
 theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxLine_7xvhv")
-theme_override_styles/fill = SubResource("StyleBoxLine_10v5d")
-value = 100.0
+theme_override_styles/background = SubResource("StyleBoxFlat_q7x2p")
+theme_override_styles/fill = SubResource("StyleBoxFlat_413gc")
+show_percentage = false
 
 [node name="StaminaBar" type="ProgressBar" parent="."]
-offset_left = -280.0
-offset_top = -210.0
-offset_right = -276.0
-offset_bottom = -183.0
+offset_left = -380.0
+offset_top = -190.0
+offset_right = -180.0
+offset_bottom = -160.0
 theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxLine_4vyvw")
-theme_override_styles/fill = SubResource("StyleBoxLine_3cxff")
-value = 100.0
+theme_override_styles/background = SubResource("StyleBoxFlat_v2s43")
+theme_override_styles/fill = SubResource("StyleBoxFlat_46tl0")
+show_percentage = false
 
 [node name="Hitbox" type="Area2D" parent="." groups=["Player"]]
 unique_name_in_owner = true
-position = Vector2(28, 28)
-collision_layer = 8
-collision_mask = 22
+position = Vector2(10, 25)
+collision_layer = 0
+collision_mask = 0
 monitoring = false
 script = ExtResource("2_k3m4p")
 
@@ -975,10 +969,9 @@ debug_color = Color(1, 0, 0.0166664, 0.419608)
 
 [node name="Hurtbox" type="Area2D" parent="." groups=["Player"]]
 unique_name_in_owner = true
-visible = false
-position = Vector2(-5, 25)
-collision_layer = 8
-collision_mask = 22
+position = Vector2(-5.5, 25)
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("3_a2m4n")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
@@ -987,6 +980,8 @@ debug_color = Color(0.0500001, 1, 0, 0.419608)
 
 [node name="CollectibleCollider" type="Area2D" parent="."]
 position = Vector2(-5, 25)
+collision_layer = 8388608
+collision_mask = 32
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollectibleCollider"]
 shape = SubResource("CapsuleShape2D_o87r6")

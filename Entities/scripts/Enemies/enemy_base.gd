@@ -43,6 +43,20 @@ func _ready() -> void:
 	add_child(health_system)
 	health_system.set_vigour(initial_vigour)
 
+	# Set collision layers/masks
+	collision_layer = C_Layers.LAYER_ENEMY
+	collision_mask = C_Layers.MASK_ENEMY
+	
+	if enemy_hitbox:
+		enemy_hitbox.hitbox_owner = self
+		enemy_hitbox.collision_layer = C_Layers.LAYER_HITBOX
+		enemy_hitbox.collision_mask = C_Layers.MASK_HITBOX
+	
+	if enemy_hurtbox:
+		enemy_hurtbox.hurtbox_owner = self
+		enemy_hurtbox.collision_layer = C_Layers.LAYER_HURTBOX
+		enemy_hurtbox.collision_mask = C_Layers.MASK_HURTBOX
+
 func _setup_enemy() -> void:
 	if detection_area:
 		detection_area.body_entered.connect(_on_detection_area_body_entered)

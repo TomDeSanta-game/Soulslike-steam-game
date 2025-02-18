@@ -1,30 +1,14 @@
-[gd_scene load_steps=46 format=3 uid="uid://cnktyvfqwjeeb"]
+[gd_scene load_steps=40 format=3 uid="uid://cnktyvfqwjeeb"]
 
 [ext_resource type="PackedScene" uid="uid://b35ig5icbvk7a" path="res://Entities/scenes/Enemies/enemy_base.tscn" id="1_1avr3"]
 [ext_resource type="Script" path="res://Entities/scripts/Enemies/Ogre/ogre.gd" id="2_1jnmm"]
 [ext_resource type="Texture2D" uid="uid://bi3o46c4nhha5" path="res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-attack.png" id="2_a5jjx"]
-[ext_resource type="Shader" path="res://Shaders/Enemies/enemy_damage.gdshader" id="3_fu3f1"]
 [ext_resource type="Texture2D" uid="uid://c7fdb5e75skgb" path="res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-idle.png" id="3_lpef3"]
-[ext_resource type="Shader" path="res://Shaders/Enemies/enemy_death.gdshader" id="4_0jxxb"]
 [ext_resource type="Texture2D" uid="uid://hjtvvyxnpxy5" path="res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-idle-unarmed.png" id="4_ky5ad"]
 [ext_resource type="Texture2D" uid="uid://bno82xp7tkfsa" path="res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-walk.png" id="5_txhg3"]
 [ext_resource type="Texture2D" uid="uid://d1mofg5jknf66" path="res://assets/Legacy Collection/Characters/Ogre/Spritesheets/ogre-walk-unarmed.png" id="6_d7gge"]
 [ext_resource type="BehaviorTree" uid="uid://r0fhd1d2703k" path="res://ai/trees/ogre.tres" id="7_nw7g0"]
 [ext_resource type="Script" path="res://Components/frame_data_component.gd" id="11_vviu0"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_e2x8i"]
-shader = ExtResource("3_fu3f1")
-shader_parameter/effect_progress = 0.0
-shader_parameter/grey_color = Vector4(0.5, 0.5, 0.5, 1)
-shader_parameter/white_color = Vector4(1, 1, 1, 1)
-shader_parameter/outline_thickness = 2.0
-shader_parameter/flash_speed = 2.0
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ojohr"]
-shader = ExtResource("4_0jxxb")
-shader_parameter/outline_thickness = 3.0
-shader_parameter/inside_color = Vector4(1, 1, 1, 1)
-shader_parameter/outline_color = Vector4(0, 0, 0, 1)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fkqug"]
 atlas = ExtResource("2_a5jjx")
@@ -243,31 +227,16 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_a4dsa"]
-radius = 14.0
-height = 40.0
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g80gg"]
 radius = 12.0
 height = 33.0
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fqljx"]
-radius = 21.0
-height = 48.0
-
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_4ik8x"]
 
-[node name="Ogre" node_paths=PackedStringArray("hitboxes", "hurtboxes") instance=ExtResource("1_1avr3")]
-collision_layer = 3
-collision_mask = 3
+[node name="Ogre" instance=ExtResource("1_1avr3")]
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("2_1jnmm")
-attack_damage = 25.0
-attack_range = 50.0
-patrol_speed = 150.0
-_shader_material = SubResource("ShaderMaterial_e2x8i")
-_death_shader_material = SubResource("ShaderMaterial_ojohr")
-hitboxes = []
-hurtboxes = []
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_odf2b")
@@ -275,37 +244,12 @@ animation = &"Attack"
 frame = 6
 frame_progress = 1.0
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="HitBox2D#CollisionShape2D" type="CollisionShape2D" parent="." index="1"]
 position = Vector2(0, 13.5)
-shape = SubResource("CapsuleShape2D_a4dsa")
-debug_color = Color(0, 0.175, 0.7, 0.419608)
-
-[node name="HitBox2D" parent="." index="2"]
-position = Vector2(0, 13.5)
-collision_layer = 2
-collision_mask = 8
-
-[node name="CollisionShape2D" parent="HitBox2D" index="0"]
 shape = SubResource("CapsuleShape2D_g80gg")
 debug_color = Color(0.7, 0.571667, 0, 0.419608)
 
-[node name="HurtBox2D" parent="." index="3"]
-position = Vector2(-60, 17)
-collision_layer = 2
-collision_mask = 8
-monitoring = false
-
-[node name="CollisionShape2D" parent="HurtBox2D" index="0"]
-shape = SubResource("CapsuleShape2D_fqljx")
-debug_color = Color(1, 0, 0.0666666, 0.419608)
-
-[node name="floor_detector_y" parent="." index="5"]
-position = Vector2(30, 0)
-
-[node name="floor_detector_x" parent="." index="6"]
-position = Vector2(-30, 0)
-
-[node name="VisibleOnScreenEnabler2D" parent="." index="7"]
+[node name="VisibleOnScreenEnabler2D" parent="." index="2"]
 position = Vector2(-3, 17.5)
 scale = Vector2(2.5, 2.25)
 
@@ -313,5 +257,5 @@ scale = Vector2(2.5, 2.25)
 behavior_tree = ExtResource("7_nw7g0")
 blackboard_plan = SubResource("BlackboardPlan_4ik8x")
 
-[node name="FrameDataComponent" type="Node2D" parent="." index="9"]
+[node name="FrameDataComponent2" type="Node2D" parent="." index="9"]
 script = ExtResource("11_vviu0")

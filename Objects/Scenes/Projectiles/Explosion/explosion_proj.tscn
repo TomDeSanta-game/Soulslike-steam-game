@@ -1,6 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://dfrnsejivjed1"]
+[gd_scene load_steps=15 format=3 uid="uid://dfrnsejivjed1"]
 
-[ext_resource type="PackedScene" uid="uid://cnj0a4x0abenb" path="res://Entities/scenes/Projectiles/proj_base.tscn" id="1_k4xwm"]
+[ext_resource type="PackedScene" uid="uid://cnj0a4x0abenb" path="res://Objects/Scenes/Projectiles/proj_base.tscn" id="1_k4xwm"]
+[ext_resource type="Script" path="res://Objects/Scripts/Projectiles/Explosion/explosion_proj.gd" id="2_3ajyg"]
 [ext_resource type="Texture2D" uid="uid://cixj0i0421kqy" path="res://assets/Legacy Collection/Misc/Explosion/spritesheet/explosion-animation.png" id="2_6248r"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ieo45"]
@@ -83,6 +84,7 @@ animations = [{
 radius = 17.1172
 
 [node name="ExplosionProj" instance=ExtResource("1_k4xwm")]
+script = ExtResource("2_3ajyg")
 metadata/entity_name = "ExplosionProj"
 
 [node name="AnimatedSprite2D" parent="." index="0"]

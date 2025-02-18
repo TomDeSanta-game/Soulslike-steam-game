@@ -99,11 +99,11 @@ children = [SubResource("BTSequence_hbayy")]
 
 [sub_resource type="BTAction" id="BTAction_88ja4"]
 script = ExtResource("5_g0ffc")
-waypoints = Array[Vector2]([])
 speed = 100.0
 tolerance = 10.0
 position_var = &"pos"
-wait_time = 1.0
+direction_var = &"dir"
+default_wait_time = 1.0
 
 [sub_resource type="BTAction" id="BTAction_jv6yl"]
 script = ExtResource("2_5ej7g")

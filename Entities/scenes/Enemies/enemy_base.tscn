@@ -6,10 +6,10 @@
 [ext_resource type="Script" path="res://Components/hurtbox_component.gd" id="3_2eggk"]
 [ext_resource type="Script" path="res://Components/box_flip.gd" id="5_nvv45"]
 
-[node name="EnemyBase" type="CharacterBody2D" node_paths=PackedStringArray("hitboxes", "hurtboxes") groups=["Enemy"]]
+[node name="EnemyBase" type="CharacterBody2D" groups=["Enemy"]]
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("1_qiq53")
-hitboxes = [NodePath("HitBox")]
-hurtboxes = [NodePath("HurtBox")]
 metadata/entity_name = "EnemyBase"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

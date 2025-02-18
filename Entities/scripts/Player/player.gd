@@ -64,6 +64,7 @@ const ANIMATIONS: Dictionary = {
 @export var _shader_material: ShaderMaterial
 @export var _death_shader_material: ShaderMaterial
 @export var _dash_shader_material: ShaderMaterial
+@export var _invincibility_shader_material: ShaderMaterial
 
 # Player state
 var magic: float = STATS.MAX_MAGIC
@@ -137,6 +138,10 @@ var dash_cooldown_timer: float = 0.0
 var coyote_timer: float = 0.0
 var has_coyote_time: bool = false
 
+# Invincibility Variables
+var invincibility_duration: float = 2.0  # Total duration of invincibility
+var invincibility_timer: float = 0.0
+
 
 func _ready() -> void:
 	add_to_group("Player")
@@ -144,9 +149,8 @@ func _ready() -> void:
 	types.player = self
 
 	# Set collision layers and masks
-	# Layer 4 (1 << 3 because it's zero-based)
-	self.collision_layer = Constants.LAYER_PLAYER
-	self.collision_mask = Constants.LAYER_WORLD  # Or Constants.MASK_PLAYER if you want multiple
+	self.collision_layer = C_Layers.LAYER_PLAYER
+	self.collision_mask = C_Layers.MASK_PLAYER
 
 	# Also set the hitbox and hurtbox layers/masks
 	if hitbox:
@@ -154,15 +158,15 @@ func _ready() -> void:
 		hitbox.damage = 15.0
 		hitbox.knockback_force = 200.0
 		hitbox.hit_stun_duration = 0.2
-		hitbox.collision_layer = Constants.LAYER_HITBOX
-		hitbox.collision_mask = Constants.LAYER_HURTBOX
+		hitbox.collision_layer = C_Layers.LAYER_HITBOX
+		hitbox.collision_mask = C_Layers.MASK_HITBOX
 		hitbox.add_to_group("Hitbox")
 		hitbox.active = true
 
 	if hurtbox:
 		hurtbox.hurtbox_owner = self
-		hurtbox.collision_layer = Constants.LAYER_HURTBOX
-		hurtbox.collision_mask = Constants.LAYER_HITBOX
+		hurtbox.collision_layer = C_Layers.LAYER_HURTBOX
+		hurtbox.collision_mask = C_Layers.MASK_HURTBOX
 		hurtbox.active = true
 
 	set_jump_power(-450.0)
@@ -268,6 +272,14 @@ func _process(delta: float) -> void:
 	_update_ui()
 	_update_health_bar()
 	_update_stamina_bar()
+
+	# Handle invincibility effect
+	if is_invincible:
+		invincibility_timer += delta
+		_invincibility_shader_material.set_shader_parameter("time_elapsed", invincibility_timer)
+		
+		if invincibility_timer >= invincibility_duration:
+			_end_invincibility()
 
 
 func _physics_process(delta: float) -> void:
@@ -551,6 +563,9 @@ func _handle_magic(healing_amount: float) -> void:
 
 # Take Damage
 func take_damage(damage_amount: float) -> void:
+	if is_invincible:
+		return  # Skip damage if invincible
+		
 	current_health -= damage_amount
 	current_health = clamp(current_health, 0.0, max_health)
 	health_percent = (current_health / max_health) * 100.0
@@ -562,19 +577,19 @@ func take_damage(damage_amount: float) -> void:
 		animated_sprite.play(ANIMATIONS.HURT)
 		SoundManager.play_sound(Sound.oof, "SFX")
 
+		# Enhanced screen shake with more impact
+		camera.shake(12, 0.3, 0.85)  # Increased intensity and duration for more impact
+
+		# Damage pause effect
+		Engine.time_scale = 0.05  # Slow down time dramatically
+		await get_tree().create_timer(0.3 * Engine.time_scale).timeout  # Account for time scale in pause duration
+		Engine.time_scale = 1.0  # Return to normal time
+
 		# Start invincibility
-		hurtbox.start_invincibility()
+		_start_invincibility()
 
 		# Update health bar
 		health_bar.value = current_health
-
-		# Screen shake effect
-		camera.shake(5, 0.2, 0.8)
-
-		# Start damage shader effect
-		effect_timer = 0.0
-		animated_sprite.material = _shader_material
-		animated_sprite.material.set_shader_parameter("effect_progress", 1.0)
 
 
 # Health the health
@@ -873,3 +888,19 @@ func restore_stamina(amount: float) -> void:
 
 func heal(amount: float) -> void:
 	_heal(amount)  # Use existing heal method
+
+func _start_invincibility() -> void:
+	is_invincible = true
+	invincibility_timer = 0.0
+	animated_sprite.material = _invincibility_shader_material
+	_invincibility_shader_material.set_shader_parameter("time_elapsed", 0.0)
+	_invincibility_shader_material.set_shader_parameter("base_visible_duration", 0.2)
+	_invincibility_shader_material.set_shader_parameter("base_invisible_duration", 0.1)
+	_invincibility_shader_material.set_shader_parameter("duration_increase_rate", 0.001)
+	hurtbox.start_invincibility(invincibility_duration)
+
+func _end_invincibility() -> void:
+	is_invincible = false
+	invincibility_timer = 0.0
+	animated_sprite.material = _shader_material
+	hurtbox.end_invincibility()

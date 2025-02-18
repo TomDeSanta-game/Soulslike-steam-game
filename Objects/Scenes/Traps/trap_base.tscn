@@ -1,8 +1,10 @@
 [gd_scene load_steps=2 format=3 uid="uid://dvkoyknj2aiv8"]
 
-[ext_resource type="Script" path="res://Entities/scripts/Traps/trap_base.gd" id="1_p5r1k"]
+[ext_resource type="Script" path="res://Objects/Scripts/Traps/trap_base.gd" id="1_p5r1k"]
 
 [node name="TrapBase" type="Area2D"]
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("1_p5r1k")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

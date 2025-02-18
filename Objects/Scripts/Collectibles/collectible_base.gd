@@ -11,6 +11,10 @@ func _ready() -> void:
 	if players.size() > 0:
 		player = players.front()
 	
+	# Set collision layers/masks
+	collision_layer = C_Layers.LAYER_COLLECTIBLE
+	collision_mask = C_Layers.MASK_COLLECTIBLE
+	
 	# Connect the area entered signal to handle collection
 	area_entered.connect(_on_area_entered)
 

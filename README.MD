@@ -4,6 +4,16 @@ A 2D action-platformer game developed in Godot 4.
 
 ## Features
 
+### UI
+- Health bar:
+  - Red progress bar showing current health
+  - Smooth visual feedback
+  - Rounded corners for modern look
+- Stamina bar:
+  - Green progress bar showing current stamina
+  - Updates dynamically with actions
+  - Visual feedback for stamina consumption
+
 ### Movement
 - Jump mechanics:
   - Coyote time (150ms to jump after leaving platform)
@@ -45,3 +55,22 @@ A 2D action-platformer game developed in Godot 4.
   - Fatal: Critical failures
 
 ## Project Structure
+
+## Controls
+
+## Technical Details
+- Built with Godot 4.x
+- Uses custom state machine implementation
+- Frame-perfect hit detection system
+- Shader-based visual effects
+- Sound management system
+
+### Collision Layer System
+- Layer 1: World/Environment
+- Layer 2: Enemies
+- Layer 3: Projectiles
+- Layer 4: Player
+- Layer 5: NPCs
+- Layer 6: Collectibles
+- Layer 7: Hitboxes
+- Layer 8: Hurtboxes

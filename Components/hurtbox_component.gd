@@ -40,6 +40,12 @@ func start_invincibility(duration: float = 0.5) -> void:
 	SignalBus.invincibility_started.emit(hurtbox_owner)  # Emit global signal
 	invincibility_timer.start(duration)
 
+func end_invincibility() -> void:
+	invincible = false
+	invincibility_timer.stop()
+	invincibility_ended.emit()  # Emit local signal
+	SignalBus.invincibility_ended.emit(hurtbox_owner)  # Emit global signal
+
 func _on_invincibility_timer_timeout() -> void:
 	invincible = false
 	invincibility_ended.emit()  # Emit local signal

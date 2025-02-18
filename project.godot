@@ -39,6 +39,7 @@ SaveEngine="*res://Singletons/Scripts/SaveManager/save_manager.gd"
 InputBuffer="*res://Singletons/Scripts/InputBuffer/input_buffer.gd"
 Log="*res://addons/logger/logger.gd"
 SignalBus="*res://Singletons/Scripts/SignalBus/signal_bus.gd"
+CLayers="*res://Singletons/Scripts/C_Layers/C_Layers.gd"
 
 [display]
 
@@ -156,6 +157,8 @@ GRAB={
 2d_physics/layer_3="PROJECTILES"
 2d_physics/layer_4="PLAYER"
 2d_physics/layer_5="NPC"
+2d_physics/layer_6="COLLECTIBLE"
+2d_physics/layer_7="TRAPS"
 
 [maaacks_game_template]
 
