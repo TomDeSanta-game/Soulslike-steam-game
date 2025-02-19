@@ -1,4 +1,4 @@
-[gd_scene load_steps=145 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=146 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -31,6 +31,7 @@
 [ext_resource type="Texture2D" uid="uid://dqktjscdxkgnq" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_SlideFull.png" id="20_hx06x"]
 [ext_resource type="Texture2D" uid="uid://s1ssddjdmy1e" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_WallClimb.png" id="23_ygupw"]
 [ext_resource type="Texture2D" uid="uid://c03o5qkye4f3y" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_WallHang.png" id="24_w6kyf"]
+[ext_resource type="PackedScene" uid="uid://c2q8vxudrm6y2" path="res://UI/Scenes/inventory.tscn" id="32_c7ngx"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_r5sqx"]
 shader = ExtResource("2_0x5o6")
@@ -1012,6 +1013,9 @@ box = NodePath("../Hitbox")
 script = ExtResource("19_box_flip")
 sprite = NodePath("../AnimatedSprite2D")
 box = NodePath("../Hurtbox")
+
+[node name="Inventory" parent="." instance=ExtResource("32_c7ngx")]
+visible = false
 
 [connection signal="timeout" from="Timers/DeathTimer" to="." method="_on_death_timer_timeout"]
 [connection signal="timeout" from="Timers/TimeTakenDamageTimer" to="." method="_on_time_taken_damage_timer_timeout"]

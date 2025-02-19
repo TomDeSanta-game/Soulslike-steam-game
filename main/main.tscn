@@ -9,13 +9,5 @@ script = ExtResource("1_wb4y3")
 
 [node name="Level" parent="." instance=ExtResource("2_6ix33")]
 
-[node name="player" parent="." node_paths=PackedStringArray("hitboxes", "hurtboxes") instance=ExtResource("3_mubwf")]
+[node name="player" parent="." instance=ExtResource("3_mubwf")]
 position = Vector2(0, -40)
-initial_health = 100.0
-initial_vigour = 10
-base_run_speed = 300.0
-base_crouch_speed = 150.0
-jump_power = -200.0
-team = 0
-hitboxes = []
-hurtboxes = []

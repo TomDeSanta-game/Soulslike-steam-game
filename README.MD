@@ -36,9 +36,10 @@ A 2D action-platformer game developed in Godot 4.
 
 ### Collectibles
 - Celestial Tears:
-  - Restore health and stamina on collection
+  - Collected and stored in inventory
   - Visual and sound effects on pickup
   - Automatic cleanup after collection
+  - Can be used from inventory to restore health and stamina
 
 ### Save System
 - Bonfire checkpoints
@@ -54,9 +55,47 @@ A 2D action-platformer game developed in Godot 4.
   - Error: Runtime errors
   - Fatal: Critical failures
 
-## Project Structure
+## Inventory System
+The game features an inventory system that allows players to collect and manage various items:
+
+### Features
+- Press 'I' to open/close the inventory
+- Visual display of collected items with their quantities
+- Support for various collectible items including Celestial Tears
+- Grid-based inventory layout
+- Automatic item stacking for multiple instances of the same item
+- Item usage system with dedicated use functions
+- Separation of collection and usage mechanics
+
+### Items
+- **Celestial Tear**: A rare crystallized tear from the heavens that can be used from inventory to restore full health and stamina.
 
 ## Controls
+
+### Movement
+- **LEFT/RIGHT**: Arrow keys or A/D
+- **UP**: Up arrow key (for wall climbing)
+- **CROUCH**: Down arrow key
+- **JUMP**: Spacebar
+- **DASH**: D key
+- **ROLL**: M key
+- **SLIDE**: N key
+- **GRAB**: G key (for wall hanging)
+
+### Combat
+- **ATTACK**: Left mouse button
+- **SHOOT**: S key
+- **HEAL**: R key
+
+### Inventory
+- **INVENTORY**: I key (toggle inventory)
+
+### Debug/Testing
+- **HEALTH_DOWN**: X key (decrease health)
+- **DIE**: ` key (instant death)
+- **BACK/QUIT**: ESC key or Q key
+
+## Project Structure
 
 ## Technical Details
 - Built with Godot 4.x

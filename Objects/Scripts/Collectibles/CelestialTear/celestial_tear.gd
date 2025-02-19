@@ -3,8 +3,13 @@ extends CollectibleBase
 # Since these are rare collectibles, they will restore full health and stamina
 # No need for export vars since they'll always restore to max
 
-@onready var sprite = $Sprite2D  # Adjust this to match your node structure
+const ITEM_ID = "celestial_tear"
+
+@onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
+
+# Add autoload reference
+@onready var inventory = get_node("/root/Inventory")
 
 func _ready() -> void:
 	super._ready()  # Call parent _ready first
@@ -34,7 +39,23 @@ func collect() -> void:
 	if _is_collected:
 		return
 
-	# Heal the player to full health
+	# Add to inventory
+	var item_data = {
+		"id": ITEM_ID,
+		"name": "Celestial Tear",
+		"texture": load("res://assets/Sprite-0003.png"),
+		"description": "A rare crystallized tear from the heavens. Restores full health and stamina when used.",
+		"quantity": 1,
+		"use_function": "use_celestial_tear"  # Add this to specify which function to call when used
+	}
+	
+	inventory.add_item(ITEM_ID, item_data)
+
+	# Call parent collect method to handle sound, effects and cleanup
+	super.collect()
+
+# New function that will be called when using the item from inventory
+func use_celestial_tear() -> void:
 	if player and player.has_method("get_max_health") and player.has_method("heal"):
 		var max_health = player.get_max_health()
 		player.heal(max_health)
@@ -43,6 +64,3 @@ func collect() -> void:
 	if player and player.has_method("get_max_stamina") and player.has_method("restore_stamina"):
 		var max_stamina = player.get_max_stamina()
 		player.restore_stamina(max_stamina)
-
-	# Call parent collect method to handle sound, effects and cleanup
-	super.collect()

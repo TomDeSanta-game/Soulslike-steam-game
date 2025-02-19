@@ -2,9 +2,9 @@ extends Node2D
 
 const OBJECT_SCENES: Dictionary = {
 	Types.ObjectType.EXPLOSION:
-	preload("res://Entities/scenes/Projectiles/Explosion/explosion_proj.tscn"),
+	preload("res://Objects/Scenes/Projectiles/Explosion/explosion_proj.tscn"),
 	Types.ObjectType.SHURIKEN:
-	preload("res://Entities/scenes/Traps/Shuriken_Trap/shuriken_trap.tscn")
+	preload("res://Objects/Scenes/Traps/Shuriken_Trap/shuriken_trap.tscn")
 }
 
 var types: Types = Types.new()
