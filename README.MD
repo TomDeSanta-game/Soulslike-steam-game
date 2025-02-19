@@ -65,10 +65,29 @@ The game features an inventory system that allows players to collect and manage 
 - Grid-based inventory layout
 - Automatic item stacking for multiple instances of the same item
 - Item usage system with dedicated use functions
+- Interactive item usage:
+  - Hover over items to reveal usage options
+  - "EAT" button appears next to consumable items
+  - Button remains visible for 1.5 seconds after moving mouse away
+  - Extended interaction window for easier item usage
+  - Items are automatically removed when consumed
+  - Quantity tracking for multiple items
+  - Automatic UI cleanup after item usage
 - Separation of collection and usage mechanics
+- Pause system integration:
+  - Game pauses when inventory is open
+  - Automatically unpauses after item usage
 
 ### Items
 - **Celestial Tear**: A rare crystallized tear from the heavens that can be used from inventory to restore full health and stamina.
+  - Hover over the tear to reveal the "EAT" button
+  - Button stays visible for 1.5 seconds after moving mouse away
+  - Click "EAT" to consume and restore health/stamina
+  - Provides visual and sound feedback when used
+  - Automatically removed from inventory when consumed
+  - Quantity decreases by one when used
+  - Instantly restores full health and stamina
+  - Triggers healing visual effects and sounds
 
 ## Controls
 
@@ -89,6 +108,8 @@ The game features an inventory system that allows players to collect and manage 
 
 ### Inventory
 - **INVENTORY**: I key (toggle inventory)
+- **LEFT CLICK**: Hover over items to show usage options
+- **EAT BUTTON**: Click to consume selected item (remains visible while hovering)
 
 ### Debug/Testing
 - **HEALTH_DOWN**: X key (decrease health)

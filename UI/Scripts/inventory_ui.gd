@@ -30,6 +30,34 @@ func _update_inventory_display() -> void:
 		var slot: Node = item_slot_scene.instantiate()
 		grid_container.add_child(slot)
 		slot.set_item(item_data)
+		# Connect the item_used signal
+		if slot.has_signal("item_used"):
+			slot.item_used.connect(_on_item_used)
 
 func _on_inventory_updated() -> void:
-	_update_inventory_display() 
+	_update_inventory_display()
+
+func _on_item_used(item_data: Dictionary) -> void:
+	if not item_data.has("use_function") or not item_data.has("id"):
+		return
+		
+	# Get player reference
+	var players = get_tree().get_nodes_in_group("Player")
+	if players.size() == 0:
+		return
+		
+	var player = players[0]
+	
+	# Handle celestial tear usage
+	if item_data.id == "celestial_tear" and player.has_method("use_celestial_tear"):
+		# Update inventory first
+		Inventory.use_item(item_data.id)
+		
+		# Use the item
+		player.use_celestial_tear()
+		
+		# Update display
+		_update_inventory_display()
+		
+		# Unpause the game
+		get_tree().paused = false 

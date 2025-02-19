@@ -889,7 +889,6 @@ position = Vector2(-5, 39)
 shape = SubResource("RectangleShape2D_j35f0")
 
 [node name="Label" type="Label" parent="."]
-visible = false
 offset_left = -70.0
 offset_top = -70.0
 offset_right = -22.0
@@ -1004,6 +1003,9 @@ hurtbox = NodePath("../Hurtbox")
 [node name="Shooter" type="Node2D" parent="."]
 script = ExtResource("18_58vw6")
 
+[node name="Inventory" parent="." instance=ExtResource("32_c7ngx")]
+visible = false
+
 [node name="HitboxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]
 script = ExtResource("19_box_flip")
 sprite = NodePath("../AnimatedSprite2D")
@@ -1013,9 +1015,6 @@ box = NodePath("../Hitbox")
 script = ExtResource("19_box_flip")
 sprite = NodePath("../AnimatedSprite2D")
 box = NodePath("../Hurtbox")
-
-[node name="Inventory" parent="." instance=ExtResource("32_c7ngx")]
-visible = false
 
 [connection signal="timeout" from="Timers/DeathTimer" to="." method="_on_death_timer_timeout"]
 [connection signal="timeout" from="Timers/TimeTakenDamageTimer" to="." method="_on_time_taken_damage_timer_timeout"]

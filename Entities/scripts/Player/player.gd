@@ -904,3 +904,17 @@ func _end_invincibility() -> void:
 	invincibility_timer = 0.0
 	animated_sprite.material = _shader_material
 	hurtbox.end_invincibility()
+
+# Add this function near other healing-related functions
+func use_celestial_tear() -> void:
+	# Heal to full health
+	var max_health = get_max_health()
+	_heal(max_health)
+
+	# Restore stamina to full
+	var max_stamina = get_max_stamina()
+	restore_stamina(max_stamina)
+			
+	# Play heal sound and effect
+	_trigger_lifesteal_effect()
+	SoundManager.play_sound(Sound.heal, "SFX")

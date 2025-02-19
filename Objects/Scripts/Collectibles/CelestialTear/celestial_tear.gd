@@ -54,13 +54,24 @@ func collect() -> void:
 	# Call parent collect method to handle sound, effects and cleanup
 	super.collect()
 
-# New function that will be called when using the item from inventory
+# Function that will be called when using the item from inventory
 func use_celestial_tear() -> void:
-	if player and player.has_method("get_max_health") and player.has_method("heal"):
-		var max_health = player.get_max_health()
-		player.heal(max_health)
+	# Get player reference
+	var players = get_tree().get_nodes_in_group("Player")
+	if players.size() > 0:
+		var player = players[0]
+		
+		# Heal to full health
+		if player.has_method("get_max_health") and player.has_method("heal"):
+			var max_health = player.get_max_health()
+			player.heal(max_health)
 
-	# Restore stamina to full if player has stamina system
-	if player and player.has_method("get_max_stamina") and player.has_method("restore_stamina"):
-		var max_stamina = player.get_max_stamina()
-		player.restore_stamina(max_stamina)
+		# Restore stamina to full
+		if player.has_method("get_max_stamina") and player.has_method("restore_stamina"):
+			var max_stamina = player.get_max_stamina()
+			player.restore_stamina(max_stamina)
+			
+		# Play heal sound and effect
+		if player.has_method("_trigger_lifesteal_effect"):
+			player._trigger_lifesteal_effect()
+		SoundManager.play_sound(Sound.heal, "SFX")
