@@ -125,8 +125,6 @@ func idle_update(_delta: float) -> void:
 		dispatch(&"run")
 	elif not player.is_on_floor() and player.velocity.y > 0:
 		dispatch(&"fall")
-	elif player.velocity.y < 0:
-		dispatch(&"jump")
 
 
 func run_start() -> void:
@@ -137,8 +135,8 @@ func run_start() -> void:
 func run_update(_delta: float) -> void:
 	if player.velocity.x == 0:
 		dispatch(&"state_ended")
-	elif player.velocity.y != 0:
-		dispatch(&"jump")
+	elif not player.is_on_floor() and player.velocity.y > 0:
+		dispatch(&"fall")
 
 
 func run_attack_start() -> void:
@@ -154,7 +152,6 @@ func run_attack_update(_delta: float) -> void:
 
 func jump_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.JUMP)
-	player.velocity.y = player.jump_power  # Set the initial jump velocity
 
 
 func jump_update(_delta: float) -> void:
@@ -165,7 +162,7 @@ func jump_update(_delta: float) -> void:
 			dispatch(&"run")
 		else:
 			dispatch(&"state_ended")
-	elif player.velocity.y > 0:  # If we're moving downward
+	elif player.velocity.y > 0 and not player.is_jump_active:  # Only transition to fall if we're not actively jumping
 		dispatch(&"fall")
 
 

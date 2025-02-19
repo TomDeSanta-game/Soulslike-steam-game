@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://beai48cdctfy7"]
+[gd_scene load_steps=18 format=4 uid="uid://beai48cdctfy7"]
 
 [ext_resource type="Script" path="res://levels/level_1/level_1.gd" id="1_wb4y3"]
 [ext_resource type="FontFile" uid="uid://7fal73nhmb20" path="res://assets/fonts/static/Oswald-Bold.ttf" id="2_1qjoy"]
@@ -54,6 +54,8 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a8ivm"]
 size = Vector2(1067, 324)
 
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_t8cxq"]
+
 [sub_resource type="Gradient" id="Gradient_2fjqu"]
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_t26pk"]
@@ -105,6 +107,12 @@ visible = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionSystem"]
 shape = SubResource("RectangleShape2D_a8ivm")
 
+[node name="DoomPit" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoomPit"]
+position = Vector2(0, 200)
+shape = SubResource("WorldBoundaryShape2D_t8cxq")
+
 [node name="Timer" type="Timer" parent="."]
 wait_time = 1.5
 one_shot = true
@@ -133,4 +141,5 @@ tile_map_data = PackedByteArray("AADs/wUAAAAAAAAAAADs/wYAAAAAAAAAAADs/wcAAAAAAAA
 tile_set = SubResource("TileSet_3icn8")
 
 [connection signal="body_entered" from="DetectionSystem" to="." method="_on_detection_system_body_entered"]
+[connection signal="body_entered" from="DoomPit" to="." method="_on_doom_pit_body_entered"]
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

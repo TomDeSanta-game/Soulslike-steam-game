@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://bvl7entlv34xj"]
 
-[ext_resource type="PackedScene" uid="uid://dvkoyknj2aiv8" path="res://Entities/scenes/Traps/trap_base.tscn" id="1_bupuo"]
+[ext_resource type="PackedScene" uid="uid://dvkoyknj2aiv8" path="res://Objects/Scenes/Traps/trap_base.tscn" id="1_bupuo"]
 [ext_resource type="Texture2D" uid="uid://dc0i85im7mpkg" path="res://assets/trap/Suriken.png" id="2_mopb5"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_idaks"]
@@ -87,6 +87,8 @@ radius = 16.2788
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_w4aua")
 animation = &"ACTIVATE"
+frame = 6
+frame_progress = 0.00099989
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource("CircleShape2D_ube2q")

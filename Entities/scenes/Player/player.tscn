@@ -1,4 +1,4 @@
-[gd_scene load_steps=146 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=145 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -831,16 +831,15 @@ radius = 6.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j35f0"]
 size = Vector2(16, 1.7)
 
-[sub_resource type="LabelSettings" id="LabelSettings_3fvdd"]
-font = ExtResource("14_j5s4l")
-outline_size = 8
-outline_color = Color(0, 0, 0, 1)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mmdt5"]
+radius = 22.0
+height = 58.0
 
-[sub_resource type="LabelSettings" id="LabelSettings_ywr0q"]
-font = ExtResource("12_trxkp")
-font_size = 50
-shadow_size = 10
-shadow_color = Color(0, 0, 0, 1)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4hfov"]
+radius = 6.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o87r6"]
+radius = 6.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q7x2p"]
 bg_color = Color(0.129412, 0.145098, 0.160784, 1)
@@ -854,15 +853,11 @@ bg_color = Color(0.129412, 0.145098, 0.160784, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46tl0"]
 bg_color = Color(0.501961, 0.929412, 0.6, 1)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mmdt5"]
-radius = 22.0
-height = 58.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4hfov"]
-radius = 6.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o87r6"]
-radius = 6.0
+[sub_resource type="LabelSettings" id="LabelSettings_ywr0q"]
+font = ExtResource("12_trxkp")
+font_size = 50
+shadow_size = 10
+shadow_color = Color(0, 0, 0, 1)
 
 [node name="player" type="CharacterBody2D"]
 collision_layer = 0
@@ -888,33 +883,6 @@ visible = false
 position = Vector2(-5, 39)
 shape = SubResource("RectangleShape2D_j35f0")
 
-[node name="Label" type="Label" parent="."]
-offset_left = -70.0
-offset_top = -70.0
-offset_right = -22.0
-offset_bottom = -47.0
-text = "000"
-label_settings = SubResource("LabelSettings_3fvdd")
-
-[node name="GameOverLabel" type="Label" parent="."]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -150.0
-offset_right = 220.0
-offset_bottom = 50.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "You
-Died!"
-label_settings = SubResource("LabelSettings_ywr0q")
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="Timers" type="Node" parent="."]
 
 [node name="AttackTimer" type="Timer" parent="Timers"]
@@ -933,26 +901,6 @@ one_shot = true
 [node name="TimeTakenDamageTimer" type="Timer" parent="Timers"]
 wait_time = 3.5
 one_shot = true
-
-[node name="ProgressBar" type="ProgressBar" parent="."]
-offset_left = -380.0
-offset_top = -240.0
-offset_right = -180.0
-offset_bottom = -210.0
-theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxFlat_q7x2p")
-theme_override_styles/fill = SubResource("StyleBoxFlat_413gc")
-show_percentage = false
-
-[node name="StaminaBar" type="ProgressBar" parent="."]
-offset_left = -380.0
-offset_top = -190.0
-offset_right = -180.0
-offset_bottom = -160.0
-theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxFlat_v2s43")
-theme_override_styles/fill = SubResource("StyleBoxFlat_46tl0")
-show_percentage = false
 
 [node name="Hitbox" type="Area2D" parent="." groups=["Player"]]
 unique_name_in_owner = true
@@ -1003,7 +951,54 @@ hurtbox = NodePath("../Hurtbox")
 [node name="Shooter" type="Node2D" parent="."]
 script = ExtResource("18_58vw6")
 
-[node name="Inventory" parent="." instance=ExtResource("32_c7ngx")]
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="ProgressBar" type="ProgressBar" parent="UILayer"]
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 210.0
+offset_bottom = 35.0
+theme_override_fonts/font = ExtResource("14_j5s4l")
+theme_override_styles/background = SubResource("StyleBoxFlat_q7x2p")
+theme_override_styles/fill = SubResource("StyleBoxFlat_413gc")
+show_percentage = false
+
+[node name="StaminaBar" type="ProgressBar" parent="UILayer"]
+offset_left = 10.0
+offset_top = 40.0
+offset_right = 210.0
+offset_bottom = 70.0
+theme_override_fonts/font = ExtResource("14_j5s4l")
+theme_override_styles/background = SubResource("StyleBoxFlat_v2s43")
+theme_override_styles/fill = SubResource("StyleBoxFlat_46tl0")
+show_percentage = false
+
+[node name="Label" type="Label" parent="UILayer"]
+offset_left = 10.0
+offset_top = 90.0
+offset_right = 200.0
+offset_bottom = 185.0
+
+[node name="GameOverLabel" type="Label" parent="UILayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 576.0
+offset_bottom = 325.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "You
+Died!"
+label_settings = SubResource("LabelSettings_ywr0q")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Inventory" parent="UILayer" instance=ExtResource("32_c7ngx")]
 visible = false
 
 [node name="HitboxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]

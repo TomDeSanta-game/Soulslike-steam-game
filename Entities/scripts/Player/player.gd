@@ -43,10 +43,10 @@ const ANIMATIONS: Dictionary = {
 
 # Node references
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var label: Label = $Label
+@onready var label: Label = $UILayer/Label
 @onready var shooter: Shooter = $Shooter
-@onready var health_bar: ProgressBar = $ProgressBar
-@onready var stamina_bar: ProgressBar = $StaminaBar
+@onready var health_bar: ProgressBar = $UILayer/ProgressBar
+@onready var stamina_bar: ProgressBar = $UILayer/StaminaBar
 @onready var camera: Camera2D = $Camera2D
 
 # Types Global
@@ -277,7 +277,7 @@ func _process(delta: float) -> void:
 	if is_invincible:
 		invincibility_timer += delta
 		_invincibility_shader_material.set_shader_parameter("time_elapsed", invincibility_timer)
-		
+
 		if invincibility_timer >= invincibility_duration:
 			_end_invincibility()
 
@@ -288,8 +288,8 @@ func _physics_process(delta: float) -> void:
 	if !is_on_floor():
 		velocity.y += Types.GRAVITY_CONSTANT * delta
 		# Only play fall animation when moving downward and not in a jump state
-		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.FALL and !is_jump_active:
-			animated_sprite.play(ANIMATIONS.FALL)
+		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.FALL and !is_jump_active and !is_attacking:
+			state_machine.dispatch(&"fall")
 
 	# Handle coyote time
 	if was_on_floor and !is_on_floor():
@@ -547,7 +547,7 @@ func _die() -> void:
 	health_bar.hide()
 
 	death_timer.start()
-	$GameOverLabel.show()
+	$UILayer/GameOverLabel.show()
 
 
 func _on_death_timer_timeout() -> void:
@@ -565,7 +565,7 @@ func _handle_magic(healing_amount: float) -> void:
 func take_damage(damage_amount: float) -> void:
 	if is_invincible:
 		return  # Skip damage if invincible
-		
+
 	current_health -= damage_amount
 	current_health = clamp(current_health, 0.0, max_health)
 	health_percent = (current_health / max_health) * 100.0
@@ -879,15 +879,19 @@ func _start_dash() -> void:
 func get_max_health() -> float:
 	return max_health
 
+
 func get_max_stamina() -> float:
 	return STATS.MAX_STAMINA
+
 
 func restore_stamina(amount: float) -> void:
 	stamina = min(stamina + amount, STATS.MAX_STAMINA)
 	_update_stamina_bar()
 
+
 func heal(amount: float) -> void:
 	_heal(amount)  # Use existing heal method
+
 
 func _start_invincibility() -> void:
 	is_invincible = true
@@ -899,11 +903,13 @@ func _start_invincibility() -> void:
 	_invincibility_shader_material.set_shader_parameter("duration_increase_rate", 0.001)
 	hurtbox.start_invincibility(invincibility_duration)
 
+
 func _end_invincibility() -> void:
 	is_invincible = false
 	invincibility_timer = 0.0
 	animated_sprite.material = _shader_material
 	hurtbox.end_invincibility()
+
 
 # Add this function near other healing-related functions
 func use_celestial_tear() -> void:
@@ -914,7 +920,7 @@ func use_celestial_tear() -> void:
 	# Restore stamina to full
 	var max_stamina = get_max_stamina()
 	restore_stamina(max_stamina)
-			
+
 	# Play heal sound and effect
 	_trigger_lifesteal_effect()
 	SoundManager.play_sound(Sound.heal, "SFX")
