@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3 uid="uid://b6c7usj8wu3ks"]
+
+[ext_resource type="Script" path="res://Objects/Scripts/Bag/bag.gd" id="1_2k3m4"]
+[ext_resource type="Texture2D" uid="uid://clcwvh1lfhngi" path="res://assets/bag/PNG/64px/backpack.png" id="2_u4v3d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n44em"]
+size = Vector2(28, 30)
+
+[node name="Bag" type="Area2D"]
+collision_layer = 32
+collision_mask = 9
+script = ExtResource("1_2k3m4")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_u4v3d")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_n44em")
+
+[node name="RayCastFarLeft" type="RayCast2D" parent="."]
+position = Vector2(-30, 0)
+
+[node name="RayCastMidLeft" type="RayCast2D" parent="."]
+position = Vector2(-20, 0)
+
+[node name="RayCastNearLeft" type="RayCast2D" parent="."]
+position = Vector2(-10, 0)
+
+[node name="RayCastNearRight" type="RayCast2D" parent="."]
+position = Vector2(10, 0)
+
+[node name="RayCastMidRight" type="RayCast2D" parent="."]
+position = Vector2(20, 0)
+
+[node name="RayCastFarRight" type="RayCast2D" parent="."]
+position = Vector2(30, 0)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

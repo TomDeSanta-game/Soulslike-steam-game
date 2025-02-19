@@ -142,6 +142,9 @@ var has_coyote_time: bool = false
 var invincibility_duration: float = 2.0  # Total duration of invincibility
 var invincibility_timer: float = 0.0
 
+# Add this near other class variables
+var last_floor_position: Vector2 = Vector2.ZERO
+
 
 func _ready() -> void:
 	add_to_group("Player")
@@ -288,8 +291,16 @@ func _physics_process(delta: float) -> void:
 	if !is_on_floor():
 		velocity.y += Types.GRAVITY_CONSTANT * delta
 		# Only play fall animation when moving downward and not in a jump state
-		if velocity.y > 0 and animated_sprite.animation != ANIMATIONS.FALL and !is_jump_active and !is_attacking:
+		if (
+			velocity.y > 0
+			and animated_sprite.animation != ANIMATIONS.FALL
+			and !is_jump_active
+			and !is_attacking
+		):
 			state_machine.dispatch(&"fall")
+	elif was_on_floor:
+		# Update last floor position when on floor
+		last_floor_position = global_position
 
 	# Handle coyote time
 	if was_on_floor and !is_on_floor():
@@ -545,9 +556,48 @@ func _die() -> void:
 	# Hide UI elements
 	label.hide()
 	health_bar.hide()
+	stamina_bar.hide()
+
+	# Get current inventory items before clearing
+	var items = Inventory.get_items().duplicate(true)
+
+	# Clear inventory
+	Inventory.clear_inventory()
+
+	# Create a timer for delayed bag spawn
+	var spawn_timer = Timer.new()
+	add_child(spawn_timer)
+	spawn_timer.wait_time = 2.0
+	spawn_timer.one_shot = true
+	spawn_timer.timeout.connect(func():
+		# Determine bag spawn position based on floor status
+		var spawn_position: Vector2
+		if is_on_floor():
+			spawn_position = global_position
+		else:
+			spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
+
+		# Adjust X position based on player direction
+		spawn_position.x += 20 if animated_sprite.flip_h else -20  # Offset left or right based on direction
+
+		# Create and spawn bag with items if there are any
+		if not items.is_empty():
+			var bag_scene = load("res://Objects/Scenes/Bag/bag.tscn")
+			var bag = bag_scene.instantiate()
+			bag.global_position = spawn_position
+			bag.store_items(items)
+			# Add the bag to the root node to persist through scene changes
+			get_node("/root").add_child(bag)
+		
+		# Clean up the timer
+		spawn_timer.queue_free()
+		
+		# Transition to game over scene after bag spawns
+		SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
+	)
+	spawn_timer.start()
 
 	death_timer.start()
-	$UILayer/GameOverLabel.show()
 
 
 func _on_death_timer_timeout() -> void:

@@ -13,6 +13,11 @@ A 2D action-platformer game developed in Godot 4.
   - Green progress bar showing current stamina
   - Updates dynamically with actions
   - Visual feedback for stamina consumption
+- Game Over Screen:
+  - Appears when player dies
+  - Dark background with red "YOU DIED!" text
+  - Press space to restart level
+  - Smooth transition between scenes
 
 ### Movement
 - Jump mechanics:
@@ -134,3 +139,19 @@ The game features an inventory system that allows players to collect and manage 
 - Layer 6: Collectibles
 - Layer 7: Hitboxes
 - Layer 8: Hurtboxes
+
+### Death and Item Recovery System
+- Dark Souls-like death mechanics:
+  - On death, all inventory items are dropped in a bag
+  - Bag spawns at player's death location and falls with gravity
+  - Items can be recovered by touching the bag
+  - Visual feedback when recovering items
+  - Sound effects on item recovery
+  - Automatic bag cleanup after recovery
+  - Items are permanently lost if player dies before recovery
+  - Advanced bag positioning system:
+    - Uses 6 raycasts for precise ground detection
+    - Raycasts positioned at -30, -20, -10, 10, 20, and 30 units from center
+    - Automatically teleports to furthest valid position to prevent wall clipping
+    - Smart gravity system with terminal velocity
+    - Ensures bags always land in accessible locations
