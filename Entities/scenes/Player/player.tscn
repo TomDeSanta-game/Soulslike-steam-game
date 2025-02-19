@@ -1,4 +1,4 @@
-[gd_scene load_steps=145 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=143 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -19,7 +19,6 @@
 [ext_resource type="Texture2D" uid="uid://dtlr6wflb4h50" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_Death.png" id="11_l5w2s"]
 [ext_resource type="Texture2D" uid="uid://ibjwfbwfdsqh" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_Run.png" id="11_pi7ox"]
 [ext_resource type="Texture2D" uid="uid://dwqqe8ephm2dg" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_Fall.png" id="12_5054a"]
-[ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="12_trxkp"]
 [ext_resource type="FontFile" uid="uid://bhjnaf7qxfop2" path="res://assets/fonts/PressStart2P-Regular.ttf" id="14_j5s4l"]
 [ext_resource type="Texture2D" uid="uid://wav3lxp18eu2" path="res://assets/Colour1/NoOutline/120x80_PNGSheets/_Roll.png" id="16_6p2cq"]
 [ext_resource type="Script" path="res://Components/frame_data_component.gd" id="16_qqvvs"]
@@ -853,12 +852,6 @@ bg_color = Color(0.129412, 0.145098, 0.160784, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46tl0"]
 bg_color = Color(0.501961, 0.929412, 0.6, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_ywr0q"]
-font = ExtResource("12_trxkp")
-font_size = 50
-shadow_size = 10
-shadow_color = Color(0, 0, 0, 1)
-
 [node name="player" type="CharacterBody2D"]
 collision_layer = 0
 collision_mask = 0
@@ -938,7 +931,7 @@ debug_color = Color(0, 0, 1, 0.0784314)
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, -35)
 zoom = Vector2(1.5, 1.5)
-position_smoothing_enabled = true
+limit_bottom = 150
 script = ExtResource("17_kn0ag")
 
 [node name="FrameDataComponent" type="Node2D" parent="." node_paths=PackedStringArray("sprite", "hitbox", "hurtbox")]
@@ -978,25 +971,6 @@ offset_left = 10.0
 offset_top = 90.0
 offset_right = 200.0
 offset_bottom = 185.0
-
-[node name="GameOverLabel" type="Label" parent="UILayer"]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -576.0
-offset_top = -324.0
-offset_right = 576.0
-offset_bottom = 325.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "You
-Died!"
-label_settings = SubResource("LabelSettings_ywr0q")
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="Inventory" parent="UILayer" instance=ExtResource("32_c7ngx")]
 visible = false

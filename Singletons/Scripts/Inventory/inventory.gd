@@ -6,9 +6,9 @@ var _items: Dictionary = {}
 
 func add_item(item_id: String, item_data: Dictionary) -> void:
 	if _items.has(item_id):
-		_items[item_id].quantity += 1
+		_items[item_id].quantity += item_data.quantity
 	else:
-		_items[item_id] = item_data
+		_items[item_id] = item_data.duplicate()
 	
 	inventory_updated.emit()
 
@@ -20,7 +20,6 @@ func remove_item(item_id: String) -> void:
 func use_item(item_id: String) -> void:
 	if _items.has(item_id):
 		_items[item_id].quantity -= 1
-		
 		if _items[item_id].quantity <= 0:
 			remove_item(item_id)
 		else:
@@ -35,4 +34,8 @@ func has_item(item_id: String) -> bool:
 func get_item_quantity(item_id: String) -> int:
 	if _items.has(item_id):
 		return _items[item_id].quantity
-	return 0 
+	return 0
+
+func clear_inventory() -> void:
+	_items.clear()
+	inventory_updated.emit() 
