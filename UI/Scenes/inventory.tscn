@@ -1,18 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://c2q8vxudrm6y2"]
+[gd_scene load_steps=4 format=3 uid="uid://b4q8vg1xwdp6x"]
 
-[ext_resource type="Script" path="res://UI/Scripts/inventory_ui.gd" id="1_u4m3p"]
+[ext_resource type="Script" path="res://UI/Scripts/inventory_ui.gd" id="1_8r4nt"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k8p3q"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j6p2x"]
 bg_color = Color(0.12549, 0.12549, 0.12549, 0.901961)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.8, 0.8, 0.8, 0.901961)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+border_color = Color(1, 1, 1, 0.901961)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.278431)
+shadow_size = 4
+
+[sub_resource type="Theme" id="Theme_2p3xt"]
+Panel/styles/panel = SubResource("StyleBoxFlat_j6p2x")
 
 [node name="Inventory" type="Control"]
 process_mode = 3
@@ -22,7 +27,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_u4m3p")
+script = ExtResource("1_8r4nt")
 
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 1
@@ -31,13 +36,13 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -150.0
-offset_right = 180.0
-offset_bottom = 150.0
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_k8p3q")
+theme = SubResource("Theme_2p3xt")
 
 [node name="Title" type="Label" parent="Panel"]
 layout_mode = 1
@@ -45,11 +50,14 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -43.5
-offset_top = 10.0
+offset_top = 20.0
 offset_right = 43.5
-offset_bottom = 36.0
+offset_bottom = 46.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 32
 text = "Inventory"
 
 [node name="GridContainer" type="GridContainer" parent="Panel"]
@@ -59,12 +67,12 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -100.0
-offset_right = 160.0
-offset_bottom = 120.0
+offset_left = -250.0
+offset_top = -180.0
+offset_right = 250.0
+offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 5 
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 4 

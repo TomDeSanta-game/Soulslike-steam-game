@@ -1,4 +1,4 @@
-[gd_scene load_steps=143 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=139 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -840,18 +840,6 @@ radius = 6.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o87r6"]
 radius = 6.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q7x2p"]
-bg_color = Color(0.129412, 0.145098, 0.160784, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_413gc"]
-bg_color = Color(0.815686, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2s43"]
-bg_color = Color(0.129412, 0.145098, 0.160784, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46tl0"]
-bg_color = Color(0.501961, 0.929412, 0.6, 1)
-
 [node name="player" type="CharacterBody2D"]
 collision_layer = 0
 collision_mask = 0
@@ -952,8 +940,6 @@ offset_top = 5.0
 offset_right = 210.0
 offset_bottom = 35.0
 theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxFlat_q7x2p")
-theme_override_styles/fill = SubResource("StyleBoxFlat_413gc")
 show_percentage = false
 
 [node name="StaminaBar" type="ProgressBar" parent="UILayer"]
@@ -962,8 +948,6 @@ offset_top = 40.0
 offset_right = 210.0
 offset_bottom = 70.0
 theme_override_fonts/font = ExtResource("14_j5s4l")
-theme_override_styles/background = SubResource("StyleBoxFlat_v2s43")
-theme_override_styles/fill = SubResource("StyleBoxFlat_46tl0")
 show_percentage = false
 
 [node name="Label" type="Label" parent="UILayer"]

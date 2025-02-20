@@ -26,15 +26,15 @@ func _ready() -> void:
 	hide_timer.wait_time = BUTTON_VISIBLE_TIME
 	hide_timer.timeout.connect(_on_hide_timer_timeout)
 	add_child(hide_timer)
+	hide_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
 
 	# Connect signals
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	use_button.pressed.connect(_on_use_button_pressed)
-	use_button.mouse_entered.connect(_on_button_mouse_entered)
-	use_button.mouse_exited.connect(_on_button_mouse_exited)
 
 func set_item(data: Dictionary) -> void:
+	print("Setting item with data: ", data)  # Debug print
 	item_data = data
 	
 	# Clear existing tear instance if any
@@ -44,14 +44,14 @@ func set_item(data: Dictionary) -> void:
 	
 	# If this is a celestial tear, instantiate the scene
 	if data.id == "celestial_tear":
+		print("Creating celestial tear instance")  # Debug print
 		tear_instance = CELESTIAL_TEAR_SCENE.instantiate()
 		item_container.add_child(tear_instance)
 		
 		# Adjust the size and position of the tear instance
 		if tear_instance is Node2D:
-			tear_instance.scale = Vector2(2.5, 2.5)  # Make it 2.5x larger
-			# Center the tear in the slot
-			tear_instance.position = Vector2(32, 32)  # Half of the 64x64 slot size
+			tear_instance.scale = Vector2(4.0, 4.0)  # Make it 4x larger
+			tear_instance.position = Vector2(64, 64)  # Center in the larger slot
 		
 		# Hide the default texture
 		texture_rect.hide()
@@ -65,37 +65,22 @@ func set_item(data: Dictionary) -> void:
 	else:
 		quantity_label.hide()
 
-
 func _on_mouse_entered() -> void:
 	is_hovering = true
-	if item_data.has("use_function"):
+	print("Mouse entered, item_data: ", item_data)  # Debug print
+	if item_data.get("id") == "celestial_tear":
+		print("Showing eat button")  # Debug print
 		use_button.show()
-		if hide_timer and is_instance_valid(hide_timer) and hide_timer.is_inside_tree():
-			hide_timer.stop()  # Stop any existing timer
-
+		hide_timer.stop()
 
 func _on_mouse_exited() -> void:
 	is_hovering = false
-	if hide_timer and is_instance_valid(hide_timer) and hide_timer.is_inside_tree():
-		hide_timer.start()  # Start the timer to hide the button
-
-
-func _on_button_mouse_entered() -> void:
-	is_hovering = true
-	if hide_timer and is_instance_valid(hide_timer) and hide_timer.is_inside_tree():
-		hide_timer.stop()  # Stop the timer when hovering over button
-
-
-func _on_button_mouse_exited() -> void:
-	is_hovering = false
-	if hide_timer and is_instance_valid(hide_timer) and hide_timer.is_inside_tree():
-		hide_timer.start()  # Start the timer when leaving button
-
+	if is_instance_valid(hide_timer) and hide_timer.is_inside_tree():
+		hide_timer.start()
 
 func _on_hide_timer_timeout() -> void:
 	if not is_hovering:
 		use_button.hide()
-
 
 func _on_use_button_pressed() -> void:
 	if item_data.is_empty():

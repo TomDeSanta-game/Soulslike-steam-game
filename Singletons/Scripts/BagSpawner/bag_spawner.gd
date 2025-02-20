@@ -11,8 +11,6 @@ signal bag_recovered(bag_id: String)
 # List of scene paths where bags should not be spawned
 const EXCLUDED_SCENES = [
 	"res://UI/Scenes/game_over.tscn",
-	"res://UI/Scenes/main_menu.tscn",
-	"res://UI/Scenes/pause_menu.tscn",
 	# Add any other non-gameplay scenes here
 ]
 

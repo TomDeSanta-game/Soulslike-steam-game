@@ -185,12 +185,46 @@ func _ready() -> void:
 	max_health = health_system.get_max_health()
 	health_percent = health_system.get_health_percentage()
 
-	# Setup health bar
+	# Setup health bar style
+	var health_bar_style = StyleBoxFlat.new()
+	health_bar_style.bg_color = Color.from_string("#d00000", Color.RED)  # Bright red
+	health_bar_style.corner_radius_top_left = 8
+	health_bar_style.corner_radius_top_right = 8
+	health_bar_style.corner_radius_bottom_right = 8
+	health_bar_style.corner_radius_bottom_left = 8
+	
+	var health_bar_bg_style = StyleBoxFlat.new()
+	health_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
+	health_bar_bg_style.corner_radius_top_left = 8
+	health_bar_bg_style.corner_radius_top_right = 8
+	health_bar_bg_style.corner_radius_bottom_right = 8
+	health_bar_bg_style.corner_radius_bottom_left = 8
+
+	# Setup stamina bar style
+	var stamina_bar_style = StyleBoxFlat.new()
+	stamina_bar_style.bg_color = Color.from_string("#80ed99", Color.GREEN)  # Bright green
+	stamina_bar_style.corner_radius_top_left = 8
+	stamina_bar_style.corner_radius_top_right = 8
+	stamina_bar_style.corner_radius_bottom_right = 8
+	stamina_bar_style.corner_radius_bottom_left = 8
+	
+	var stamina_bar_bg_style = StyleBoxFlat.new()
+	stamina_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
+	stamina_bar_bg_style.corner_radius_top_left = 8
+	stamina_bar_bg_style.corner_radius_top_right = 8
+	stamina_bar_bg_style.corner_radius_bottom_right = 8
+	stamina_bar_bg_style.corner_radius_bottom_left = 8
+
+	# Apply styles to health bar
+	health_bar.add_theme_stylebox_override("fill", health_bar_style)
+	health_bar.add_theme_stylebox_override("background", health_bar_bg_style)
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_bar.min_value = 0
 
-	# Setup stamina bar
+	# Apply styles to stamina bar
+	stamina_bar.add_theme_stylebox_override("fill", stamina_bar_style)
+	stamina_bar.add_theme_stylebox_override("background", stamina_bar_bg_style)
 	stamina_bar.max_value = STATS.MAX_STAMINA
 	stamina_bar.value = stamina
 	stamina_bar.min_value = 0
