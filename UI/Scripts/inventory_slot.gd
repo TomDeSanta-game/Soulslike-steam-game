@@ -34,6 +34,7 @@ func _ready() -> void:
 func set_item(data: Dictionary) -> void:
 	print("Setting item with data: ", data)  # Debug print
 	item_data = data
+	is_empty = false
 	
 	# Clear existing tear instance if any
 	if tear_instance:
@@ -48,8 +49,10 @@ func set_item(data: Dictionary) -> void:
 		
 		# Adjust the size and position of the tear instance
 		if tear_instance is Node2D:
-			tear_instance.scale = Vector2(4.0, 4.0)  # Make it 4x larger
-			tear_instance.position = Vector2(64, 64)  # Center in the larger slot
+			tear_instance.scale = Vector2(4.0, 4.0)  # Larger scale for better visibility
+			# Center the tear in the slot by using the slot's size
+			var slot_size = size
+			tear_instance.position = slot_size / 2
 		
 		# Hide the default texture
 		texture_rect.hide()
@@ -81,28 +84,28 @@ func _on_hide_timer_timeout() -> void:
 		use_button.hide()
 
 func _on_use_button_pressed() -> void:
-	if not is_empty:
-		# Instead of emitting local signal, use SignalBus
+	if item_data.has("id"):  # Check if we have valid item data
+		# Emit the signal through SignalBus
 		SignalBus.item_used.emit(item_data)
 		clear_slot()
 
 func clear_slot() -> void:
 	# Clear item data
 	item_data = {}
+	is_empty = true
 	
 	# Clear existing tear instance if any
 	if tear_instance:
 		tear_instance.queue_free()
 		tear_instance = null
 	
-	# Hide texture
+	# Reset texture
+	texture_rect.texture = null
 	texture_rect.hide()
 	
 	# Hide quantity label
 	quantity_label.hide()
+	quantity_label.text = ""
 	
 	# Hide use button
 	use_button.hide()
-	
-	# Clear item container
-	item_container.clear()

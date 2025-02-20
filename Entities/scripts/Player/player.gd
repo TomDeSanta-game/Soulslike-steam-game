@@ -146,6 +146,9 @@ func _ready() -> void:
 	super._ready()  # Call parent _ready to initialize health system
 	types.player = self
 
+	# Connect item used signal
+	SignalBus.item_used.connect(_on_item_used)
+
 	# Set collision layers and masks
 	self.collision_layer = C_Layers.LAYER_PLAYER
 	self.collision_mask = C_Layers.MASK_PLAYER
@@ -978,3 +981,9 @@ func use_celestial_tear() -> void:
 	# Play heal sound and effect
 	_trigger_lifesteal_effect()
 	SoundManager.play_sound(Sound.heal, "SFX")
+
+
+# Add this function near other healing-related functions
+func _on_item_used(item_data: Dictionary) -> void:
+	if item_data.id == "celestial_tear":
+		use_celestial_tear()
