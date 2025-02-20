@@ -6,6 +6,8 @@ extends Node2D
 
 @onready var timer: Timer = $Timer
 
+@onready var detection_system: Area2D = $DetectionSystem
+
 
 func _ready() -> void:
 	pass
@@ -37,6 +39,7 @@ func _on_text_show_finished(anim_name: String) -> void:
 		timer.queue_free()
 		label.queue_free()
 		animation_player.queue_free()
+		detection_system.queue_free()
 
 
 func _on_doom_pit_body_entered(body: Node2D) -> void:

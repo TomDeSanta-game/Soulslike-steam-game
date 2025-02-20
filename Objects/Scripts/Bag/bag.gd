@@ -16,9 +16,13 @@ var velocity: Vector2 = Vector2.ZERO
 var gravity_force: float = 900.0  # Increased gravity for snappier falling
 const TERMINAL_VELOCITY: float = 600.0  # Reduced terminal velocity for better control
 
-
 func _ready() -> void:
-	player = get_tree().get_nodes_in_group("Player").front()
+	# Wait one frame to ensure all nodes are ready
+	await get_tree().process_frame
+	
+	var players = get_tree().get_nodes_in_group("Player")
+	player = players[0] if not players.is_empty() else null
+	
 	# Set collision layer and mask for interaction
 	collision_layer = C_Layers.LAYER_COLLECTIBLE
 	collision_mask = C_Layers.MASK_COLLECTIBLE | C_Layers.LAYER_WORLD
@@ -26,9 +30,12 @@ func _ready() -> void:
 	# Initialize raycasts
 	var raycasts = [raycast_far_left, raycast_mid_left, raycast_near_left, 
 					raycast_near_right, raycast_mid_right, raycast_far_right]
+	
+	# Validate that all raycasts exist
 	for raycast in raycasts:
-		raycast.target_position = Vector2(0, 32)  # Set downward raycast
-		raycast.collision_mask = C_Layers.LAYER_WORLD
+		if raycast != null:
+			raycast.target_position = Vector2(0, 32)  # Set downward raycast
+			raycast.collision_mask = C_Layers.LAYER_WORLD
 
 	# Check initial position and adjust if needed
 	call_deferred("_check_and_adjust_position")
@@ -44,8 +51,7 @@ func _physics_process(delta: float) -> void:
 					raycast_near_right, raycast_mid_right, raycast_far_right]
 	
 	for raycast in raycasts:
-		raycast.force_raycast_update()
-		if raycast.is_colliding():
+		if raycast != null and raycast.is_colliding():
 			is_grounded = true
 			var collision_point = raycast.get_collision_point()
 			if position.y < collision_point.y:
@@ -70,14 +76,15 @@ func _check_and_adjust_position() -> void:
 
 	# Force update all raycasts
 	for raycast_data in raycasts:
-		raycast_data["node"].force_raycast_update()
+		if raycast_data["node"] != null:
+			raycast_data["node"].force_raycast_update()
 
 	# Find the furthest colliding raycast from center
 	var furthest_colliding = null
 	var max_distance = 0
 
 	for raycast_data in raycasts:
-		if raycast_data["node"].is_colliding():
+		if raycast_data["node"] != null and raycast_data["node"].is_colliding():
 			var distance = abs(raycast_data["offset"])
 			if distance > max_distance:
 				max_distance = distance

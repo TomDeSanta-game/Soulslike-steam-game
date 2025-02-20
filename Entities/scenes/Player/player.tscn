@@ -930,7 +930,7 @@ debug_color = Color(0, 0, 1, 0.0784314)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, -35)
-zoom = Vector2(1.5, 1.5)
+zoom = Vector2(2.5, 2.5)
 limit_bottom = 150
 script = ExtResource("17_kn0ag")
 

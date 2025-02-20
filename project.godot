@@ -39,12 +39,18 @@ SaveEngine="*res://Singletons/Scripts/SaveManager/save_manager.gd"
 InputBuffer="*res://Singletons/Scripts/InputBuffer/input_buffer.gd"
 Log="*res://addons/logger/logger.gd"
 SignalBus="*res://Singletons/Scripts/SignalBus/signal_bus.gd"
-CLayers="res://Singletons/Scripts/C_Layers/C_Layers.gd"
+PersistentObjects="*res://Singletons/Scripts/PersistentChase/persistent_objects.gd"
+C_Layers="*res://Singletons/Scripts/C_Layers/C_Layers.gd"
 Inventory="*res://Singletons/Scripts/Inventory/inventory.gd"
+BagSpawner="*res://Singletons/Scripts/BagSpawner/bag_spawner.gd"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/size/mode=3
+window/size/window_width_override=1280
+window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/vsync/vsync_mode=0
@@ -191,4 +197,5 @@ common/physics_ticks_per_second=120
 
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true

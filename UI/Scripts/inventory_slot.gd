@@ -1,3 +1,4 @@
+class_name InventorySlot
 extends Panel
 
 signal item_used(item_data: Dictionary)
@@ -6,12 +7,14 @@ signal item_used(item_data: Dictionary)
 @onready var quantity_label = $QuantityLabel
 @onready var use_button = $UseButton
 @onready var hide_timer = Timer.new()
+@onready var item_container = $ItemContainer
 
 const BUTTON_VISIBLE_TIME = 1.5  # Time in seconds to keep button visible
+const CELESTIAL_TEAR_SCENE = preload("res://Objects/Scenes/Collectibles/CelestialTear/celestial_tear.tscn")
 
 var item_data: Dictionary = {}
 var is_hovering: bool = false
-
+var tear_instance = null
 
 func _ready() -> void:
 	# Hide use button initially
@@ -31,10 +34,30 @@ func _ready() -> void:
 	use_button.mouse_entered.connect(_on_button_mouse_entered)
 	use_button.mouse_exited.connect(_on_button_mouse_exited)
 
-
 func set_item(data: Dictionary) -> void:
 	item_data = data
-	texture_rect.texture = data.texture
+	
+	# Clear existing tear instance if any
+	if tear_instance:
+		tear_instance.queue_free()
+		tear_instance = null
+	
+	# If this is a celestial tear, instantiate the scene
+	if data.id == "celestial_tear":
+		tear_instance = CELESTIAL_TEAR_SCENE.instantiate()
+		item_container.add_child(tear_instance)
+		
+		# Adjust the size and position of the tear instance
+		if tear_instance is Node2D:
+			tear_instance.scale = Vector2(2.5, 2.5)  # Make it 2.5x larger
+			# Center the tear in the slot
+			tear_instance.position = Vector2(32, 32)  # Half of the 64x64 slot size
+		
+		# Hide the default texture
+		texture_rect.hide()
+	else:
+		texture_rect.texture = data.texture
+		texture_rect.show()
 
 	if data.quantity > 1:
 		quantity_label.text = str(data.quantity)

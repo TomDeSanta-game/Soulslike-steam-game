@@ -14,7 +14,6 @@ const STATS: Dictionary = {
 	"STAMINA_REGEN_RATE": 20.0,  # Stamina points per second
 	"ATTACK_STAMINA_COST": 10.0,
 	"RUN_ATTACK_STAMINA_COST": 20.0,
-	"JUMP_STAMINA_COST": 35.0,
 	"RUN_STAMINA_DRAIN_RATE": 5.55,  # Drains full stamina if running too long
 	"COYOTE_TIME": 0.15,  # 150ms of coyote time
 }
@@ -511,11 +510,7 @@ func _handle_input(event: InputEvent) -> void:
 
 
 func _handle_jump() -> void:
-	if not _has_enough_stamina(STATS.JUMP_STAMINA_COST):
-		return  # Don't jump if not enough stamina
-
 	if is_on_floor() or has_coyote_time:
-		_use_stamina(STATS.JUMP_STAMINA_COST)  # Consume stamina for jump
 		velocity.y = jump_power
 		is_jump_held = true
 		is_jump_active = true
@@ -564,38 +559,30 @@ func _die() -> void:
 	# Clear inventory
 	Inventory.clear_inventory()
 
-	# Create a timer for delayed bag spawn
-	var spawn_timer = Timer.new()
-	add_child(spawn_timer)
-	spawn_timer.wait_time = 2.0
-	spawn_timer.one_shot = true
-	spawn_timer.timeout.connect(func():
-		# Determine bag spawn position based on floor status
-		var spawn_position: Vector2
-		if is_on_floor():
-			spawn_position = global_position
-		else:
-			spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
+	# Determine bag spawn position based on floor status
+	var spawn_position: Vector2
+	if is_on_floor():
+		spawn_position = global_position
+	else:
+		spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
 
-		# Adjust X position based on player direction
-		spawn_position.x += 20 if animated_sprite.flip_h else -20  # Offset left or right based on direction
+	# Adjust X position based on player direction
+	spawn_position.x += 20 if animated_sprite.flip_h else -20  # Offset left or right based on direction
 
-		# Create and spawn bag with items if there are any
-		if not items.is_empty():
-			var bag_scene = load("res://Objects/Scenes/Bag/bag.tscn")
-			var bag = bag_scene.instantiate()
-			bag.global_position = spawn_position
-			bag.store_items(items)
-			# Add the bag to the root node to persist through scene changes
-			get_node("/root").add_child(bag)
-		
-		# Clean up the timer
-		spawn_timer.queue_free()
-		
-		# Transition to game over scene after bag spawns
+	# Create and spawn bag with items if there are any
+	if not items.is_empty():
+		BagSpawner.spawn_bag(spawn_position, items)
+	
+	# Create a timer for delayed scene transition
+	var transition_timer = Timer.new()
+	add_child(transition_timer)
+	transition_timer.wait_time = 2.0
+	transition_timer.one_shot = true
+	transition_timer.timeout.connect(func():
 		SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
+		transition_timer.queue_free()
 	)
-	spawn_timer.start()
+	transition_timer.start()
 
 	death_timer.start()
 

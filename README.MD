@@ -93,6 +93,9 @@ The game features an inventory system that allows players to collect and manage 
   - Quantity decreases by one when used
   - Instantly restores full health and stamina
   - Triggers healing visual effects and sounds
+  - Features animated shader effects in inventory
+  - Displays full celestial tear animation while in inventory slots
+  - Maintains consistent visual appearance between world and inventory
 
 ## Controls
 
