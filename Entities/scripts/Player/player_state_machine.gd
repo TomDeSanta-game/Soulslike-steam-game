@@ -7,6 +7,9 @@ var player: CharacterBody2D
 # State configurations
 var states: Dictionary = {}
 
+signal attack_started
+signal attack_ended
+
 # Constants for state names
 const STATE_IDLE: String = "idle"
 const STATE_RUN: String = "run"
@@ -15,7 +18,6 @@ const STATE_JUMP: String = "jump"
 const STATE_FALL: String = "fall"
 const STATE_ATTACK: String = "attack"
 const STATE_CROUCH: String = "crouch"
-const STATE_CROUCH_ATTACK: String = "crouch_attack"
 const STATE_HURT: String = "hurt"
 const STATE_DASH: String = "dash"
 const STATE_ROLL: String = "roll"
@@ -24,8 +26,8 @@ const STATE_WALL_CLIMB: String = "wall_climb"
 const STATE_WALL_HANG: String = "wall_hang"
 
 # Add to the top of the file
-signal attack_started
-signal attack_ended
+# signal attack_started
+# signal attack_ended
 
 
 # Initialize the state machine
@@ -43,8 +45,6 @@ func init(player_node: CharacterBody2D) -> void:
 		STATE_FALL: _create_state(STATE_FALL, fall_start, fall_update),
 		STATE_ATTACK: _create_state(STATE_ATTACK, attack_start, attack_update),
 		STATE_CROUCH: _create_state(STATE_CROUCH, crouch_start, crouch_update),
-		STATE_CROUCH_ATTACK:
-		_create_state(STATE_CROUCH_ATTACK, crouch_attack_start, crouch_attack_update),
 		STATE_HURT: _create_state(STATE_HURT, hurt_start, hurt_update),
 		STATE_DASH: _create_state(STATE_DASH, dash_start, dash_update),
 		STATE_ROLL: _create_state(STATE_ROLL, roll_start, roll_update),
@@ -91,10 +91,7 @@ func _setup_transitions() -> void:
 		[states[STATE_JUMP], states[STATE_FALL], &"fall"],
 		[states[STATE_FALL], states[STATE_IDLE], &"state_ended"],
 		[states[STATE_RUN_ATTACK], states[STATE_RUN], &"state_ended"],
-		[states[STATE_CROUCH], states[STATE_CROUCH_ATTACK], &"crouch_attack"],
 		[states[STATE_CROUCH], states[STATE_IDLE], &"state_ended"],
-		[states[STATE_CROUCH_ATTACK], states[STATE_IDLE], &"state_ended"],
-		[states[STATE_CROUCH_ATTACK], states[STATE_CROUCH], &"crouch"],
 		[ANYSTATE, states[STATE_HURT], &"hurt"],
 		[ANYSTATE, states[STATE_WALL_HANG], &"wall_hang"],
 		[states[STATE_WALL_HANG], states[STATE_WALL_CLIMB], &"wall_climb"],
@@ -164,18 +161,21 @@ func jump_update(_delta: float) -> void:
 			dispatch(&"state_ended")
 	elif player.velocity.y > 0 and not player.is_jump_active:  # Only transition to fall if we're not actively jumping
 		dispatch(&"fall")
+	
+	# Always play jump animation while in jump state, regardless of horizontal movement
+	player.animated_sprite.play(player.ANIMATIONS.JUMP)
 
 
 func attack_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.ATTACK)
 	SoundManager.play_sound(Sound._attack, "SFX")
 	player.attack_timer.start()
-	SignalBus.attack_started.emit(player)
+	attack_started.emit()
 
 
 func attack_update(_delta: float) -> void:
 	if player.attack_timer.is_stopped():
-		SignalBus.attack_ended.emit(player)
+		attack_ended.emit()
 		dispatch(&"state_ended")
 
 
@@ -197,25 +197,6 @@ func crouch_update(_delta: float) -> void:
 			player.animated_sprite.play(player.ANIMATIONS.CROUCH_RUN)
 		else:
 			player.animated_sprite.play(player.ANIMATIONS.CROUCH)
-
-
-func crouch_attack_start() -> void:
-	player.animated_sprite.play(player.ANIMATIONS.CROUCH_ATTACK)
-	player.crouch_attack_timer.start()
-	SignalBus.attack_started.emit(player)
-
-
-func crouch_attack_update(_delta: float) -> void:
-	# Only check for state changes after both animation and timer are done
-	if player.crouch_attack_timer.is_stopped() and not player.animated_sprite.is_playing():
-		SignalBus.attack_ended.emit(player)
-		# If still holding crouch, go back to crouch state
-		if Input.is_action_pressed("CROUCH"):
-			dispatch(&"crouch")
-		# If not holding crouch, go to idle
-		else:
-			player.is_crouching = false
-			dispatch(&"state_ended")
 
 
 func hurt_start() -> void:
@@ -306,3 +287,7 @@ func fall_update(_delta: float) -> void:
 			dispatch(&"run")
 		else:
 			dispatch(&"state_ended")
+		return  # Exit early to prevent playing fall animation after landing
+	
+	# Always play fall animation while in fall state, regardless of horizontal movement
+	player.animated_sprite.play(player.ANIMATIONS.FALL)

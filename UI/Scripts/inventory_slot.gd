@@ -1,7 +1,4 @@
-class_name InventorySlot
 extends Panel
-
-signal item_used(item_data: Dictionary)
 
 @onready var texture_rect = $TextureRect
 @onready var quantity_label = $QuantityLabel
@@ -15,6 +12,7 @@ const CELESTIAL_TEAR_SCENE = preload("res://Objects/Scenes/Collectibles/Celestia
 var item_data: Dictionary = {}
 var is_hovering: bool = false
 var tear_instance = null
+var is_empty: bool = true
 
 func _ready() -> void:
 	# Hide use button initially
@@ -83,18 +81,28 @@ func _on_hide_timer_timeout() -> void:
 		use_button.hide()
 
 func _on_use_button_pressed() -> void:
-	if item_data.is_empty():
-		return
+	if not is_empty:
+		# Instead of emitting local signal, use SignalBus
+		SignalBus.item_used.emit(item_data)
+		clear_slot()
 
-	# Emit signal to handle item usage
-	item_used.emit(item_data)
-
-	# Update quantity
-	item_data.quantity -= 1
-
-	if item_data.quantity > 0:
-		# Update display
-		set_item(item_data)
-	else:
-		# Clear slot if no items left
-		queue_free()
+func clear_slot() -> void:
+	# Clear item data
+	item_data = {}
+	
+	# Clear existing tear instance if any
+	if tear_instance:
+		tear_instance.queue_free()
+		tear_instance = null
+	
+	# Hide texture
+	texture_rect.hide()
+	
+	# Hide quantity label
+	quantity_label.hide()
+	
+	# Hide use button
+	use_button.hide()
+	
+	# Clear item container
+	item_container.clear()

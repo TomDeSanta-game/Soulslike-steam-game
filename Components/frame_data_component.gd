@@ -17,15 +17,15 @@ const ANIMATION_DATA = {
 	"Attack": {
 		"frames": [1, 2],
 		"positions": {
-			"hitbox": Vector2(38, 22),
-			"hurtbox": Vector2(10, 25)
+			"hitbox": Vector2(0, 0),
+			"hurtbox": Vector2(0, 5)
 		}
 	},
 	"Run_Attack": {
 		"frames": [2, 3, 4],
 		"positions": {
-			"hitbox": Vector2(10, 25),
-			"hurtbox": Vector2(5.5, 25)
+			"hitbox": Vector2(6.5, 0),
+			"hurtbox": Vector2(0, 5)
 		}
 	}
 }

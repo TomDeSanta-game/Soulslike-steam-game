@@ -24,6 +24,7 @@ A 2D action-platformer game developed in Godot 4.
   - Coyote time (150ms to jump after leaving platform)
   - Jump buffering (150ms to press jump before landing)
   - Variable jump height
+  - Full air control with proper animations
 - Walk, run, and crouch
 
 ### Combat
@@ -126,7 +127,13 @@ The game features an inventory system that allows players to collect and manage 
 
 ## Project Structure
 
-## Technical Details
+### Asset Organization
+- `assets/Player/Individual Sprites/`: Contains all player character animations
+  - Includes sprite sheets for all player states (Attack, Idle, Run, Jump, etc.)
+  - Organized by action type with consistent naming (_Attack.png, _Idle.png, etc.)
+  - Used by the player scene for all animations
+
+### Technical Details
 - Built with Godot 4.x
 - Uses custom state machine implementation
 - Frame-perfect hit detection system

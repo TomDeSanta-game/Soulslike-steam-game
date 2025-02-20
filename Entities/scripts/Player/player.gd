@@ -23,16 +23,12 @@ const ANIMATIONS: Dictionary = {
 	"RUN": "Run",
 	"JUMP": "Jump",
 	"ATTACK": "Attack",
-	"ATTACK_COMBO": "Attack_Combo",
 	"CROUCH": "Crouch",
-	"CROUCH_ATTACK": "Crouch_Attack",
 	"CROUCH_RUN": "Crouch_Run",
-	"CROUCH_TRANSITION": "Crouch_Start_&_End",
 	"DASH": "Dash",
 	"DEATH": "Death",
 	"FALL": "Fall",
 	"HURT": "Hurt",
-	"JUMP_ATTACK": "Jump_Attack",
 	"ROLL": "Roll",
 	"RUN_ATTACK": "Run_Attack",
 	"SLIDE": "Slide",
@@ -419,7 +415,11 @@ func _update_health_bar() -> void:
 func _handle_movement() -> void:
 	direction = Input.get_axis("LEFT", "RIGHT")
 	var speed = _get_current_speed()
-
+	
+	# Apply air control (reduced speed) when in the air
+	if !is_on_floor():
+		speed *= 0.6  # Reduce speed to 60% while in air
+	
 	if current_state == Types.CharacterState.IDLE or current_state == Types.CharacterState.MOVE:
 		if direction != 0:
 			deceleration_counter = 0  # Reset deceleration counter when moving
@@ -480,10 +480,7 @@ func _is_attack_animation() -> bool:
 		animated_sprite.animation
 		in [
 			ANIMATIONS.ATTACK,
-			ANIMATIONS.ATTACK_COMBO,
-			ANIMATIONS.JUMP_ATTACK,
 			ANIMATIONS.RUN_ATTACK,
-			ANIMATIONS.CROUCH_ATTACK
 		]
 	)
 
@@ -760,20 +757,12 @@ func _on_animation_changed() -> void:
 			animated_sprite.play(ANIMATIONS.RUN_ATTACK)
 		ANIMATIONS.CROUCH:
 			animated_sprite.play(ANIMATIONS.CROUCH)
-		ANIMATIONS.CROUCH_ATTACK:
-			animated_sprite.play(ANIMATIONS.CROUCH_ATTACK)
 		ANIMATIONS.CROUCH_RUN:
 			animated_sprite.play(ANIMATIONS.CROUCH_RUN)
-		ANIMATIONS.CROUCH_TRANSITION:
-			animated_sprite.play(ANIMATIONS.CROUCH_TRANSITION)
 		ANIMATIONS.JUMP:
 			animated_sprite.play(ANIMATIONS.JUMP)
-		ANIMATIONS.JUMP_ATTACK:
-			animated_sprite.play(ANIMATIONS.JUMP_ATTACK)
 		ANIMATIONS.ATTACK:
 			animated_sprite.play(ANIMATIONS.ATTACK)
-		ANIMATIONS.ATTACK_COMBO:
-			animated_sprite.play(ANIMATIONS.ATTACK_COMBO)
 		ANIMATIONS.DASH:
 			animated_sprite.play(ANIMATIONS.DASH)
 		ANIMATIONS.DEATH:
@@ -796,15 +785,9 @@ func _on_animation_finished() -> void:
 			animated_sprite.play(ANIMATIONS.IDLE)
 		ANIMATIONS.RUN_ATTACK:
 			animated_sprite.play(ANIMATIONS.RUN)
-		ANIMATIONS.CROUCH_ATTACK:
-			animated_sprite.play(ANIMATIONS.CROUCH)
 		ANIMATIONS.JUMP:
 			animated_sprite.play(ANIMATIONS.IDLE)
-		ANIMATIONS.JUMP_ATTACK:
-			animated_sprite.play(ANIMATIONS.JUMP)
 		ANIMATIONS.ATTACK:
-			animated_sprite.play(ANIMATIONS.IDLE)
-		ANIMATIONS.ATTACK_COMBO:
 			animated_sprite.play(ANIMATIONS.IDLE)
 		ANIMATIONS.DASH:
 			animated_sprite.play(ANIMATIONS.IDLE)

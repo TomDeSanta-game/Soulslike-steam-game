@@ -2,22 +2,29 @@ class_name CharacterBase
 extends CharacterBody2D
 
 @export_group("Character Properties")
+@warning_ignore("unused_private_class_variable")
 @export var initial_health: float = 100.0
 @export var initial_vigour: int = 10
 
 @export_group("Movement Properties")
-@export var base_run_speed: float = 300.0
+@export var base_run_speed: float = 100.0
 @export var base_crouch_speed: float = 150.0
 @export var jump_power: float = -200.0
 
 @export_group("Combat Properties")
+@warning_ignore("unused_private_class_variable")
 @export var team: int = 0  # For team-based collision
+@warning_ignore("unused_private_class_variable")
 @export var hitboxes: Array[Node] = []
+@warning_ignore("unused_private_class_variable")
 @export var hurtboxes: Array[Node] = []
 
 var health_system: HealthSystem
+@warning_ignore("unused_private_class_variable")
 var current_speed: float = base_run_speed
+@warning_ignore("unused_private_class_variable")
 var is_invincible: bool = false
+@warning_ignore("unused_private_class_variable")
 var is_in_hit_stun: bool = false
 
 
@@ -100,11 +107,13 @@ func set_hit_stun(duration: float) -> void:
 	is_in_hit_stun = false
 
 
+@warning_ignore("unused_parameter")
 func _on_hit_landed(hurtbox: Node) -> void:
 	# Override in child classes to handle hit effects
 	pass
 
 
+@warning_ignore("unused_parameter")
 func _on_hit_taken(hitbox: Node) -> void:
 	# Override in child classes to handle being hit
 	pass
@@ -118,6 +127,7 @@ func _on_invincibility_ended() -> void:
 	is_invincible = false
 
 
+@warning_ignore("unused_parameter")
 func _on_health_changed(new_health: float, max_health: float) -> void:
 	SignalBus.health_changed.emit(new_health, max_health)
 

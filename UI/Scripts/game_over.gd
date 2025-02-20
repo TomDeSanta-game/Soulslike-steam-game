@@ -2,7 +2,9 @@ extends Control
 
 
 func _ready() -> void:
-	# Ensure this control node has focus to receive input
+	# Ensure this control node can receive focus
+	set_focus_mode(Control.FOCUS_ALL)
+	# Now grab focus
 	grab_focus()
 
 
