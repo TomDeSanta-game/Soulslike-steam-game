@@ -33,3 +33,6 @@ var collect: AudioStream = preload("res://assets/sounds/Collectible/Collect/coll
 
 # Other Sounds
 var heal: AudioStream = preload("res://assets/sounds/Other/Heal/heal.mp3")
+
+# Music
+var music: AudioStream = preload("res://assets/music/music.mp3")
