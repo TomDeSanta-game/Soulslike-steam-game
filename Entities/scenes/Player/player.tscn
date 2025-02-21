@@ -1,4 +1,4 @@
-[gd_scene load_steps=88 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=90 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -66,6 +66,7 @@
 [ext_resource type="Texture2D" uid="uid://bibla740hcac5" path="res://assets/Player/Individual Sprites/adventurer-crnr-grb-02.png" id="56_01e00"]
 [ext_resource type="Texture2D" uid="uid://duefbqrf00nlm" path="res://assets/Player/Individual Sprites/adventurer-crnr-grb-03.png" id="57_w1nw7"]
 [ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="64_tlvdk"]
+[ext_resource type="FontFile" uid="uid://0nfrgqthwlnw" path="res://assets/fonts/FiraSans-Regular.ttf" id="66_hfnjg"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_r5sqx"]
 shader = ExtResource("2_0x5o6")
@@ -387,6 +388,10 @@ font = ExtResource("64_tlvdk")
 font_size = 24
 font_color = Color(1, 1, 1, 0.568627)
 
+[sub_resource type="LabelSettings" id="LabelSettings_lqeyv"]
+font = ExtResource("66_hfnjg")
+font_size = 148
+
 [node name="player" type="CharacterBody2D"]
 collision_layer = 0
 collision_mask = 0
@@ -524,6 +529,18 @@ label_settings = SubResource("LabelSettings_kpg22")
 
 [node name="Inventory" parent="UILayer" instance=ExtResource("32_c7ngx")]
 visible = false
+
+[node name="PlaceLabel" type="Label" parent="UILayer"]
+unique_name_in_owner = true
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 468.0
+grow_horizontal = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+label_settings = SubResource("LabelSettings_lqeyv")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HitboxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]
 script = ExtResource("19_box_flip")

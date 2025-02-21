@@ -18,7 +18,7 @@ var is_empty: bool = true
 func _ready() -> void:
 	# Hide use button initially
 	use_button.hide()
-	use_button.text = "EAT"
+	use_button.text = "READ"  # Change to READ for lore items
 
 	# Setup timer
 	hide_timer.one_shot = true
@@ -83,12 +83,22 @@ func set_item(data: Dictionary) -> void:
 	else:
 		texture_rect.texture = data.texture
 		texture_rect.show()
+		
+		# Apply custom inventory scale if provided
+		if data.has("inventory_scale"):
+			texture_rect.scale = data.inventory_scale
+		else:
+			texture_rect.scale = Vector2.ONE
+			
+		# Center the texture in the slot
+		texture_rect.pivot_offset = texture_rect.size / 2
+		texture_rect.position = size / 2
 
 func _on_mouse_entered() -> void:
 	is_hovering = true
 	print("Mouse entered, item_data: ", item_data)  # Debug print
-	if item_data.get("id") == "celestial_tear":
-		print("Showing eat button")  # Debug print
+	if item_data.get("use_function"):
+		use_button.text = "READ" if item_data.get("type") == "lore" else "EAT"
 		use_button.show()
 		hide_timer.stop()
 
@@ -131,6 +141,7 @@ func clear_slot() -> void:
 	# Reset texture
 	texture_rect.texture = null
 	texture_rect.hide()
+	texture_rect.scale = Vector2.ONE
 	
 	# Hide labels
 	name_label.hide()

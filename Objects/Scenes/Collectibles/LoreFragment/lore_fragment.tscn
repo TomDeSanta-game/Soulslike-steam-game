@@ -1,0 +1,110 @@
+[gd_scene load_steps=10 format=3 uid="uid://m5ewagldf4er"]
+
+[ext_resource type="PackedScene" uid="uid://c637fr3a5igbv" path="res://Objects/Scenes/Collectibles/collectible_base.tscn" id="1_4b011"]
+[ext_resource type="Texture2D" uid="uid://cpvx2ay1ltucs" path="res://assets/cover.png" id="2_5nok6"]
+[ext_resource type="Script" path="res://Objects/Scripts/Collectibles/LoreFragment/lore_fragment.gd" id="2_k3m4p"]
+[ext_resource type="FontFile" uid="uid://d16vc7dcykm2c" path="res://assets/fonts/FiraSans-BlackItalic.ttf" id="4_xcxqu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h0ixc"]
+size = Vector2(20, 25)
+
+[sub_resource type="Animation" id="Animation_collect"]
+resource_name = "collect"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.0444444, 0.0277778), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_f88qm"]
+resource_name = "idle"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position:y")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [-2.5, -7.5, -2.5]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_xscpa"]
+_data = {
+"collect": SubResource("Animation_collect"),
+"idle": SubResource("Animation_f88qm")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_g4g3c"]
+font = ExtResource("4_xcxqu")
+
+[node name="LoreFragment" instance=ExtResource("1_4b011")]
+script = ExtResource("2_k3m4p")
+lore_id = "LORE_001"
+lore_title = "Lore Fragment"
+lore_content = "Empty lore content"
+interaction_distance = 100.0
+
+[node name="Sprite2D" parent="." index="0"]
+position = Vector2(0, -2.5)
+scale = Vector2(0.0444444, 0.0277778)
+texture = ExtResource("2_5nok6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="1"]
+visible = false
+position = Vector2(0, -2.5)
+shape = SubResource("RectangleShape2D_h0ixc")
+debug_color = Color(0.7, 0, 0.0116665, 0.419608)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="3"]
+libraries = {
+"": SubResource("AnimationLibrary_xscpa")
+}
+autoplay = "idle"
+
+[node name="InteractionPrompt" type="Node2D" parent="." index="4"]
+position = Vector2(0, -30)
+
+[node name="Label" type="Label" parent="InteractionPrompt" index="0"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -13.0
+offset_right = 40.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Lore Fragment"
+label_settings = SubResource("LabelSettings_g4g3c")
+horizontal_alignment = 1
+
+[node name="VisibleOnScreenEnabler2D" parent="." index="5"]
+position = Vector2(0, -2.5)
+scale = Vector2(1, 1.25)

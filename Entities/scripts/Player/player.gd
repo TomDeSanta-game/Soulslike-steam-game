@@ -47,6 +47,7 @@ const ANIMATIONS: Dictionary = {
 @onready var stamina_bar: ProgressBar = $UILayer/StaminaBar
 @onready var camera: Camera2D = $Camera2D
 @onready var grab_collision_shape: CollisionShape2D = $GrabCollisionShape
+@onready var place_label: Label = $UILayer/PlaceLabel
 
 # Types Global
 @onready var types: Types = Types.new()
@@ -169,6 +170,8 @@ func _ready() -> void:
 	add_to_group("Player")
 	super._ready()  # Call parent _ready to initialize health system
 	types.player = self
+
+	place_label.add_to_group("PlaceLabel")
 
 	# Connect item used signal
 	SignalBus.item_used.connect(_on_item_used)

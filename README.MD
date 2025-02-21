@@ -198,3 +198,24 @@ The game features an inventory system that allows players to collect and manage 
     - Automatically teleports to furthest valid position to prevent wall clipping
     - Smart gravity system with terminal velocity
     - Ensures bags always land in accessible locations
+
+### Location Label System
+- Elden Ring-style location notifications
+- Features:
+  - Smooth fade-in/fade-out transitions
+  - Double pulse effect
+  - Automatic cleanup after animation
+- Implementation:
+  1. Create a Label node in your level scene
+  2. Add it to the "PlaceLabel" group
+  3. Set up the detection system:
+     - Add an Area2D node named "DetectionSystem"
+     - Configure collision shape for trigger area
+     - Ensure it can detect the "Player" group
+- Technical Details:
+  - Uses Godot's Tween system for smooth animations
+  - Animation sequence:
+    1. Initial 2-second fade in
+    2. Two pulse cycles (0.7s each)
+    3. Final 2-second fade out
+  - Automatic cleanup of detection system after display
