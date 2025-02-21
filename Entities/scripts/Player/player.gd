@@ -16,6 +16,9 @@ const STATS: Dictionary = {
 	"RUN_ATTACK_STAMINA_COST": 20.0,
 	"RUN_STAMINA_DRAIN_RATE": 5.55,  # Drains full stamina if running too long
 	"COYOTE_TIME": 0.15,  # 150ms of coyote time
+	"WALL_CLIMB_STAMINA_DRAIN": 15.0,  # Stamina drain per second while wall climbing
+	"WALL_CLIMB_SPEED": -10.0,  # Upward speed while wall climbing (-10 means up)
+	"WALL_GRAB_CHECK_DISTANCE": 5.0,  # How far to check for walls
 }
 
 const ANIMATIONS: Dictionary = {
@@ -43,6 +46,7 @@ const ANIMATIONS: Dictionary = {
 @onready var health_bar: ProgressBar = $UILayer/ProgressBar
 @onready var stamina_bar: ProgressBar = $UILayer/StaminaBar
 @onready var camera: Camera2D = $Camera2D
+@onready var grab_collision_shape: CollisionShape2D = $GrabCollisionShape
 
 # Types Global
 @onready var types: Types = Types.new()
@@ -140,6 +144,16 @@ var invincibility_timer: float = 0.0
 # Add this near other class variables
 var last_floor_position: Vector2 = Vector2.ZERO
 
+# Add near other class variables
+var is_grabbing: bool = false
+
+# Add these new variables near the top with other class variables
+@onready var ledge_check: RayCast2D = $LedgeCheck
+@onready var ledge_climb_position: Marker2D = $LedgeClimbPosition
+
+# Add near the top with other class variables
+var is_ledge_climbing: bool = false
+
 
 func _ready() -> void:
 	add_to_group("Player")
@@ -191,7 +205,7 @@ func _ready() -> void:
 	health_bar_style.corner_radius_top_right = 8
 	health_bar_style.corner_radius_bottom_right = 8
 	health_bar_style.corner_radius_bottom_left = 8
-	
+
 	var health_bar_bg_style = StyleBoxFlat.new()
 	health_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
 	health_bar_bg_style.corner_radius_top_left = 8
@@ -206,7 +220,7 @@ func _ready() -> void:
 	stamina_bar_style.corner_radius_top_right = 8
 	stamina_bar_style.corner_radius_bottom_right = 8
 	stamina_bar_style.corner_radius_bottom_left = 8
-	
+
 	var stamina_bar_bg_style = StyleBoxFlat.new()
 	stamina_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
 	stamina_bar_bg_style.corner_radius_top_left = 8
@@ -280,6 +294,10 @@ func _ready() -> void:
 	if save_engine.load_game():
 		_load_player_state(save_engine.get_save_data())
 
+	# Disable grab collision shape by default
+	if grab_collision_shape:
+		grab_collision_shape.disabled = true
+
 
 func _process(delta: float) -> void:
 	if effect_timer > 0.0:
@@ -320,15 +338,28 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	var was_on_floor = is_on_floor()
 
-	if !is_on_floor():
+	# Handle wall climbing stamina drain and movement
+	if is_grabbing:
+		if is_on_wall() and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * delta):
+			velocity.y = STATS.WALL_CLIMB_SPEED
+			_use_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * delta)
+			animated_sprite.play(ANIMATIONS.WALL_CLIMB)
+			
+			# Check if we can climb the ledge
+			if _can_climb_ledge():
+				_start_ledge_climb()
+		else:
+			_end_grab()  # Let go if not on wall or out of stamina
+
+	if !is_on_floor() and !is_grabbing:  # Only apply gravity if not grabbing
 		velocity.y += Types.GRAVITY_CONSTANT * delta
 		# Only play fall animation when moving downward and not in a jump state
 		if (
 			velocity.y > 0
 			and !is_jump_active
 			and !is_attacking
-			and animated_sprite.animation != ANIMATIONS.JUMP  # Check animation instead of state
-		):
+			and animated_sprite.animation != ANIMATIONS.JUMP
+		):  # Check animation instead of state
 			state_machine.dispatch(&"fall")
 	elif was_on_floor:
 		# Update last floor position when on floor
@@ -421,11 +452,11 @@ func _update_health_bar() -> void:
 func _handle_movement() -> void:
 	direction = Input.get_axis("LEFT", "RIGHT")
 	var speed = _get_current_speed()
-	
+
 	# Apply air control (reduced speed) when in the air
 	if !is_on_floor():
 		speed *= 0.6  # Reduce speed to 60% while in air
-	
+
 	if current_state == Types.CharacterState.IDLE or current_state == Types.CharacterState.MOVE:
 		if direction != 0:
 			deceleration_counter = 0  # Reset deceleration counter when moving
@@ -534,11 +565,11 @@ func _handle_input(event: InputEvent) -> void:
 		_shoot()
 
 	# Wall interactions
-	if is_on_wall():
-		if event.is_action_pressed("GRAB"):
-			state_machine.dispatch(&"wall_hang")
-		elif event.is_action_pressed("UP") and state_machine.current_state.name == "wall_hang":
-			state_machine.dispatch(&"wall_climb")
+	if event.is_action_pressed("GRAB") and is_on_wall():
+		_start_grab()
+		state_machine.dispatch(&"wall_hang")
+	elif event.is_action_released("GRAB"):
+		_end_grab()
 
 	# Health
 	if event.is_action_released("HEALTH_DOWN"):
@@ -604,7 +635,9 @@ func _die() -> void:
 	if is_on_floor():
 		spawn_position = global_position
 	else:
-		spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
+		spawn_position = (
+			last_floor_position if last_floor_position != Vector2.ZERO else global_position
+		)
 
 	# Adjust X position based on player direction
 	spawn_position.x += 20 if animated_sprite.flip_h else -20  # Offset left or right based on direction
@@ -612,15 +645,16 @@ func _die() -> void:
 	# Create and spawn bag with items if there are any
 	if not items.is_empty():
 		BagSpawner.spawn_bag(spawn_position, items)
-	
+
 	# Create a timer for delayed scene transition
 	var transition_timer = Timer.new()
 	add_child(transition_timer)
 	transition_timer.wait_time = 2.0
 	transition_timer.one_shot = true
-	transition_timer.timeout.connect(func():
-		SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
-		transition_timer.queue_free()
+	transition_timer.timeout.connect(
+		func():
+			SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
+			transition_timer.queue_free()
 	)
 	transition_timer.start()
 
@@ -993,3 +1027,92 @@ func use_celestial_tear() -> void:
 func _on_item_used(item_data: Dictionary) -> void:
 	if item_data.id == "celestial_tear":
 		use_celestial_tear()
+
+
+# Add these new methods
+func _start_grab() -> void:
+	if grab_collision_shape and is_on_wall() and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * 0.1):
+		grab_collision_shape.disabled = false
+		is_grabbing = true
+		# Apply upward movement while grabbing
+		velocity.y = STATS.WALL_CLIMB_SPEED
+		# Use stamina
+		_use_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * get_physics_process_delta_time())
+
+func _end_grab() -> void:
+	if grab_collision_shape:
+		grab_collision_shape.disabled = true
+		is_grabbing = false
+		state_machine.dispatch(&"state_ended")
+
+# Modify the wall_hang_update function to check for ledge climbing
+func _update_wall_climbing(delta: float) -> void:
+	if is_grabbing and not is_ledge_climbing:
+		if is_on_wall() and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * delta):
+			velocity.y = STATS.WALL_CLIMB_SPEED
+			_use_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * delta)
+			animated_sprite.play(ANIMATIONS.WALL_CLIMB)
+			
+			# Check if we can climb the ledge
+			if _can_climb_ledge():
+				print("Can climb ledge!")
+				_start_ledge_climb()
+		else:
+			_end_grab()  # Let go if not on wall or out of stamina
+
+# Modify the _can_climb_ledge function
+func _can_climb_ledge() -> bool:
+	if !ledge_check or is_ledge_climbing:
+		return false
+		
+	# Update raycast direction based on character facing
+	var check_direction = -1 if animated_sprite.flip_h else 1
+	ledge_check.target_position.x = 32 * check_direction
+	
+	# Force the raycast to update
+	ledge_check.force_raycast_update()
+	
+	# Check if we found a valid ledge
+	return ledge_check.is_colliding() and not ledge_check.get_collision_point().is_equal_approx(global_position)
+
+# Update the ledge climb function
+func _start_ledge_climb() -> void:
+	if !ledge_climb_position or is_ledge_climbing:
+		return
+		
+	is_ledge_climbing = true
+	
+	# Disable physics and stop all movement
+	set_physics_process(false)
+	velocity = Vector2.ZERO
+	
+	# Update marker position based on character facing
+	var climb_offset = Vector2(24, -24)
+	if animated_sprite.flip_h:
+		climb_offset.x *= -1
+	
+	# Calculate the target position based on the raycast collision
+	var target_position = Vector2.ZERO
+	if ledge_check.is_colliding():
+		var collision_point = ledge_check.get_collision_point()
+		target_position = Vector2(collision_point.x - (climb_offset.x/2 * (-1 if animated_sprite.flip_h else 1)), 
+								collision_point.y + climb_offset.y)
+	
+	# Create a tween for smooth movement
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.set_ease(Tween.EASE_OUT)
+	
+	# First move up to the ledge height
+	var intermediate_pos = Vector2(global_position.x, target_position.y)
+	tween.tween_property(self, "global_position", intermediate_pos, 0.3)
+	
+	# Then move onto the platform
+	tween.tween_property(self, "global_position", target_position, 0.2)
+	
+	# When the climb is complete
+	tween.tween_callback(func():
+		is_ledge_climbing = false
+		set_physics_process(true)
+		state_machine.dispatch(&"state_ended")
+	)

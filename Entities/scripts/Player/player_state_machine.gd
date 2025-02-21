@@ -22,7 +22,6 @@ const STATE_HURT: String = "hurt"
 const STATE_DASH: String = "dash"
 const STATE_ROLL: String = "roll"
 const STATE_SLIDE: String = "slide"
-const STATE_WALL_CLIMB: String = "wall_climb"
 const STATE_WALL_HANG: String = "wall_hang"
 
 # Add to the top of the file
@@ -49,7 +48,6 @@ func init(player_node: CharacterBody2D) -> void:
 		STATE_DASH: _create_state(STATE_DASH, dash_start, dash_update),
 		STATE_ROLL: _create_state(STATE_ROLL, roll_start, roll_update),
 		STATE_SLIDE: _create_state(STATE_SLIDE, slide_start, slide_update),
-		STATE_WALL_CLIMB: _create_state(STATE_WALL_CLIMB, wall_climb_start, wall_climb_update),
 		STATE_WALL_HANG: _create_state(STATE_WALL_HANG, wall_hang_start, wall_hang_update),
 	}
 
@@ -92,10 +90,10 @@ func _setup_transitions() -> void:
 		[states[STATE_FALL], states[STATE_IDLE], &"state_ended"],
 		[states[STATE_RUN_ATTACK], states[STATE_RUN], &"state_ended"],
 		[states[STATE_CROUCH], states[STATE_IDLE], &"state_ended"],
+		[states[STATE_CROUCH], states[STATE_ATTACK], &"attack"],
+		[states[STATE_ATTACK], states[STATE_CROUCH], &"crouch"],
 		[ANYSTATE, states[STATE_HURT], &"hurt"],
 		[ANYSTATE, states[STATE_WALL_HANG], &"wall_hang"],
-		[states[STATE_WALL_HANG], states[STATE_WALL_CLIMB], &"wall_climb"],
-		[states[STATE_WALL_CLIMB], states[STATE_WALL_HANG], &"wall_hang"],
 		[states[STATE_SLIDE], states[STATE_IDLE], &"state_ended"],
 		[states[STATE_ROLL], states[STATE_IDLE], &"state_ended"],
 		[states[STATE_DASH], states[STATE_IDLE], &"state_ended"],
@@ -176,7 +174,11 @@ func attack_start() -> void:
 func attack_update(_delta: float) -> void:
 	if player.attack_timer.is_stopped():
 		attack_ended.emit()
-		dispatch(&"state_ended")
+		# If we were crouching before the attack, return to crouch
+		if Input.is_action_pressed("CROUCH"):
+			dispatch(&"crouch")
+		else:
+			dispatch(&"state_ended")
 
 
 func crouch_start() -> void:
@@ -187,7 +189,10 @@ func crouch_start() -> void:
 
 func crouch_update(_delta: float) -> void:
 	if Input.is_action_just_pressed("ATTACK"):
-		dispatch(&"crouch_attack")
+		# Only allow attack if we have enough stamina
+		if player._has_enough_stamina(player.STATS.ATTACK_STAMINA_COST):
+			player._use_stamina(player.STATS.ATTACK_STAMINA_COST)
+			dispatch(&"attack")
 	elif !Input.is_action_pressed("CROUCH"):
 		player.is_crouching = false
 		dispatch(&"state_ended")
@@ -254,24 +259,30 @@ func slide_update(_delta: float) -> void:
 		dispatch(&"state_ended")
 
 
-func wall_climb_start() -> void:
-	player.animated_sprite.play(player.ANIMATIONS.WALL_CLIMB)
-
-
-func wall_climb_update(_delta: float) -> void:
-	if not player.is_on_wall():
-		dispatch(&"state_ended")
-
-
 func wall_hang_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.WALL_HANG)
+	player.velocity.x = 0  # Stop horizontal movement
+	player.velocity.y = 0  # Stop vertical movement initially
 
 
-func wall_hang_update(_delta: float) -> void:
+func wall_hang_update(delta: float) -> void:
 	if not player.is_on_wall():
-		dispatch(&"state_ended")
-	elif Input.is_action_just_pressed("UP"):
-		dispatch(&"wall_climb")
+		player._end_grab()
+		dispatch(&"fall")
+		return
+
+	if Input.is_action_just_pressed("JUMP"):
+		player._end_grab()
+		# Wall jump
+		var jump_direction = -1 if player.animated_sprite.flip_h else 1
+		player.velocity.x = jump_direction * 300.0  # Horizontal jump force
+		player.velocity.y = player.jump_power  # Use regular jump power
+		dispatch(&"jump")
+	elif not Input.is_action_pressed("GRAB"):
+		player._end_grab()
+		dispatch(&"fall")
+	else:
+		player._update_wall_climbing(delta)
 
 
 func fall_start() -> void:

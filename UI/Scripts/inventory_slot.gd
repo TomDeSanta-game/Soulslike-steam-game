@@ -2,6 +2,7 @@ extends Panel
 
 @onready var texture_rect = $TextureRect
 @onready var quantity_label = $QuantityLabel
+@onready var name_label = $NameLabel
 @onready var use_button = $UseButton
 @onready var hide_timer = Timer.new()
 @onready var item_container = $ItemContainer
@@ -43,6 +44,14 @@ func set_item(data: Dictionary) -> void:
 			item_container.remove_child(tear_instance)
 		tear_instance.queue_free()
 		tear_instance = null
+	
+	# Set the item name
+	if data.has("name"):
+		name_label.text = data.name
+		name_label.show()
+	else:
+		name_label.text = data.id.capitalize().replace("_", " ")
+		name_label.show()
 	
 	# If this is a celestial tear, instantiate the scene
 	if data.id == "celestial_tear":
@@ -126,9 +135,11 @@ func clear_slot() -> void:
 	texture_rect.texture = null
 	texture_rect.hide()
 	
-	# Hide quantity label
+	# Hide labels
 	quantity_label.hide()
 	quantity_label.text = ""
+	name_label.hide()
+	name_label.text = ""
 	
 	# Hide use button
 	use_button.hide()

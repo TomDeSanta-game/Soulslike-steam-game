@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://b4q8vg1xwdp6x"]
+[gd_scene load_steps=5 format=3 uid="uid://b4q8vg1xwdp6x"]
 
 [ext_resource type="Script" path="res://UI/Scripts/inventory_slot.gd" id="1_8r4nt"]
+[ext_resource type="FontFile" uid="uid://oswald_font" path="res://assets/fonts/static/Oswald-Regular.ttf" id="2_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j6p2x"]
 bg_color = Color(0.12549, 0.12549, 0.12549, 0.784314)
@@ -47,12 +48,29 @@ mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_bottom = 0.75
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 0.85
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 0
+text_overrun_behavior = 3
+text = ""
 
 [node name="QuantityLabel" type="Label" parent="."]
 layout_mode = 1
