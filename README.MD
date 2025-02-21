@@ -4,6 +4,26 @@ A 2D action-platformer game developed in Godot 4.
 
 ## Features
 
+### Souls and XP System
+- Souls serve as both currency and experience points
+- Souls can be gained from:
+  - Defeating enemies
+  - Collecting rare items
+  - Finding celestial tears (50,000 souls)
+- XP/Level System:
+  - Souls can be spent to level up
+  - Each level requires progressively more souls
+  - Multiple stats can be improved:
+    - Vigour (Health)
+    - Endurance (Stamina)
+    - Strength (Physical damage)
+    - Dexterity (Attack speed)
+    - Intelligence (Magic damage)
+    - Faith (Healing power)
+  - Press 'L' to open the level-up menu
+  - Visual display of current souls and XP needed
+  - Automatic level-up effects and sounds
+
 ### UI
 - Health bar:
   - Red progress bar showing current health
@@ -26,6 +46,16 @@ A 2D action-platformer game developed in Godot 4.
   - Variable jump height
   - Full air control with proper animations
 - Walk, run, and crouch
+- Dash:
+  - Quick burst of speed
+  - Costs 50 stamina
+  - 0.1 second duration
+  - Instant activation
+- Roll:
+  - Short defensive maneuver
+  - Costs 10 stamina
+  - Smooth position transition
+  - 0.5 second duration
 
 ### Combat
 - Basic attacks (standing, running, jumping, crouching)
@@ -36,16 +66,20 @@ A 2D action-platformer game developed in Godot 4.
 ### Character
 - Health system with regeneration
 - Stamina system:
-  - Attack costs: Basic (10), Run (20), Jump (40)
+  - Attack costs: Basic (10), Run (20)
+  - Dash cost: 50 stamina
+  - Roll cost: 10 stamina
   - Running drains stamina
   - Auto regeneration when not attacking/running
 
 ### Collectibles
 - Celestial Tears:
-  - Collected and stored in inventory
-  - Visual and sound effects on pickup
-  - Automatic cleanup after collection
+  - Extremely rare and powerful items
+  - Grants 50,000 souls when collected
   - Can be used from inventory to restore health and stamina
+  - Features beautiful glow effects and animations
+  - Provides visual and sound feedback on collection
+  - Automatic cleanup after collection
 
 ### Save System
 - Bonfire checkpoints
@@ -105,9 +139,8 @@ The game features an inventory system that allows players to collect and manage 
 - **UP**: Up arrow key (for wall climbing)
 - **CROUCH**: Down arrow key
 - **JUMP**: Spacebar
-- **DASH**: D key
-- **ROLL**: M key
-- **SLIDE**: N key
+- **DASH**: D key (costs 50 stamina)
+- **ROLL**: M key (costs 10 stamina)
 - **GRAB**: G key (for wall hanging)
 
 ### Combat

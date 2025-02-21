@@ -2,6 +2,8 @@ extends Area2D
 class_name CollectibleBase
 
 @export var collect_effect: PackedScene
+@export var gives_souls: bool = false  # Flag to control if this collectible gives souls
+@export var souls_amount: int = 10  # Amount of souls to give if gives_souls is true
 
 var _is_collected: bool = false
 var player = null
@@ -37,6 +39,12 @@ func collect() -> void:
 		var effect = collect_effect.instantiate()
 		get_tree().current_scene.add_child(effect)
 		effect.global_position = global_position
+
+	# Add souls if this collectible is configured to give them
+	if gives_souls:
+		var souls_system = get_node("/root/SoulsSystem")
+		if souls_system:
+			souls_system.add_souls(souls_amount)
 
 	SignalBus.collectible_collected.emit(self)
 	queue_free()

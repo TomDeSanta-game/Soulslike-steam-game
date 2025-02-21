@@ -1,0 +1,50 @@
+[gd_scene load_steps=7 format=3 uid="uid://cnmj0gyi42cv"]
+
+[ext_resource type="Script" path="res://UI/Scripts/souls_display.gd" id="1_souls"]
+[ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="2_o5530"]
+[ext_resource type="FontFile" uid="uid://ckp0yattq52lf" path="res://assets/fonts/Oswald-VariableFont_wght.ttf" id="3_k15lr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_souls"]
+bg_color = Color(0.133333, 0.133333, 0.133333, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_1gx1p"]
+font = ExtResource("2_o5530")
+
+[sub_resource type="LabelSettings" id="LabelSettings_113na"]
+font = ExtResource("3_k15lr")
+font_size = 24
+
+[node name="SoulsDisplay" type="PanelContainer"]
+offset_right = 200.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_souls")
+script = ExtResource("1_souls")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "SOULS"
+label_settings = SubResource("LabelSettings_1gx1p")
+
+[node name="SoulsAmount" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.94902, 0.94902, 1)
+theme_override_font_sizes/font_size = 24
+text = "0"
+label_settings = SubResource("LabelSettings_113na")

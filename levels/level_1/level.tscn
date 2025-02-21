@@ -3528,7 +3528,7 @@ tile_set = SubResource("TileSet_3icn8")
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(0.1, 1)
+motion_scale = Vector2(0.15, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
 position = Vector2(0, -100)
@@ -3536,7 +3536,7 @@ scale = Vector2(2, 2)
 texture = ExtResource("7_lpm3e")
 
 [node name="ParallaxLayer2D" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(0.2, 1)
+motion_scale = Vector2(0.25, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer2D"]
 position = Vector2(0, -100)
@@ -3544,7 +3544,7 @@ scale = Vector2(2, 2)
 texture = ExtResource("8_usxhw")
 
 [node name="ParallaxLayer3D" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(0.3, 1)
+motion_scale = Vector2(0.35, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer3D"]
 position = Vector2(0, -100)
@@ -3554,7 +3554,7 @@ texture = ExtResource("3_g63hl")
 [node name="ParallaxBackground2D" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground2D"]
-motion_scale = Vector2(0.4, 1)
+motion_scale = Vector2(0.45, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground2D/ParallaxLayer"]
 position = Vector2(0, -100)
@@ -3562,7 +3562,7 @@ scale = Vector2(2, 2)
 texture = ExtResource("4_lqd81")
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground2D"]
-motion_scale = Vector2(0.5, 1)
+motion_scale = Vector2(0.55, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground2D/ParallaxLayer2"]
 position = Vector2(0, -100)

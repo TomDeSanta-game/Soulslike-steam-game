@@ -3,16 +3,23 @@ extends CollectibleBase
 # Since these are rare collectibles, they will restore full health and stamina
 # No need for export vars since they'll always restore to max
 
-const ITEM_ID = "celestial_tear"
+const ITEM_ID: String = "celestial_tear"
+const SOULS_REWARD: int = 50000  # 50,000 souls
+const XP_REWARD: int = 100000    # 100,000 XP
 
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
+@onready var souls_system = get_node("/root/SoulsSystem")
+@onready var xp_system = get_node("/root/XPSystem")
 
 # Add autoload reference
 @onready var inventory = get_node("/root/Inventory")
 
 func _ready() -> void:
 	super._ready()  # Call parent _ready first
+	
+	# Configure this collectible to NOT give souls through parent class
+	gives_souls = false  # We'll handle souls manually in collect()
 	
 	# Make sure the sprite has the shader material assigned
 	if sprite:
@@ -39,14 +46,21 @@ func collect() -> void:
 	if _is_collected:
 		return
 
+	# Add souls directly through the souls system
+	if souls_system:
+		souls_system.add_souls(SOULS_REWARD)
+		
+		# Try to level up instantly with the new souls
+		if xp_system:
+			xp_system.try_level_up()
+
 	# Add to inventory
 	var item_data = {
 		"id": ITEM_ID,
 		"name": "Celestial Tear",
 		"texture": load("res://assets/Sprite-0003.png"),
 		"description": "A rare crystallized tear from the heavens. Restores full health and stamina when used.",
-		"quantity": 1,
-		"use_function": "use_celestial_tear"  # Add this to specify which function to call when used
+		"use_function": "use_celestial_tear"
 	}
 	
 	inventory.add_item(ITEM_ID, item_data)

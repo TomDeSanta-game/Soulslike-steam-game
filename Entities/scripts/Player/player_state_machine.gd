@@ -215,25 +215,67 @@ func hurt_update(_delta: float) -> void:
 
 
 func dash_start() -> void:
+	# Check if player has enough stamina
+	if not player._has_enough_stamina(50.0):
+		dispatch(&"state_ended")
+		return
+		
+	player._use_stamina(50.0)  # Use 50 stamina for dash
 	player.animated_sprite.play(player.ANIMATIONS.DASH)
+	
+	# Apply immediate position change for instant dash start
+	var dash_direction = -1.0 if player.animated_sprite.flip_h else 1.0
+	player.position.x += 30 * dash_direction  # Add immediate position change
+	
 	player._start_dash()
+	# Disable gravity during dash
+	player.set_gravity_enabled(false)
 
 
 func dash_update(_delta: float) -> void:
 	if not player.is_dashing:
+		# Re-enable gravity after dash
+		player.set_gravity_enabled(true)
 		dispatch(&"state_ended")
+	else:
+		# Keep playing dash animation
+		if not player.animated_sprite.is_playing():
+			player.animated_sprite.play(player.ANIMATIONS.DASH)
 
 
 func roll_start() -> void:
+	# Check if player has enough stamina
+	if not player._has_enough_stamina(10.0):
+		dispatch(&"state_ended")
+		return
+		
+	player._use_stamina(10.0)  # Use 10 stamina for roll
 	player.animated_sprite.play(player.ANIMATIONS.ROLL)
-	# Add roll movement
+	
+	# Calculate roll direction
 	var roll_direction = -1.0 if player.animated_sprite.flip_h else 1.0
-	player.position.x += 10 * roll_direction
+	
+	# Create tween for smooth position change
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(player, "position:x", player.position.x + (10 * roll_direction), 0.15)
+	
+	# Disable player input during roll
+	player.set_physics_process(false)
+	
+	# Start roll timer
+	var roll_timer = get_tree().create_timer(0.5)  # Duration of roll animation
+	roll_timer.timeout.connect(func():
+		player.set_physics_process(true)
+		dispatch(&"state_ended")
+	)
 
 
 func roll_update(_delta: float) -> void:
+	# Keep playing roll animation until it's done
 	if not player.animated_sprite.is_playing():
-		dispatch(&"state_ended")
+		player.animated_sprite.play(player.ANIMATIONS.ROLL)
 
 
 func slide_start() -> void:

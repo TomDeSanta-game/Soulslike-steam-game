@@ -7,8 +7,8 @@ const STATS: Dictionary = {
 	"LIFESTEAL_PERCENT": 15.0,  # Percentage of damage dealt that will be returned as health
 	"MIN_LIFESTEAL_AMOUNT": 1.0,  # Minimum amount of health restored per hit
 	"MAX_LIFESTEAL_AMOUNT": 25.0,  # Maximum amount of health restored per hit
-	"DASH_SPEED": 800.0,  # Speed during dash
-	"DASH_DURATION": 0.2,  # Duration of dash in seconds
+	"DASH_SPEED": 1200.0,  # Increased from 800 to 1200 for faster dash
+	"DASH_DURATION": 0.1,  # Reduced from 0.15 to 0.1 for faster dash
 	"DASH_COOLDOWN": 0.5,  # Time before can dash again
 	"MAX_STAMINA": 100.0,
 	"STAMINA_REGEN_RATE": 20.0,  # Stamina points per second
@@ -129,6 +129,7 @@ var can_dash: bool = true
 var is_dashing: bool = false
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
+var dash_direction: float = 1.0
 
 # Save Engine
 @onready var save_engine: Node = get_node("/root/SaveEngine")
@@ -154,6 +155,15 @@ var is_grabbing: bool = false
 # Add near the top with other class variables
 var is_ledge_climbing: bool = false
 
+# Add near other @onready vars
+@onready var ui_layer: CanvasLayer = $UILayer
+
+# UI Elements
+@onready var xp_display = preload("res://UI/Scenes/xp_display.tscn").instantiate()
+@onready var level_up_menu = preload("res://UI/Scenes/level_up_menu.tscn").instantiate()
+
+# Add near other class variables
+var gravity_enabled: bool = true
 
 func _ready() -> void:
 	add_to_group("Player")
@@ -242,8 +252,8 @@ func _ready() -> void:
 	stamina_bar.value = stamina
 	stamina_bar.min_value = 0
 
-	# Add self to Player group
-	add_to_group("Player")
+	# Setup UI displays
+	_setup_ui_displays()
 
 	add_child(state_machine)
 
@@ -351,7 +361,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			_end_grab()  # Let go if not on wall or out of stamina
 
-	if !is_on_floor() and !is_grabbing:  # Only apply gravity if not grabbing
+	if !is_on_floor() and !is_grabbing and gravity_enabled:  # Only apply gravity if enabled
 		velocity.y += Types.GRAVITY_CONSTANT * delta
 		# Only play fall animation when moving downward and not in a jump state
 		if (
@@ -396,11 +406,11 @@ func _physics_process(delta: float) -> void:
 		dash_timer -= delta
 		if dash_timer <= 0:
 			is_dashing = false
+			velocity.x = dash_direction * MOVEMENT_SPEEDS.RUN  # Maintain some momentum after dash
 		else:
 			# Apply dash velocity
-			var dash_direction = -1.0 if animated_sprite.flip_h else 1.0
 			velocity.x = dash_direction * STATS.DASH_SPEED
-			# Disable gravity during dash
+			# Keep y velocity at 0 during dash
 			velocity.y = 0
 
 	# Handle running stamina drain
@@ -578,6 +588,9 @@ func _handle_input(event: InputEvent) -> void:
 		_heal(10.0)
 	elif event.is_action_released("DIE"):
 		take_damage(100.0)
+
+	if event.is_action_pressed("level_up"):
+		level_up_menu.show_menu()
 
 
 func _handle_jump() -> void:
@@ -952,6 +965,13 @@ func _start_dash() -> void:
 	can_dash = false
 	dash_timer = STATS.DASH_DURATION
 	dash_cooldown_timer = STATS.DASH_COOLDOWN
+	
+	# Store dash direction
+	dash_direction = -1.0 if animated_sprite.flip_h else 1.0
+
+	# Apply immediate velocity for instant dash
+	velocity.x = dash_direction * STATS.DASH_SPEED
+	velocity.y = 0
 
 	# Switch to dash shader material
 	animated_sprite.material = _dash_shader_material
@@ -960,13 +980,12 @@ func _start_dash() -> void:
 	SoundManager.play_sound(Sound.dash, "SFX")
 
 	# Enhanced screen shake for dash feedback
-	camera.shake(8, 0.15, 0.8)  # Increased intensity and duration
+	camera.shake(8, 0.15, 0.8)
 
-	# Brief pause for impact - using get_parent() to get the actual CharacterBody2D node
-	var player_node = self
-	PauseManager.pause(player_node)  # Pause the player
-	await get_tree().create_timer(0.1).timeout  # Wait for 0.1 seconds
-	PauseManager.unpause(player_node)  # Unpause the player
+	# Brief pause for impact - even shorter now
+	Engine.time_scale = 0.05
+	await get_tree().create_timer(0.03).timeout  # Reduced from 0.05 to 0.03
+	Engine.time_scale = 1.0
 
 	# Switch back to normal shader after dash starts
 	animated_sprite.material = _shader_material
@@ -1116,3 +1135,31 @@ func _start_ledge_climb() -> void:
 		set_physics_process(true)
 		state_machine.dispatch(&"state_ended")
 	)
+
+# Add this function near the end of the file
+func _setup_ui_displays() -> void:
+	# Add souls display
+	var souls_display = preload("res://UI/Scenes/souls_display.tscn").instantiate()
+	ui_layer.add_child(souls_display)
+	
+	# Position souls display on the right side
+	souls_display.position = Vector2(
+		get_viewport_rect().size.x - souls_display.size.x - 20,  # 20 pixels from right edge
+		20  # 20 pixels from top
+	)
+	
+	# Add XP display below souls display
+	ui_layer.add_child(xp_display)
+	
+	# Position XP display below souls display with same horizontal alignment
+	xp_display.position = Vector2(
+		get_viewport_rect().size.x - xp_display.size.x - 20,  # Same distance from right edge
+		souls_display.position.y + souls_display.size.y + 10  # 10 pixels gap between displays
+	)
+	
+	# Add level up menu
+	ui_layer.add_child(level_up_menu)
+	level_up_menu.hide()  # Start hidden
+
+func set_gravity_enabled(enabled: bool) -> void:
+	gravity_enabled = enabled

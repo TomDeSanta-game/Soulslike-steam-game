@@ -72,5 +72,23 @@ signal collectible_collected(collectible: Node)
 @warning_ignore("unused_signal")
 signal item_used(item_data: Dictionary)
 
+# Souls Signals
+@warning_ignore("unused_signal")
+signal souls_changed(new_amount: int)
+@warning_ignore("unused_signal")
+signal souls_lost(amount_lost: int)
+@warning_ignore("unused_signal")
+signal souls_recovered(amount_recovered: int)
+
+# XP System Signals
+@warning_ignore("unused_signal")
+signal level_up_started
+@warning_ignore("unused_signal")
+signal level_up_completed(new_level: int)
+@warning_ignore("unused_signal")
+signal stat_point_gained
+@warning_ignore("unused_signal")
+signal stat_increased(stat_name: String, new_value: int)
+
 func _ready() -> void:
 	Log.info("SignalBus initialized and ready to handle game signals")

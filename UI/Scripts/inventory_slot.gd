@@ -1,11 +1,11 @@
 extends Panel
 
 @onready var texture_rect = $TextureRect
-@onready var quantity_label = $QuantityLabel
 @onready var name_label = $NameLabel
 @onready var use_button = $UseButton
 @onready var hide_timer = Timer.new()
 @onready var item_container = $ItemContainer
+@onready var external_quantity_label = $ExternalQuantityLabel
 
 const BUTTON_VISIBLE_TIME = 1.5  # Time in seconds to keep button visible
 const CELESTIAL_TEAR_SCENE = preload("res://Objects/Scenes/Collectibles/CelestialTear/celestial_tear.tscn")
@@ -32,6 +32,9 @@ func _ready() -> void:
 	mouse_exited.connect(_on_mouse_exited)
 	use_button.pressed.connect(_on_use_button_pressed)
 
+	# Initialize external quantity label
+	external_quantity_label.text = "x1"
+
 func set_item(data: Dictionary) -> void:
 	print("Setting item with data: ", data)  # Debug print
 	item_data = data
@@ -52,6 +55,10 @@ func set_item(data: Dictionary) -> void:
 	else:
 		name_label.text = data.id.capitalize().replace("_", " ")
 		name_label.show()
+	
+	# Show external quantity label with correct quantity
+	external_quantity_label.show()
+	external_quantity_label.text = "x%d" % data.get("quantity", 1)
 	
 	# If this is a celestial tear, instantiate the scene
 	if data.id == "celestial_tear":
@@ -76,12 +83,6 @@ func set_item(data: Dictionary) -> void:
 	else:
 		texture_rect.texture = data.texture
 		texture_rect.show()
-
-	if data.quantity > 1:
-		quantity_label.text = str(data.quantity)
-		quantity_label.show()
-	else:
-		quantity_label.hide()
 
 func _on_mouse_entered() -> void:
 	is_hovering = true
@@ -111,12 +112,8 @@ func _on_use_button_pressed() -> void:
 		# Hide the use button
 		use_button.hide()
 		
-		# Update the display based on the new quantity
-		var new_quantity = Inventory.get_item_quantity(item_data.id)
-		if new_quantity > 0:
-			quantity_label.text = str(new_quantity)
-		else:
-			clear_slot()  # Clear the slot if no items remain
+		# Clear the slot if item was used
+		clear_slot()
 
 func clear_slot() -> void:
 	# Clear item data
@@ -136,10 +133,10 @@ func clear_slot() -> void:
 	texture_rect.hide()
 	
 	# Hide labels
-	quantity_label.hide()
-	quantity_label.text = ""
 	name_label.hide()
 	name_label.text = ""
+	external_quantity_label.hide()
+	external_quantity_label.text = "x1"
 	
 	# Hide use button
 	use_button.hide()

@@ -6,24 +6,27 @@ var _items: Dictionary = {}
 
 func add_item(item_id: String, item_data: Dictionary) -> void:
 	if _items.has(item_id):
-		_items[item_id].quantity += item_data.quantity
+		# If item exists, increment quantity
+		_items[item_id]["quantity"] = _items[item_id].get("quantity", 1) + 1
 	else:
-		_items[item_id] = item_data.duplicate()
-	
+		# If new item, add it with quantity 1
+		var new_item = item_data.duplicate()
+		new_item["quantity"] = 1
+		_items[item_id] = new_item
 	inventory_updated.emit()
 
 func remove_item(item_id: String) -> void:
 	if _items.has(item_id):
-		_items.erase(item_id)
+		# Decrease quantity
+		_items[item_id]["quantity"] = _items[item_id].get("quantity", 1) - 1
+		# Remove item if quantity reaches 0
+		if _items[item_id]["quantity"] <= 0:
+			_items.erase(item_id)
 		inventory_updated.emit()
 
 func use_item(item_id: String) -> void:
 	if _items.has(item_id):
-		_items[item_id].quantity -= 1
-		if _items[item_id].quantity <= 0:
-			remove_item(item_id)
-		else:
-			inventory_updated.emit()
+		remove_item(item_id)
 
 func get_items() -> Dictionary:
 	return _items
@@ -31,11 +34,6 @@ func get_items() -> Dictionary:
 func has_item(item_id: String) -> bool:
 	return _items.has(item_id)
 
-func get_item_quantity(item_id: String) -> int:
-	if _items.has(item_id):
-		return _items[item_id].quantity
-	return 0
-
 func clear_inventory() -> void:
 	_items.clear()
-	inventory_updated.emit() 
+	inventory_updated.emit()
