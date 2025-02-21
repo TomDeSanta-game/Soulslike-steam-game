@@ -37,25 +37,33 @@ func set_item(data: Dictionary) -> void:
 	is_empty = false
 	
 	# Clear existing tear instance if any
-	if tear_instance:
+	if is_instance_valid(tear_instance):
+		# Make sure to remove from tree before freeing
+		if tear_instance.is_inside_tree():
+			item_container.remove_child(tear_instance)
 		tear_instance.queue_free()
 		tear_instance = null
 	
 	# If this is a celestial tear, instantiate the scene
 	if data.id == "celestial_tear":
 		print("Creating celestial tear instance")  # Debug print
+		# Wait a frame to ensure previous instance is fully cleaned up
+		await get_tree().process_frame
 		tear_instance = CELESTIAL_TEAR_SCENE.instantiate()
-		item_container.add_child(tear_instance)
 		
-		# Adjust the size and position of the tear instance
-		if tear_instance is Node2D:
-			tear_instance.scale = Vector2(4.0, 4.0)  # Larger scale for better visibility
-			# Center the tear in the slot by using the slot's size
-			var slot_size = size
-			tear_instance.position = slot_size / 2
-		
-		# Hide the default texture
-		texture_rect.hide()
+		# Make sure the item_container still exists before adding
+		if is_instance_valid(item_container) and item_container.is_inside_tree():
+			item_container.add_child(tear_instance)
+			
+			# Adjust the size and position of the tear instance
+			if tear_instance is Node2D:
+				tear_instance.scale = Vector2(4.0, 4.0)  # Larger scale for better visibility
+				# Center the tear in the slot by using the slot's size
+				var slot_size = size
+				tear_instance.position = slot_size / 2
+			
+			# Hide the default texture
+			texture_rect.hide()
 	else:
 		texture_rect.texture = data.texture
 		texture_rect.show()
@@ -87,7 +95,19 @@ func _on_use_button_pressed() -> void:
 	if item_data.has("id"):  # Check if we have valid item data
 		# Emit the signal through SignalBus
 		SignalBus.item_used.emit(item_data)
-		clear_slot()
+		
+		# Use the item through the Inventory singleton
+		Inventory.use_item(item_data.id)
+		
+		# Hide the use button
+		use_button.hide()
+		
+		# Update the display based on the new quantity
+		var new_quantity = Inventory.get_item_quantity(item_data.id)
+		if new_quantity > 0:
+			quantity_label.text = str(new_quantity)
+		else:
+			clear_slot()  # Clear the slot if no items remain
 
 func clear_slot() -> void:
 	# Clear item data
@@ -95,7 +115,10 @@ func clear_slot() -> void:
 	is_empty = true
 	
 	# Clear existing tear instance if any
-	if tear_instance:
+	if is_instance_valid(tear_instance):
+		# Make sure to remove from tree before freeing
+		if tear_instance.is_inside_tree():
+			item_container.remove_child(tear_instance)
 		tear_instance.queue_free()
 		tear_instance = null
 	
@@ -109,3 +132,16 @@ func clear_slot() -> void:
 	
 	# Hide use button
 	use_button.hide()
+
+# Add cleanup on exit
+func _exit_tree() -> void:
+	# Ensure tear instance is properly cleaned up
+	if is_instance_valid(tear_instance):
+		if tear_instance.is_inside_tree():
+			item_container.remove_child(tear_instance)
+		tear_instance.queue_free()
+		tear_instance = null
+	
+	# Clean up timer if it exists
+	if is_instance_valid(hide_timer):
+		hide_timer.queue_free()

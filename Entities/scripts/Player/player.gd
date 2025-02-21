@@ -76,7 +76,7 @@ var is_fading: bool = false  # Track if the fade effect is active
 
 const MOVEMENT_SPEEDS = {
 	"WALK": 300.0,
-	"RUN": 450.0,
+	"RUN": 400.0,
 	"CROUCH": 150.0,
 }
 
@@ -170,7 +170,7 @@ func _ready() -> void:
 		hurtbox.collision_mask = C_Layers.MASK_HURTBOX
 		hurtbox.active = true
 
-	set_jump_power(-450.0)
+	set_jump_power(-410.0)
 
 	# Initialize health system first
 	health_system = HealthSystem.new()
@@ -325,9 +325,9 @@ func _physics_process(delta: float) -> void:
 		# Only play fall animation when moving downward and not in a jump state
 		if (
 			velocity.y > 0
-			and animated_sprite.animation != ANIMATIONS.FALL
 			and !is_jump_active
 			and !is_attacking
+			and animated_sprite.animation != ANIMATIONS.JUMP  # Check animation instead of state
 		):
 			state_machine.dispatch(&"fall")
 	elif was_on_floor:
@@ -341,6 +341,7 @@ func _physics_process(delta: float) -> void:
 	elif is_on_floor():
 		has_coyote_time = false
 		coyote_timer = 0.0
+		is_jump_active = false  # Reset jump active when landing
 	elif coyote_timer > 0:
 		coyote_timer -= delta
 		if coyote_timer <= 0:
@@ -350,6 +351,8 @@ func _physics_process(delta: float) -> void:
 	if is_jump_active and not is_jump_held and velocity.y < 0:
 		velocity.y = 0  # Stop upward movement if jump button is released
 		is_jump_active = false
+		if !is_on_floor():  # If we're in the air after cutting jump, transition to fall
+			state_machine.dispatch(&"fall")
 
 	# Handle dash cooldown
 	if dash_cooldown_timer > 0:
@@ -453,10 +456,12 @@ func _get_current_speed() -> float:
 
 func _update_movement_state() -> void:
 	if abs(velocity.x) > 5.0:  # Small threshold to avoid floating point issues
-		current_state = Types.CharacterState.MOVE
+		if !is_attacking and !is_jump_active and is_on_floor():
+			animated_sprite.play(ANIMATIONS.RUN)
 	else:
 		velocity.x = 0  # Snap to zero when very slow
-		current_state = Types.CharacterState.IDLE
+		if !is_attacking and !is_jump_active and is_on_floor():
+			animated_sprite.play(ANIMATIONS.IDLE)
 
 
 func _reset_acceleration() -> void:
@@ -492,11 +497,12 @@ func _is_attack_animation() -> bool:
 func _handle_input(event: InputEvent) -> void:
 	if event.is_action_pressed("JUMP"):
 		is_jump_held = true
-		if is_on_floor() or has_coyote_time:
+		if (is_on_floor() or has_coyote_time) and not is_jump_active:  # Add check for is_jump_active
 			_handle_jump()
 		else:
-			# Buffer the jump input
-			InputBuffer.buffer_jump()
+			# Buffer the jump input only if we're not already jumping
+			if not is_jump_active:
+				InputBuffer.buffer_jump()
 	elif event.is_action_released("JUMP"):
 		is_jump_held = false
 
@@ -544,14 +550,14 @@ func _handle_input(event: InputEvent) -> void:
 
 
 func _handle_jump() -> void:
-	if is_on_floor() or has_coyote_time:
+	if (is_on_floor() or has_coyote_time) and not is_jump_active:  # Add check for is_jump_active
 		velocity.y = jump_power
 		is_jump_held = true
 		is_jump_active = true
 		has_coyote_time = false  # Consume coyote time
 		coyote_timer = 0.0
 		jump_timer.start()
-		animated_sprite.play(ANIMATIONS.JUMP)
+		state_machine.dispatch(&"jump")  # Ensure we transition to jump state
 		InputBuffer.consume_jump_buffer()  # Consume any buffered jump
 
 
