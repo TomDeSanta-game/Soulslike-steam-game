@@ -25,16 +25,16 @@ func _ready() -> void:
 	if sprite:
 		@warning_ignore("shadowed_variable_base_class")
 		var material = ShaderMaterial.new()
-		material.shader = preload("res://Shaders/Collectibles/glow_effect.gdshader")
+		material.shader = preload("res://Shaders/Collectibles/lore_fragment.gdshader")
 		
-		# Set default shader parameters
-		material.set_shader_parameter("glow_color", Color(0.5, 0.8, 1.0, 0.6))  # Light blue glow
-		material.set_shader_parameter("glow_intensity", 1.5)
-		material.set_shader_parameter("glow_scale", 2.0)
-		material.set_shader_parameter("pulse_speed", 3.0)
-		material.set_shader_parameter("outer_radius", 0.4)
-		material.set_shader_parameter("inner_radius", 0.1)
-		material.set_shader_parameter("light_intensity", 0.5)
+		# Set shader parameters for a celestial tear appearance
+		material.set_shader_parameter("glow_color", Color(0.7, 0.9, 1.0, 0.8))  # Light blue ethereal glow
+		material.set_shader_parameter("glow_intensity", 1.2)
+		material.set_shader_parameter("glow_scale", 1.8)
+		material.set_shader_parameter("pulse_speed", 2.0)
+		material.set_shader_parameter("outer_radius", 0.5)
+		material.set_shader_parameter("inner_radius", 0.2)
+		material.set_shader_parameter("light_intensity", 0.4)
 		
 		sprite.material = material
 

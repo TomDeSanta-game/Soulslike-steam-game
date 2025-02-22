@@ -218,6 +218,14 @@ func _ready() -> void:
 	health_bar_style.corner_radius_top_right = 8
 	health_bar_style.corner_radius_bottom_right = 8
 	health_bar_style.corner_radius_bottom_left = 8
+	health_bar_style.border_width_left = 2
+	health_bar_style.border_width_top = 2
+	health_bar_style.border_width_right = 2
+	health_bar_style.border_width_bottom = 2
+	health_bar_style.border_color = Color(0.8, 0.8, 0.8, 0.5)  # Light gray border
+	health_bar_style.shadow_color = Color(0, 0, 0, 0.3)
+	health_bar_style.shadow_size = 4
+	health_bar_style.anti_aliasing = true
 
 	var health_bar_bg_style = StyleBoxFlat.new()
 	health_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
@@ -225,6 +233,14 @@ func _ready() -> void:
 	health_bar_bg_style.corner_radius_top_right = 8
 	health_bar_bg_style.corner_radius_bottom_right = 8
 	health_bar_bg_style.corner_radius_bottom_left = 8
+	health_bar_bg_style.border_width_left = 2
+	health_bar_bg_style.border_width_top = 2
+	health_bar_bg_style.border_width_right = 2
+	health_bar_bg_style.border_width_bottom = 2
+	health_bar_bg_style.border_color = Color(0.2, 0.2, 0.2, 0.5)  # Dark gray border
+	health_bar_bg_style.shadow_color = Color(0, 0, 0, 0.2)
+	health_bar_bg_style.shadow_size = 2
+	health_bar_bg_style.anti_aliasing = true
 
 	# Setup stamina bar style
 	var stamina_bar_style = StyleBoxFlat.new()
@@ -233,6 +249,14 @@ func _ready() -> void:
 	stamina_bar_style.corner_radius_top_right = 8
 	stamina_bar_style.corner_radius_bottom_right = 8
 	stamina_bar_style.corner_radius_bottom_left = 8
+	stamina_bar_style.border_width_left = 2
+	stamina_bar_style.border_width_top = 2
+	stamina_bar_style.border_width_right = 2
+	stamina_bar_style.border_width_bottom = 2
+	stamina_bar_style.border_color = Color(0.8, 0.8, 0.8, 0.5)  # Light gray border
+	stamina_bar_style.shadow_color = Color(0, 0, 0, 0.3)
+	stamina_bar_style.shadow_size = 4
+	stamina_bar_style.anti_aliasing = true
 
 	var stamina_bar_bg_style = StyleBoxFlat.new()
 	stamina_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
@@ -240,6 +264,14 @@ func _ready() -> void:
 	stamina_bar_bg_style.corner_radius_top_right = 8
 	stamina_bar_bg_style.corner_radius_bottom_right = 8
 	stamina_bar_bg_style.corner_radius_bottom_left = 8
+	stamina_bar_bg_style.border_width_left = 2
+	stamina_bar_bg_style.border_width_top = 2
+	stamina_bar_bg_style.border_width_right = 2
+	stamina_bar_bg_style.border_width_bottom = 2
+	stamina_bar_bg_style.border_color = Color(0.2, 0.2, 0.2, 0.5)  # Dark gray border
+	stamina_bar_bg_style.shadow_color = Color(0, 0, 0, 0.2)
+	stamina_bar_bg_style.shadow_size = 2
+	stamina_bar_bg_style.anti_aliasing = true
 
 	# Apply styles to health bar
 	health_bar.add_theme_stylebox_override("fill", health_bar_style)
@@ -247,6 +279,8 @@ func _ready() -> void:
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_bar.min_value = 0
+	health_bar.custom_minimum_size = Vector2(250, 35)  # Make the bar wider and taller
+	health_bar.modulate.a = 0.95  # Slightly transparent
 
 	# Apply styles to stamina bar
 	stamina_bar.add_theme_stylebox_override("fill", stamina_bar_style)
@@ -254,6 +288,8 @@ func _ready() -> void:
 	stamina_bar.max_value = STATS.MAX_STAMINA
 	stamina_bar.value = stamina
 	stamina_bar.min_value = 0
+	stamina_bar.custom_minimum_size = Vector2(250, 35)  # Make the bar wider and taller
+	stamina_bar.modulate.a = 0.95  # Slightly transparent
 
 	# Setup UI displays
 	_setup_ui_displays()
@@ -458,7 +494,14 @@ func _trigger_effect() -> void:
 
 # Update the healthbar
 func _update_health_bar() -> void:
-	health_bar.value = current_health
+	var tween = create_tween()
+	tween.tween_property(health_bar, "value", current_health, 0.3).set_trans(Tween.TRANS_CIRC).set_ease(Tween.EASE_OUT)
+	
+	# Flash effect when taking damage
+	if health_bar.value > current_health:
+		var flash_tween = create_tween()
+		flash_tween.tween_property(health_bar, "modulate", Color(1.5, 1.5, 1.5, 1), 0.1)
+		flash_tween.tween_property(health_bar, "modulate", Color(1, 1, 1, 0.95), 0.2)
 
 
 # Movement System
@@ -716,7 +759,7 @@ func take_damage(damage_amount: float) -> void:
 		_start_invincibility()
 
 		# Update health bar
-		health_bar.value = current_health
+		_update_health_bar()
 
 
 # Health the health
@@ -894,7 +937,7 @@ func _on_health_changed(new_health: float, new_max_health: float) -> void:
 	current_health = new_health
 	max_health = new_max_health
 	health_percent = health_system.get_health_percentage()
-	health_bar.value = current_health
+	_update_health_bar()
 
 
 func _on_character_died() -> void:
@@ -920,7 +963,15 @@ func _is_running() -> bool:
 
 
 func _update_stamina_bar() -> void:
-	stamina_bar.value = stamina
+	var tween = create_tween()
+	tween.tween_property(stamina_bar, "value", stamina, 0.3).set_trans(Tween.TRANS_CIRC).set_ease(Tween.EASE_OUT)
+	
+	# Flash effect when stamina is low
+	if stamina < STATS.MAX_STAMINA * 0.2:  # Less than 20% stamina
+		var flash_tween = create_tween()
+		flash_tween.tween_property(stamina_bar, "modulate", Color(1.2, 1.2, 1.2, 1), 0.5)
+		flash_tween.tween_property(stamina_bar, "modulate", Color(1, 1, 1, 0.95), 0.5)
+		flash_tween.set_loops()  # Make it loop while stamina is low
 
 
 func _has_enough_stamina(cost: float) -> bool:

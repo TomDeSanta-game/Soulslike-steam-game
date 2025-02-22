@@ -21,6 +21,21 @@ func _ready() -> void:
 	# Connect to interaction system
 	add_to_group("interactable")
 	
+	# Set up shader material
+	if sprite:
+		var material = ShaderMaterial.new()
+		material.shader = preload("res://Shaders/Collectibles/lore_fragment.gdshader")
+		
+		# Set shader parameters
+		material.set_shader_parameter("glow_color", Color(1.0, 0.8, 0.4, 1.0))
+		material.set_shader_parameter("glow_intensity", 2.0)
+		material.set_shader_parameter("pulse_speed", 3.0)
+		material.set_shader_parameter("ray_speed", 2.0)
+		material.set_shader_parameter("ray_intensity", 1.0)
+		material.set_shader_parameter("distortion_strength", 0.02)
+		
+		sprite.material = material
+	
 	# Connect mouse signals
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
