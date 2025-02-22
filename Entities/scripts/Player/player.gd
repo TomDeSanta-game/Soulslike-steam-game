@@ -166,6 +166,13 @@ var is_ledge_climbing: bool = false
 # Add near other class variables
 var gravity_enabled: bool = true
 
+# Add near other class variables
+var current_merchant: Node = null
+
+@export var merchant_menu_scene: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")
+var merchant_menu: MerchantMenu = null
+
+
 func _ready() -> void:
 	add_to_group("Player")
 	super._ready()  # Call parent _ready to initialize health system
@@ -213,65 +220,81 @@ func _ready() -> void:
 
 	# Setup health bar style
 	var health_bar_style = StyleBoxFlat.new()
-	health_bar_style.bg_color = Color.from_string("#d00000", Color.RED)  # Bright red
-	health_bar_style.corner_radius_top_left = 8
-	health_bar_style.corner_radius_top_right = 8
-	health_bar_style.corner_radius_bottom_right = 8
-	health_bar_style.corner_radius_bottom_left = 8
-	health_bar_style.border_width_left = 2
-	health_bar_style.border_width_top = 2
-	health_bar_style.border_width_right = 2
-	health_bar_style.border_width_bottom = 2
-	health_bar_style.border_color = Color(0.8, 0.8, 0.8, 0.5)  # Light gray border
-	health_bar_style.shadow_color = Color(0, 0, 0, 0.3)
-	health_bar_style.shadow_size = 4
+	health_bar_style.bg_color = Color.from_string("#ff0033", Color.RED)  # Vibrant red
+	health_bar_style.corner_radius_top_left = 12
+	health_bar_style.corner_radius_top_right = 12
+	health_bar_style.corner_radius_bottom_right = 12
+	health_bar_style.corner_radius_bottom_left = 12
+	health_bar_style.border_width_left = 3
+	health_bar_style.border_width_top = 3
+	health_bar_style.border_width_right = 3
+	health_bar_style.border_width_bottom = 3
+	health_bar_style.border_color = Color(0.9, 0.9, 0.9, 0.7)  # Lighter border
+	health_bar_style.shadow_color = Color(0, 0, 0, 0.4)
+	health_bar_style.shadow_size = 6
 	health_bar_style.anti_aliasing = true
+	health_bar_style.expand_margin_left = 4
+	health_bar_style.expand_margin_right = 4
+	health_bar_style.expand_margin_top = 4
+	health_bar_style.expand_margin_bottom = 4
 
 	var health_bar_bg_style = StyleBoxFlat.new()
-	health_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
-	health_bar_bg_style.corner_radius_top_left = 8
-	health_bar_bg_style.corner_radius_top_right = 8
-	health_bar_bg_style.corner_radius_bottom_right = 8
-	health_bar_bg_style.corner_radius_bottom_left = 8
-	health_bar_bg_style.border_width_left = 2
-	health_bar_bg_style.border_width_top = 2
-	health_bar_bg_style.border_width_right = 2
-	health_bar_bg_style.border_width_bottom = 2
-	health_bar_bg_style.border_color = Color(0.2, 0.2, 0.2, 0.5)  # Dark gray border
-	health_bar_bg_style.shadow_color = Color(0, 0, 0, 0.2)
-	health_bar_bg_style.shadow_size = 2
+	health_bar_bg_style.bg_color = Color.from_string("#1a1a1a", Color.BLACK)  # Darker background
+	health_bar_bg_style.corner_radius_top_left = 12
+	health_bar_bg_style.corner_radius_top_right = 12
+	health_bar_bg_style.corner_radius_bottom_right = 12
+	health_bar_bg_style.corner_radius_bottom_left = 12
+	health_bar_bg_style.border_width_left = 3
+	health_bar_bg_style.border_width_top = 3
+	health_bar_bg_style.border_width_right = 3
+	health_bar_bg_style.border_width_bottom = 3
+	health_bar_bg_style.border_color = Color(0.3, 0.3, 0.3, 0.6)  # Darker border
+	health_bar_bg_style.shadow_color = Color(0, 0, 0, 0.3)
+	health_bar_bg_style.shadow_size = 4
 	health_bar_bg_style.anti_aliasing = true
+	health_bar_bg_style.expand_margin_left = 4
+	health_bar_bg_style.expand_margin_right = 4
+	health_bar_bg_style.expand_margin_top = 4
+	health_bar_bg_style.expand_margin_bottom = 4
 
 	# Setup stamina bar style
 	var stamina_bar_style = StyleBoxFlat.new()
-	stamina_bar_style.bg_color = Color.from_string("#80ed99", Color.GREEN)  # Bright green
-	stamina_bar_style.corner_radius_top_left = 8
-	stamina_bar_style.corner_radius_top_right = 8
-	stamina_bar_style.corner_radius_bottom_right = 8
-	stamina_bar_style.corner_radius_bottom_left = 8
-	stamina_bar_style.border_width_left = 2
-	stamina_bar_style.border_width_top = 2
-	stamina_bar_style.border_width_right = 2
-	stamina_bar_style.border_width_bottom = 2
-	stamina_bar_style.border_color = Color(0.8, 0.8, 0.8, 0.5)  # Light gray border
-	stamina_bar_style.shadow_color = Color(0, 0, 0, 0.3)
-	stamina_bar_style.shadow_size = 4
+	stamina_bar_style.bg_color = Color.from_string("#00cc66", Color.GREEN)  # Vibrant green
+	stamina_bar_style.corner_radius_top_left = 12
+	stamina_bar_style.corner_radius_top_right = 12
+	stamina_bar_style.corner_radius_bottom_right = 12
+	stamina_bar_style.corner_radius_bottom_left = 12
+	stamina_bar_style.border_width_left = 3
+	stamina_bar_style.border_width_top = 3
+	stamina_bar_style.border_width_right = 3
+	stamina_bar_style.border_width_bottom = 3
+	stamina_bar_style.border_color = Color(0.9, 0.9, 0.9, 0.7)  # Lighter border
+	stamina_bar_style.shadow_color = Color(0, 0, 0, 0.4)
+	stamina_bar_style.shadow_size = 6
 	stamina_bar_style.anti_aliasing = true
+	stamina_bar_style.expand_margin_left = 4
+	stamina_bar_style.expand_margin_right = 4
+	stamina_bar_style.expand_margin_top = 4
+	stamina_bar_style.expand_margin_bottom = 4
 
 	var stamina_bar_bg_style = StyleBoxFlat.new()
-	stamina_bar_bg_style.bg_color = Color.from_string("#212529", Color.BLACK)  # Dark gray
-	stamina_bar_bg_style.corner_radius_top_left = 8
-	stamina_bar_bg_style.corner_radius_top_right = 8
-	stamina_bar_bg_style.corner_radius_bottom_right = 8
-	stamina_bar_bg_style.corner_radius_bottom_left = 8
-	stamina_bar_bg_style.border_width_left = 2
-	stamina_bar_bg_style.border_width_top = 2
-	stamina_bar_bg_style.border_width_right = 2
-	stamina_bar_bg_style.border_width_bottom = 2
-	stamina_bar_bg_style.border_color = Color(0.2, 0.2, 0.2, 0.5)  # Dark gray border
-	stamina_bar_bg_style.shadow_color = Color(0, 0, 0, 0.2)
-	stamina_bar_bg_style.shadow_size = 2
+	stamina_bar_bg_style.bg_color = Color.from_string("#1a1a1a", Color.BLACK)  # Darker background
+	stamina_bar_bg_style.corner_radius_top_left = 12
+	stamina_bar_bg_style.corner_radius_top_right = 12
+	stamina_bar_bg_style.corner_radius_bottom_right = 12
+	stamina_bar_bg_style.corner_radius_bottom_left = 12
+	stamina_bar_bg_style.border_width_left = 3
+	stamina_bar_bg_style.border_width_top = 3
+	stamina_bar_bg_style.border_width_right = 3
+	stamina_bar_bg_style.border_width_bottom = 3
+	stamina_bar_bg_style.border_color = Color(0.3, 0.3, 0.3, 0.6)  # Darker border
+	stamina_bar_bg_style.shadow_color = Color(0, 0, 0, 0.3)
+	stamina_bar_bg_style.shadow_size = 4
 	stamina_bar_bg_style.anti_aliasing = true
+	stamina_bar_bg_style.expand_margin_left = 4
+	stamina_bar_bg_style.expand_margin_right = 4
+	stamina_bar_bg_style.expand_margin_top = 4
+	stamina_bar_bg_style.expand_margin_bottom = 4
 
 	# Apply styles to health bar
 	health_bar.add_theme_stylebox_override("fill", health_bar_style)
@@ -347,6 +370,10 @@ func _ready() -> void:
 	if grab_collision_shape:
 		grab_collision_shape.disabled = true
 
+	merchant_menu = merchant_menu_scene.instantiate()
+	get_tree().root.add_child(merchant_menu)
+	merchant_menu.visible = false
+
 
 func _process(delta: float) -> void:
 	if effect_timer > 0.0:
@@ -393,7 +420,7 @@ func _physics_process(delta: float) -> void:
 			velocity.y = STATS.WALL_CLIMB_SPEED
 			_use_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * delta)
 			animated_sprite.play(ANIMATIONS.WALL_CLIMB)
-			
+
 			# Check if we can climb the ledge
 			if _can_climb_ledge():
 				_start_ledge_climb()
@@ -494,14 +521,41 @@ func _trigger_effect() -> void:
 
 # Update the healthbar
 func _update_health_bar() -> void:
+	# Create a smooth tween for health bar updates
 	var tween = create_tween()
-	tween.tween_property(health_bar, "value", current_health, 0.3).set_trans(Tween.TRANS_CIRC).set_ease(Tween.EASE_OUT)
-	
+	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(health_bar, "value", current_health, 0.4)
+
+	# Dynamic color change based on health percentage
+	var health_style = health_bar.get_theme_stylebox("fill") as StyleBoxFlat
+	if health_style:
+		var health_percent = (current_health / max_health) * 100
+		var new_color: Color
+		if health_percent > 60:
+			new_color = Color.from_string("#ff0033", Color.RED)  # Full health color
+		elif health_percent > 30:
+			new_color = Color.from_string("#ff9900", Color.ORANGE)  # Medium health color
+		else:
+			new_color = Color.from_string("#ff0000", Color.RED)  # Low health color
+		
+		# Tween the color change
+		tween.parallel().tween_method(
+			func(c): health_style.bg_color = c,
+			health_style.bg_color,
+			new_color,
+			0.4
+		)
+
 	# Flash effect when taking damage
 	if health_bar.value > current_health:
 		var flash_tween = create_tween()
-		flash_tween.tween_property(health_bar, "modulate", Color(1.5, 1.5, 1.5, 1), 0.1)
+		flash_tween.tween_property(health_bar, "modulate", Color(2, 2, 2, 1), 0.1)
 		flash_tween.tween_property(health_bar, "modulate", Color(1, 1, 1, 0.95), 0.2)
+		
+		# Screen shake effect on significant damage
+		if (health_bar.value - current_health) > max_health * 0.1:  # More than 10% damage
+			camera.shake(10, 0.3, 0.85)
 
 
 # Movement System
@@ -582,12 +636,15 @@ func _is_attack_animation() -> bool:
 
 # Input Handling
 func _handle_input(event: InputEvent) -> void:
+	if event.is_action_pressed("interact"):
+		merchant_menu.visible = !merchant_menu.visible
+		get_tree().paused = merchant_menu.visible
+
 	if event.is_action_pressed("JUMP"):
 		is_jump_held = true
-		if (is_on_floor() or has_coyote_time) and not is_jump_active:  # Add check for is_jump_active
+		if (is_on_floor() or has_coyote_time) and not is_jump_active:
 			_handle_jump()
 		else:
-			# Buffer the jump input only if we're not already jumping
 			if not is_jump_active:
 				InputBuffer.buffer_jump()
 	elif event.is_action_released("JUMP"):
@@ -637,6 +694,10 @@ func _handle_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("level_up"):
 		level_up_menu.show_menu()
+
+	if event.is_action_pressed("interact") and current_merchant:
+		if current_merchant.has_method("toggle_shop"):
+			current_merchant.toggle_shop()
 
 
 func _handle_jump() -> void:
@@ -963,15 +1024,44 @@ func _is_running() -> bool:
 
 
 func _update_stamina_bar() -> void:
+	# Create a smooth tween for stamina bar updates
 	var tween = create_tween()
-	tween.tween_property(stamina_bar, "value", stamina, 0.3).set_trans(Tween.TRANS_CIRC).set_ease(Tween.EASE_OUT)
-	
-	# Flash effect when stamina is low
+	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(stamina_bar, "value", stamina, 0.3)
+
+	# Dynamic color change based on stamina percentage
+	var stamina_style = stamina_bar.get_theme_stylebox("fill") as StyleBoxFlat
+	if stamina_style:
+		var stamina_percent = (stamina / STATS.MAX_STAMINA) * 100
+		var new_color: Color
+		if stamina_percent > 60:
+			new_color = Color.from_string("#00cc66", Color.GREEN)  # Full stamina color
+		elif stamina_percent > 30:
+			new_color = Color.from_string("#ffcc00", Color.YELLOW)  # Medium stamina color
+		else:
+			new_color = Color.from_string("#ff6600", Color.ORANGE)  # Low stamina color
+		
+		# Tween the color change
+		tween.parallel().tween_method(
+			func(c): stamina_style.bg_color = c,
+			stamina_style.bg_color,
+			new_color,
+			0.3
+		)
+
+	# Pulse effect when stamina is low
 	if stamina < STATS.MAX_STAMINA * 0.2:  # Less than 20% stamina
+		var pulse_tween = create_tween()
+		pulse_tween.set_loops()  # Make it loop
+		pulse_tween.tween_property(stamina_bar, "modulate", Color(1.3, 1.3, 1.3, 1), 0.5)
+		pulse_tween.tween_property(stamina_bar, "modulate", Color(1, 1, 1, 0.95), 0.5)
+
+	# Flash effect when using a lot of stamina
+	if stamina_bar.value - stamina > STATS.MAX_STAMINA * 0.3:  # Using more than 30% stamina
 		var flash_tween = create_tween()
-		flash_tween.tween_property(stamina_bar, "modulate", Color(1.2, 1.2, 1.2, 1), 0.5)
-		flash_tween.tween_property(stamina_bar, "modulate", Color(1, 1, 1, 0.95), 0.5)
-		flash_tween.set_loops()  # Make it loop while stamina is low
+		flash_tween.tween_property(stamina_bar, "modulate", Color(1.5, 1.5, 1.5, 1), 0.1)
+		flash_tween.tween_property(stamina_bar, "modulate", Color(1, 1, 1, 0.95), 0.2)
 
 
 func _has_enough_stamina(cost: float) -> bool:
@@ -1019,7 +1109,7 @@ func _start_dash() -> void:
 	can_dash = false
 	dash_timer = STATS.DASH_DURATION
 	dash_cooldown_timer = STATS.DASH_COOLDOWN
-	
+
 	# Store dash direction
 	dash_direction = -1.0 if animated_sprite.flip_h else 1.0
 
@@ -1104,7 +1194,7 @@ func use_celestial_tear() -> void:
 	# Restore stamina to full
 	var max_stamina = get_max_stamina()
 	restore_stamina(max_stamina)
-	
+
 	# Play heal sound when using the tear
 	SoundManager.play_sound(Sound.heal, "SFX")
 
@@ -1117,7 +1207,11 @@ func _on_item_used(item_data: Dictionary) -> void:
 
 # Add these new methods
 func _start_grab() -> void:
-	if grab_collision_shape and is_on_wall() and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * 0.1):
+	if (
+		grab_collision_shape
+		and is_on_wall()
+		and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * 0.1)
+	):
 		grab_collision_shape.disabled = false
 		is_grabbing = true
 		# Apply upward movement while grabbing
@@ -1125,11 +1219,13 @@ func _start_grab() -> void:
 		# Use stamina
 		_use_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * get_physics_process_delta_time())
 
+
 func _end_grab() -> void:
 	if grab_collision_shape:
 		grab_collision_shape.disabled = true
 		is_grabbing = false
 		state_machine.dispatch(&"state_ended")
+
 
 # Modify the wall_hang_update function to check for ledge climbing
 func _update_wall_climbing(delta: float) -> void:
@@ -1138,95 +1234,117 @@ func _update_wall_climbing(delta: float) -> void:
 			velocity.y = STATS.WALL_CLIMB_SPEED
 			_use_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * delta)
 			animated_sprite.play(ANIMATIONS.WALL_CLIMB)
-			
+
 			# Check if we can climb the ledge
 			if _can_climb_ledge():
-				print("Can climb ledge!")
 				_start_ledge_climb()
 		else:
 			_end_grab()  # Let go if not on wall or out of stamina
+
 
 # Modify the _can_climb_ledge function
 func _can_climb_ledge() -> bool:
 	if !ledge_check or is_ledge_climbing:
 		return false
-		
+
 	# Update raycast direction based on character facing
 	var check_direction = -1 if animated_sprite.flip_h else 1
 	ledge_check.target_position.x = 32 * check_direction
-	
+
 	# Force the raycast to update
 	ledge_check.force_raycast_update()
-	
+
 	# Check if we found a valid ledge
-	return ledge_check.is_colliding() and not ledge_check.get_collision_point().is_equal_approx(global_position)
+	return (
+		ledge_check.is_colliding()
+		and not ledge_check.get_collision_point().is_equal_approx(global_position)
+	)
+
 
 # Update the ledge climb function
 func _start_ledge_climb() -> void:
 	if !ledge_climb_position or is_ledge_climbing:
 		return
-		
+
 	is_ledge_climbing = true
-	
+
 	# Disable physics and stop all movement
 	set_physics_process(false)
 	velocity = Vector2.ZERO
-	
+
 	# Update marker position based on character facing
 	var climb_offset = Vector2(24, -24)
 	if animated_sprite.flip_h:
 		climb_offset.x *= -1
-	
+
 	# Calculate the target position based on the raycast collision
 	var target_position = Vector2.ZERO
 	if ledge_check.is_colliding():
 		var collision_point = ledge_check.get_collision_point()
-		target_position = Vector2(collision_point.x - (climb_offset.x/2 * (-1 if animated_sprite.flip_h else 1)), 
-								collision_point.y + climb_offset.y)
-	
+		target_position = Vector2(
+			collision_point.x - (climb_offset.x / 2 * (-1 if animated_sprite.flip_h else 1)),
+			collision_point.y + climb_offset.y
+		)
+
 	# Create a tween for smooth movement
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_QUAD)
 	tween.set_ease(Tween.EASE_OUT)
-	
+
 	# First move up to the ledge height
 	var intermediate_pos = Vector2(global_position.x, target_position.y)
 	tween.tween_property(self, "global_position", intermediate_pos, 0.3)
-	
+
 	# Then move onto the platform
 	tween.tween_property(self, "global_position", target_position, 0.2)
-	
+
 	# When the climb is complete
-	tween.tween_callback(func():
-		is_ledge_climbing = false
-		set_physics_process(true)
-		state_machine.dispatch(&"state_ended")
+	tween.tween_callback(
+		func():
+			is_ledge_climbing = false
+			set_physics_process(true)
+			state_machine.dispatch(&"state_ended")
 	)
+
 
 # Add this function near the end of the file
 func _setup_ui_displays() -> void:
 	# Add souls display
 	var souls_display = preload("res://UI/Scenes/souls_display.tscn").instantiate()
 	ui_layer.add_child(souls_display)
-	
+
 	# Position souls display on the right side
-	souls_display.position = Vector2(
-		get_viewport_rect().size.x - souls_display.size.x - 20,  # 20 pixels from right edge
-		20  # 20 pixels from top
-	)
-	
+	souls_display.position = Vector2(get_viewport_rect().size.x - souls_display.size.x - 20, 20)  # 20 pixels from right edge  # 20 pixels from top
+
 	# Add XP display below souls display
 	ui_layer.add_child(xp_display)
-	
+
 	# Position XP display below souls display with same horizontal alignment
 	xp_display.position = Vector2(
-		get_viewport_rect().size.x - xp_display.size.x - 20,  # Same distance from right edge
-		souls_display.position.y + souls_display.size.y + 10  # 10 pixels gap between displays
+		get_viewport_rect().size.x - xp_display.size.x - 20,  # 20 pixels from right edge
+		souls_display.position.y + souls_display.size.y + 10   # 10 pixels below souls display
 	)
-	
+
 	# Add level up menu
 	ui_layer.add_child(level_up_menu)
 	level_up_menu.hide()  # Start hidden
 
+
 func set_gravity_enabled(enabled: bool) -> void:
 	gravity_enabled = enabled
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("interact") and current_merchant:
+		if current_merchant.has_method("toggle_shop"):
+			current_merchant.toggle_shop()
+
+
+func _on_chat_box_area_entered(area: Area2D) -> void:
+	if area.get_parent().is_in_group("Merchant"):
+		current_merchant = area.get_parent()
+
+
+func _on_chat_box_area_exited(area: Area2D) -> void:
+	if area.get_parent() == current_merchant:
+		current_merchant = null

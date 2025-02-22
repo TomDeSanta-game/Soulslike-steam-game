@@ -76,8 +76,8 @@ font = ExtResource("5_5r53r")
 material = SubResource("ShaderMaterial_op5rc")
 script = ExtResource("2_k3m4p")
 lore_id = "LORE_001"
-lore_title = "Lore Fragment"
-lore_content = "Empty lore content"
+lore_title = "Ancient Fragment"
+lore_content = "A Piece Of Knowledge From The Old Era"
 interaction_distance = 100.0
 
 [node name="Sprite2D" parent="." index="0"]

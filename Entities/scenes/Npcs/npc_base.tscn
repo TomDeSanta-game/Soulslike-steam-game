@@ -1,6 +1,5 @@
-[gd_scene load_steps=3 format=3 uid="uid://bfexry3355fb"]
+[gd_scene load_steps=2 format=3 uid="uid://bfexry3355fb"]
 
-[ext_resource type="Script" path="res://Singletons/Scripts/HealthSystem/healthsystem.gd" id="1_2kil3"]
 [ext_resource type="Script" path="res://Entities/scripts/Npcs/npc_base.gd" id="1_daci5"]
 
 [node name="NpcBase" type="CharacterBody2D"]
@@ -12,7 +11,7 @@ script = ExtResource("1_daci5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
 
 [node name="HitBox" type="Area2D" parent="."]
 
@@ -25,9 +24,6 @@ script = ExtResource("1_daci5")
 [node name="ChatBoxArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ChatBoxArea"]
-
-[node name="HealthSystem" type="Node" parent="."]
-script = ExtResource("1_2kil3")
 
 [node name="StateTimer" type="Timer" parent="."]
 

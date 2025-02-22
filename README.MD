@@ -11,6 +11,15 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
 - Inventory system for items and equipment
 - Experience and leveling system
 - Souls collection and management
+  - Collect souls from defeating enemies
+  - Celestial Tears grant exactly 50,000 souls and 100,000 XP
+  - Souls can be spent on leveling up and items
+  - Lost souls can be recovered after death
+- Trading system with merchants
+  - Buy rare items like Celestial Tears
+  - Sell collected items for souls
+  - Dynamic pricing system
+  - Interactive merchant NPCs throughout the world
 
 ### Visual Effects & Aesthetics
 - Dynamic shader effects for collectibles:
@@ -20,6 +29,17 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
     - Pulsing glow effect
     - Edge highlighting
   - **Celestial Tears**: Ethereal blue glow with smooth pulsing
+- Enhanced UI Elements:
+  - Dynamic health bar with:
+    - Color transitions based on health level
+    - Smooth value transitions
+    - Impact flash effects
+    - Screen shake on major hits
+  - Responsive stamina bar featuring:
+    - Color changes reflecting stamina state
+    - Pulsing effect at low stamina
+    - Smooth regeneration animation
+    - Usage feedback effects
 - Smooth character animations
 - Visual feedback for all actions
 - Particle effects for impacts and interactions
@@ -44,6 +64,11 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
 - Level up system with stat allocation
 - Item collection and management
 - Lore discovery through collectible fragments
+- Trading and economy system
+  - Multiple merchants with unique inventories
+  - Buy and sell items using souls as currency
+  - Rare items available for purchase
+  - Lore fragments can be traded
 
 ### Movement & Exploration
 - Precise platforming controls

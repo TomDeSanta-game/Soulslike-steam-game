@@ -1,0 +1,238 @@
+[gd_scene load_steps=8 format=3 uid="uid://dkrkpa0tb16re"]
+
+[ext_resource type="Script" path="res://UI/Scripts/MerchantMenu.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://ck2b6aq1lk44q" path="res://assets/fonts/static/Oswald-Regular.ttf" id="2_font"]
+[ext_resource type="LabelSettings" uid="uid://dihms2mfxpk5d" path="res://assets/labelSettings/menu.tres" id="3_3t85j"]
+[ext_resource type="FontFile" uid="uid://7fal73nhmb20" path="res://assets/fonts/static/Oswald-Bold.ttf" id="4_m06v8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_merchant"]
+bg_color = Color(0.12549, 0.12549, 0.12549, 0.901961)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 0.901961)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.278431)
+shadow_size = 4
+
+[sub_resource type="Theme" id="Theme_merchant"]
+Panel/styles/panel = SubResource("StyleBoxFlat_merchant")
+
+[sub_resource type="LabelSettings" id="LabelSettings_merchant"]
+font = ExtResource("2_font")
+font_size = 36
+
+[node name="MerchantMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -600.0
+offset_top = -400.0
+offset_right = 600.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_merchant")
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 70.0
+grow_horizontal = 2
+text = "Merchant"
+label_settings = SubResource("LabelSettings_merchant")
+horizontal_alignment = 1
+
+[node name="MerchantInventory" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = -300.0
+offset_right = 550.0
+offset_bottom = 235.0
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/MerchantInventory"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 10.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Merchant's Wares"
+label_settings = ExtResource("3_3t85j")
+horizontal_alignment = 1
+
+[node name="ItemGrid" type="GridContainer" parent="Panel/MerchantInventory"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -225.0
+offset_top = -250.0
+offset_right = 225.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 3
+
+[node name="PlayerInventory" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -550.0
+offset_top = -300.0
+offset_right = -50.0
+offset_bottom = 235.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/PlayerInventory"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 10.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Your Inventory"
+label_settings = ExtResource("3_3t85j")
+horizontal_alignment = 1
+
+[node name="ItemGrid" type="GridContainer" parent="Panel/PlayerInventory"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -225.0
+offset_top = -250.0
+offset_right = 225.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 3
+
+[node name="ItemDetails" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ItemName" type="Label" parent="Panel/ItemDetails"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 10.0
+offset_bottom = 40.0
+grow_horizontal = 2
+label_settings = ExtResource("3_3t85j")
+horizontal_alignment = 1
+
+[node name="ItemDescription" type="Label" parent="Panel/ItemDetails"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = ExtResource("3_3t85j")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Price" type="Label" parent="Panel/ItemDetails"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+label_settings = ExtResource("3_3t85j")
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/ItemDetails"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -40.0
+offset_right = -20.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("4_m06v8")
+text = "Buy"
+
+[node name="SellButton" type="Button" parent="Panel/ItemDetails"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -40.0
+offset_right = -20.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("4_m06v8")
+text = "Sell"

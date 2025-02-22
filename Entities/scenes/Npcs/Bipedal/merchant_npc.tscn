@@ -1,0 +1,139 @@
+[gd_scene load_steps=19 format=3 uid="uid://bt3gkgqdx5bd0"]
+
+[ext_resource type="PackedScene" uid="uid://bfexry3355fb" path="res://Entities/scenes/Npcs/npc_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://Entities/scripts/Npcs/Bipedal/merchant_npc.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://dkrkpa0tb16re" path="res://UI/Scenes/MerchantMenu.tscn" id="3_h4no0"]
+[ext_resource type="Shader" path="res://Shaders/Merchant/merchant.gdshader" id="4_shader"]
+[ext_resource type="Texture2D" uid="uid://bnueqonf1cykr" path="res://assets/Legacy Collection/Characters/bipedal-Unit/spritesheet.png" id="5_sprite"]
+[ext_resource type="FontFile" uid="uid://ckp0yattq52lf" path="res://assets/fonts/Oswald-VariableFont_wght.ttf" id="6_gsu7v"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_merchant"]
+resource_local_to_scene = true
+shader = ExtResource("4_shader")
+shader_parameter/outline_color = Color(1, 0.8, 0, 1)
+shader_parameter/outline_width = 1.0
+shader_parameter/glow_intensity = 0.5
+shader_parameter/glow_color = Color(1, 0.9, 0.5, 0.5)
+shader_parameter/time_offset = 0.0
+shader_parameter/pulse_speed = 2.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant1"]
+atlas = ExtResource("5_sprite")
+region = Rect2(0, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant2"]
+atlas = ExtResource("5_sprite")
+region = Rect2(80, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant3"]
+atlas = ExtResource("5_sprite")
+region = Rect2(160, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant4"]
+atlas = ExtResource("5_sprite")
+region = Rect2(240, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant5"]
+atlas = ExtResource("5_sprite")
+region = Rect2(320, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant6"]
+atlas = ExtResource("5_sprite")
+region = Rect2(400, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_merchant7"]
+atlas = ExtResource("5_sprite")
+region = Rect2(480, 0, 80, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_merchant"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_merchant7")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_rulsk"]
+radius = 21.5
+height = 54.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_merchant_interaction"]
+radius = 98.0051
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_interact"]
+bg_color = Color(0, 0, 0, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.8, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MerchantNpc" instance=ExtResource("1_base")]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("2_script")
+shop_interaction_distance = 100.0
+merchant_menu_scene = ExtResource("3_h4no0")
+idle_animation = &"Stop"
+run_animation = &"Run"
+metadata/entity_name = "Merchant"
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+material = SubResource("ShaderMaterial_merchant")
+sprite_frames = SubResource("SpriteFrames_merchant")
+animation = &"Idle"
+autoplay = "Idle"
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(-2.5, 5)
+shape = SubResource("CapsuleShape2D_rulsk")
+debug_color = Color(1, 1, 1, 0.42)
+
+[node name="VisibleOnScreenEnabler2D" parent="." index="2"]
+position = Vector2(-2.5, 5.5)
+scale = Vector2(2.15, 2.65)
+
+[node name="ChatBoxArea" parent="." index="5"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" parent="ChatBoxArea" index="0"]
+shape = SubResource("CircleShape2D_merchant_interaction")
+
+[node name="InteractButton" type="Button" parent="." index="7"]
+visible = false
+offset_left = -50.0
+offset_top = -80.0
+offset_right = 50.0
+offset_bottom = -50.0
+theme_override_fonts/font = ExtResource("6_gsu7v")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_interact")
+text = "Press E to Shop"
+
+[connection signal="pressed" from="InteractButton" to="." method="toggle_shop"]

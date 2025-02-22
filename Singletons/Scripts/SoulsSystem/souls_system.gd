@@ -84,16 +84,17 @@ func clear_souls() -> void:
 	}
 	SignalBus.souls_changed.emit(_current_souls)
 
-# Format souls amount for display (e.g., "1,234,567")
+# Format souls amount for display (e.g., "50,000" or "100,000")
 func format_souls(amount: int) -> String:
-	var formatted = ""
 	var str_amount = str(amount)
 	var length = str_amount.length()
-	var comma_count = 0
+	var formatted = ""
+	var count = 0
 	
-	for i in range(length):
-		if i > 0 and (length - i) % 3 == 0:
+	for i in range(length - 1, -1, -1):
+		if count > 0 and count % 3 == 0:
 			formatted = "," + formatted
-		formatted = str_amount[length - 1 - i] + formatted
+		formatted = str_amount[i] + formatted
+		count += 1
 	
 	return formatted 

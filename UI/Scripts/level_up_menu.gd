@@ -41,11 +41,11 @@ func _ready() -> void:
 	faith_inc.pressed.connect(func(): _increase_stat("faith"))
 
 	# Connect XP system signals
+	xp_system.xp_gained.connect(_on_xp_gained)
 	xp_system.level_up.connect(_on_level_up)
-	xp_system.stat_increased.connect(_on_stat_increased)
 
 	# Initial update
-	_update_display()
+	update_display()
 
 
 func _input(event: InputEvent) -> void:
@@ -54,7 +54,7 @@ func _input(event: InputEvent) -> void:
 
 
 func show_menu() -> void:
-	_update_display()
+	update_display()
 	show()
 	get_tree().paused = true
 
@@ -64,15 +64,18 @@ func hide_menu() -> void:
 	get_tree().paused = false
 
 
-func _update_display() -> void:
-	if not xp_system or not souls_system:
+func update_display() -> void:
+	if not xp_system:
 		return
 
 	# Update level info
 	level_label.text = str(xp_system.current_level)
-	souls_needed_label.text = str(xp_system.get_souls_for_next_level())
+	
+	var xp_needed = xp_system.get_xp_for_next_level()
+	var current_xp = xp_system.current_xp
+	souls_needed_label.text = "%s / %s XP" % [xp_system.format_xp(current_xp), xp_system.format_xp(xp_needed)]
 	points_label.text = str(xp_system.available_points)
-
+	
 	# Update stats
 	var stats = xp_system.get_stats()
 	vigour_label.text = str(stats.vigour)
@@ -92,28 +95,27 @@ func _update_display() -> void:
 	faith_inc.disabled = not has_points
 
 	# Update level up button
-	level_up_button.disabled = souls_system.get_souls() < xp_system.get_souls_for_next_level()
+	level_up_button.disabled = current_xp < xp_needed
 
 
 func _increase_stat(stat_name: String) -> void:
 	if xp_system.increase_stat(stat_name):
-		_update_display()
+		update_display()
 
 
-func _on_level_up(new_level: int, available_points: int) -> void:
-	_update_display()
+func _on_xp_gained(_amount: int) -> void:
+	update_display()
+
+
+func _on_level_up(_new_level: int, _points: int) -> void:
+	update_display()
 	# Play level up sound/effect
 	SoundManager.play_sound(Sound.collect, "SFX")  # Temporarily use collect sound until proper level up sound is added
 
 
-func _on_stat_increased(stat_name: String, new_value: int) -> void:
-	_update_display()
-	# Play stat increase sound/effect
-	SoundManager.play_sound(Sound.collect, "SFX")  # Replace with proper stat increase sound
-
-
 func _on_level_up_pressed() -> void:
-	xp_system.try_level_up()
+	if xp_system:
+		xp_system.add_xp(0)  # This will trigger level up if we have enough XP
 
 
 func _on_close_pressed() -> void:

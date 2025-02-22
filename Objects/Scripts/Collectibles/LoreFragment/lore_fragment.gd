@@ -3,8 +3,8 @@ extends Area2D
 signal lore_collected(lore_id: String)
 
 @export var lore_id: String = "LORE_001"
-@export var lore_title: String = "Lore Fragment"
-@export var lore_content: String = "Empty lore content"
+@export var lore_title: String = "Ancient Fragment"
+@export var lore_content: String = "A Piece Of Knowledge From The Old Era"
 @export var interaction_distance: float = 100.0
 
 @onready var sprite: Sprite2D = $Sprite2D

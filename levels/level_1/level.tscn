@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=4 uid="uid://beai48cdctfy7"]
+[gd_scene load_steps=26 format=4 uid="uid://beai48cdctfy7"]
 
 [ext_resource type="Script" path="res://levels/level_1/level_1.gd" id="1_wb4y3"]
 [ext_resource type="Texture2D" uid="uid://ceqmp4vsqbm1h" path="res://assets/dungeon-platformer-pixel-art-tileset/background3.png" id="3_g63hl"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://cdvlibqffsyta" path="res://assets/dungeon-platformer-pixel-art-tileset/background1.png" id="7_lpm3e"]
 [ext_resource type="Texture2D" uid="uid://sv85i8vwcba" path="res://assets/dungeon-platformer-pixel-art-tileset/background2.png" id="8_usxhw"]
 [ext_resource type="Texture2D" uid="uid://dlj57mf6nyi6g" path="res://assets/dungeon-platformer-pixel-art-tileset/background4b.png" id="11_3gvcf"]
+[ext_resource type="PackedScene" uid="uid://bt3gkgqdx5bd0" path="res://Entities/scenes/Npcs/Bipedal/merchant_npc.tscn" id="12_j7kmx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a8ivm"]
 size = Vector2(1067, 324)
@@ -3507,6 +3508,9 @@ motion_scale = Vector2(1.2, 1)
 position = Vector2(0, -100)
 scale = Vector2(2, 2)
 texture = ExtResource("11_3gvcf")
+
+[node name="MerchantNpc" parent="." instance=ExtResource("12_j7kmx")]
+position = Vector2(-100, -15)
 
 [connection signal="body_entered" from="DetectionSystem" to="." method="_on_detection_system_body_entered"]
 [connection signal="body_entered" from="DoomPit" to="." method="_on_doom_pit_body_entered"]

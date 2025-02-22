@@ -89,6 +89,3 @@ signal level_up_completed(new_level: int)
 signal stat_point_gained
 @warning_ignore("unused_signal")
 signal stat_increased(stat_name: String, new_value: int)
-
-func _ready() -> void:
-	Log.info("SignalBus initialized and ready to handle game signals")
