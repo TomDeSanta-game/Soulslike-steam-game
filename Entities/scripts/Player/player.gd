@@ -1030,18 +1030,31 @@ func _end_invincibility() -> void:
 	hurtbox.end_invincibility()
 
 
+# Silent version of heal that doesn't trigger effects
+func _heal_silent(amount: float) -> void:
+	if health_system:
+		# Directly set health in the health system
+		var new_health = min(current_health + amount, max_health)
+		health_system.set_health_silent(new_health)  # Use silent method
+	else:
+		current_health += amount
+		current_health = clamp(current_health, 0.0, max_health)
+		health_percent = (current_health / max_health) * 100.0
+		_update_health_bar()
+		_check_health()
+
+
 # Add this function near other healing-related functions
 func use_celestial_tear() -> void:
-	# Heal to full health
+	# Heal to full health silently
 	var max_health = get_max_health()
-	_heal(max_health)
+	_heal_silent(max_health)
 
 	# Restore stamina to full
 	var max_stamina = get_max_stamina()
 	restore_stamina(max_stamina)
-
-	# Play heal sound and effect
-	_trigger_lifesteal_effect()
+	
+	# Play heal sound when using the tear
 	SoundManager.play_sound(Sound.heal, "SFX")
 
 

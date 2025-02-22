@@ -46,6 +46,8 @@ func collect() -> void:
 	if _is_collected:
 		return
 
+	_is_collected = true
+
 	# Add souls directly through the souls system
 	if souls_system:
 		souls_system.add_souls(SOULS_REWARD)
@@ -65,8 +67,11 @@ func collect() -> void:
 	
 	inventory.add_item(ITEM_ID, item_data)
 
-	# Call parent collect method to handle sound, effects and cleanup
-	super.collect()
+	# Play collect sound
+	SoundManager.play_sound(Sound.collect, "SFX")
+	
+	SignalBus.collectible_collected.emit(self)
+	queue_free()
 
 # Function that will be called when using the item from inventory
 func use_celestial_tear() -> void:
@@ -75,17 +80,13 @@ func use_celestial_tear() -> void:
 	if players.size() > 0:
 		var player = players[0]
 		
-		# Heal to full health
-		if player.has_method("get_max_health") and player.has_method("heal"):
+		# Heal to full health silently by directly updating health system
+		if player.has_method("get_max_health"):
 			var max_health = player.get_max_health()
-			player.heal(max_health)
+			if player.health_system:
+				player.health_system.set_health_silent(max_health)
 
 		# Restore stamina to full
 		if player.has_method("get_max_stamina") and player.has_method("restore_stamina"):
 			var max_stamina = player.get_max_stamina()
 			player.restore_stamina(max_stamina)
-			
-		# Play heal sound and effect
-		if player.has_method("_trigger_lifesteal_effect"):
-			player._trigger_lifesteal_effect()
-		SoundManager.play_sound(Sound.heal, "SFX")

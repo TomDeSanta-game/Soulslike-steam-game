@@ -74,18 +74,19 @@ func collect_lore() -> void:
 	var item_data = {
 		"id": lore_id,
 		"name": lore_title,
-		"description": lore_content,
 		"type": "lore",
 		"texture": sprite.texture,
+		"description": lore_content,
+		"use_function": "read_lore",
 		"quantity": 1,
-		"use_function": "read_lore",  # Function to call when using the lore item
-		"inventory_scale": Vector2(0.025, 0.015)  # Smaller scale for inventory display
+		"has_been_read": false,
+		"unread": true  # Initial state for sales value
 	}
 	
 	# Add to inventory through the Inventory singleton
 	if has_node("/root/Inventory"):
 		var inventory = get_node("/root/Inventory")
-		inventory.add_item(lore_id, item_data)  # Pass both the ID and data
+		inventory.add_item(lore_id, item_data)
 	
 	# Play collection animation
 	if animation_player and animation_player.has_animation("collect"):

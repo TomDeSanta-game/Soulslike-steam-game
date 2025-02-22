@@ -41,10 +41,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -300.0
-offset_top = -250.0
-offset_right = 300.0
-offset_bottom = 250.0
+offset_left = -600.0
+offset_top = -400.0
+offset_right = 600.0
+offset_bottom = 400.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_2p3xt")
@@ -73,12 +73,65 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -180.0
-offset_right = 250.0
-offset_bottom = 180.0
+offset_left = -550.0
+offset_top = -320.0
+offset_right = 150.0
+offset_bottom = 320.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/h_separation = 20
+theme_override_constants/h_separation = 80
 theme_override_constants/v_separation = 20
 columns = 4
+
+[node name="ItemDetails" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -350.0
+offset_top = 80.0
+offset_right = -50.0
+offset_bottom = -80.0
+grow_horizontal = 0
+grow_vertical = 2
+theme = SubResource("Theme_2p3xt")
+
+[node name="DetailSlot" type="Panel" parent="Panel/ItemDetails"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 220.0
+grow_horizontal = 2
+
+[node name="ItemName" type="Label" parent="Panel/ItemDetails"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 240.0
+offset_bottom = 280.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("2_dbiym")
+theme_override_font_sizes/font_size = 32
+text = "Item Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemDescription" type="Label" parent="Panel/ItemDetails"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 300.0
+offset_bottom = 500.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("2_dbiym")
+theme_override_font_sizes/font_size = 24
+text = "Item description goes here with more details about the selected item."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2

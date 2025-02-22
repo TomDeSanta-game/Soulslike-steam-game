@@ -38,7 +38,6 @@
 [ext_resource type="Texture2D" uid="uid://dgyb0t6h00si7" path="res://assets/Player/Individual Sprites/adventurer-idle-2-02.png" id="29_qxslc"]
 [ext_resource type="Texture2D" uid="uid://b38jgobnnwl68" path="res://assets/Player/Individual Sprites/adventurer-idle-2-03.png" id="30_i0d1b"]
 [ext_resource type="Texture2D" uid="uid://dh08fdquh1v2t" path="res://assets/Player/Individual Sprites/adventurer-jump-00.png" id="31_7xsh2"]
-[ext_resource type="PackedScene" uid="uid://c2q8vxudrm6y2" path="res://UI/Scenes/inventory.tscn" id="32_c7ngx"]
 [ext_resource type="Texture2D" uid="uid://bqrpy4albp0vr" path="res://assets/Player/Individual Sprites/adventurer-jump-01.png" id="32_m2a4i"]
 [ext_resource type="Texture2D" uid="uid://b4vj2b6fqjns5" path="res://assets/Player/Individual Sprites/adventurer-jump-02.png" id="33_inb7a"]
 [ext_resource type="Texture2D" uid="uid://bjowwakew70ob" path="res://assets/Player/Individual Sprites/adventurer-jump-03.png" id="34_gxf7r"]
@@ -66,7 +65,8 @@
 [ext_resource type="Texture2D" uid="uid://bibla740hcac5" path="res://assets/Player/Individual Sprites/adventurer-crnr-grb-02.png" id="56_01e00"]
 [ext_resource type="Texture2D" uid="uid://duefbqrf00nlm" path="res://assets/Player/Individual Sprites/adventurer-crnr-grb-03.png" id="57_w1nw7"]
 [ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="64_tlvdk"]
-[ext_resource type="FontFile" uid="uid://0nfrgqthwlnw" path="res://assets/fonts/FiraSans-Regular.ttf" id="66_hfnjg"]
+[ext_resource type="PackedScene" uid="uid://c2q8vxudrm6y2" path="res://UI/Scenes/inventory.tscn" id="65_8s1py"]
+[ext_resource type="FontFile" uid="uid://dkfmcs12ufeaf" path="res://assets/fonts/FiraSans-Medium.ttf" id="65_g3sok"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_r5sqx"]
 shader = ExtResource("2_0x5o6")
@@ -389,7 +389,7 @@ font_size = 24
 font_color = Color(1, 1, 1, 0.568627)
 
 [sub_resource type="LabelSettings" id="LabelSettings_lqeyv"]
-font = ExtResource("66_hfnjg")
+font = ExtResource("65_g3sok")
 font_size = 148
 
 [node name="player" type="CharacterBody2D"]
@@ -527,9 +527,6 @@ offset_bottom = 185.0
 text = "000"
 label_settings = SubResource("LabelSettings_kpg22")
 
-[node name="Inventory" parent="UILayer" instance=ExtResource("32_c7ngx")]
-visible = false
-
 [node name="PlaceLabel" type="Label" parent="UILayer"]
 unique_name_in_owner = true
 anchors_preset = 10
@@ -541,6 +538,9 @@ size_flags_vertical = 0
 label_settings = SubResource("LabelSettings_lqeyv")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Inventory" parent="UILayer" instance=ExtResource("65_8s1py")]
+visible = false
 
 [node name="HitboxFlip" type="Node" parent="." node_paths=PackedStringArray("sprite", "box")]
 script = ExtResource("19_box_flip")

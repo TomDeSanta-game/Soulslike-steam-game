@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://b4q8vg1xwdp6x"]
+[gd_scene load_steps=9 format=3 uid="uid://b4q8vg1xwdp6x"]
 
 [ext_resource type="Script" path="res://UI/Scripts/inventory_slot.gd" id="1_8r4nt"]
 [ext_resource type="FontFile" uid="uid://ck2b6aq1lk44q" path="res://assets/fonts/static/Oswald-Regular.ttf" id="2_font"]
 [ext_resource type="FontFile" uid="uid://ckp0yattq52lf" path="res://assets/fonts/Oswald-VariableFont_wght.ttf" id="3_cu5pw"]
+[ext_resource type="FontFile" uid="uid://dk21eya5etvaa" path="res://assets/fonts/FiraSans-BoldItalic.ttf" id="4_wbjhd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j6p2x"]
 bg_color = Color(0.12549, 0.12549, 0.12549, 0.784314)
@@ -16,9 +17,18 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="LabelSettings" id="LabelSettings_eyffh"]
+font = ExtResource("2_font")
+font_color = Color(0.921569, 0.921569, 0.921569, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_giv1u"]
 font = ExtResource("3_cu5pw")
-font_size = 18
+font_size = 14
+font_color = Color(0.784314, 0.784314, 0.784314, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
 bg_color = Color(0.12549, 0.12549, 0.12549, 0.784314)
@@ -50,58 +60,67 @@ mouse_filter = 2
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 0.75
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2
+pivot_offset = Vector2(50, 50)
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.85
+anchors_preset = 12
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -23.0
+offset_top = -32.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 18
+label_settings = SubResource("LabelSettings_eyffh")
 horizontal_alignment = 1
+vertical_alignment = 1
 text_overrun_behavior = 3
+uppercase = true
 
 [node name="ExternalQuantityLabel" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = -1
-anchor_top = 1.0
+anchors_preset = 1
+anchor_left = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.2
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
+offset_left = -32.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 32.0
+grow_horizontal = 0
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 18
 text = "x1"
 label_settings = SubResource("LabelSettings_giv1u")
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="UseButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 138.0
 offset_top = 44.0
-offset_right = 218.0
+offset_right = 198.0
 offset_bottom = 84.0
 mouse_filter = 1
-theme_override_colors/font_hover_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_hover_color = Color(1, 0.921569, 0.615686, 1)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_fonts/font = ExtResource("4_wbjhd")
+theme_override_font_sizes/font_size = 20
 theme_override_styles/hover = SubResource("StyleBoxFlat_button")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
-text = "EAT"
+text = "READ"

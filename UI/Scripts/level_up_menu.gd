@@ -103,7 +103,7 @@ func _increase_stat(stat_name: String) -> void:
 func _on_level_up(new_level: int, available_points: int) -> void:
 	_update_display()
 	# Play level up sound/effect
-	SoundManager.play_sound(Sound.heal, "SFX")  # Replace with proper level up sound
+	SoundManager.play_sound(Sound.collect, "SFX")  # Temporarily use collect sound until proper level up sound is added
 
 
 func _on_stat_increased(stat_name: String, new_value: int) -> void:

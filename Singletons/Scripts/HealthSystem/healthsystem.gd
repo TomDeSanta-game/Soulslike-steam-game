@@ -37,3 +37,17 @@ func get_health() -> float:
 
 func get_max_health() -> float:
 	return max_health
+
+
+func set_health(new_health: float) -> void:
+	current_health = clamp(new_health, 0.0, max_health)
+	emit_signal("_health_changed", current_health, max_health)
+	if current_health <= 0:
+		emit_signal("_character_died")
+
+
+func set_health_silent(new_health: float) -> void:
+	current_health = clamp(new_health, 0.0, max_health)
+	emit_signal("_health_changed", current_health, max_health)
+	if current_health <= 0:
+		emit_signal("_character_died")

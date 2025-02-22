@@ -100,14 +100,29 @@ The game features an inventory system that allows players to collect and manage 
 
 ### Features
 - Press 'I' to open/close the inventory
+- Large inventory panel with grid-based layout
+- Elden Ring-style item details panel:
+  - Shows detailed item information when hovering
+  - Large item preview in detail slot
+  - Item name in 32px font
+  - Item description in 24px font
+  - Dynamic item animations in both inventory and detail view
 - Visual display of collected items with their quantities
-- Support for various collectible items including Celestial Tears
-- Grid-based inventory layout
-- Automatic item stacking for multiple instances of the same item
+- Support for various collectible items including:
+  - Celestial Tears:
+    - Animated crystal tear effect
+    - Shows as "Tears of the Celestial" in details
+    - Full description of healing properties
+  - Lore Fragments:
+    - Animated parchment with golden glow
+    - Shows as "Celestial Tear" in details
+    - Custom lore text display
+- Grid-based inventory layout with proper spacing
+- Automatic item stacking for multiple instances
 - Item usage system with dedicated use functions
 - Interactive item usage:
   - Hover over items to reveal usage options
-  - "EAT" button appears next to consumable items
+  - Context-aware buttons ("EAT" for consumables, "READ" for lore)
   - Button remains visible for 1.5 seconds after moving mouse away
   - Extended interaction window for easier item usage
   - Items are automatically removed when consumed
@@ -131,6 +146,16 @@ The game features an inventory system that allows players to collect and manage 
   - Features animated shader effects in inventory
   - Displays full celestial tear animation while in inventory slots
   - Maintains consistent visual appearance between world and inventory
+
+- **Lore Fragment**: Collectible pieces of lore that reveal the game's story.
+  - Features a glowing parchment-like appearance with wave animation
+  - Hover over to reveal the "READ" button
+  - Button stays visible for 1.5 seconds after moving mouse away
+  - Click "READ" to view the lore content
+  - Automatically stored in inventory when collected
+  - Maintains quantity tracking for multiple fragments
+  - Custom scaling and positioning in inventory
+  - Preserves original appearance with shader effects
 
 ## Controls
 

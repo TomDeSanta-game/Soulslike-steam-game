@@ -26,7 +26,9 @@ func remove_item(item_id: String) -> void:
 
 func use_item(item_id: String) -> void:
 	if _items.has(item_id):
-		remove_item(item_id)
+		# Don't remove lore items when used
+		if _items[item_id].get("type") != "lore":
+			remove_item(item_id)
 
 func get_items() -> Dictionary:
 	return _items
@@ -37,3 +39,13 @@ func has_item(item_id: String) -> bool:
 func clear_inventory() -> void:
 	_items.clear()
 	inventory_updated.emit()
+
+func update_item(item_id: String, new_data: Dictionary) -> void:
+	if _items.has(item_id):
+		# Merge the new data with existing data, preserving quantity
+		var quantity = _items[item_id].get("quantity", 1)
+		_items[item_id] = new_data
+		_items[item_id]["quantity"] = quantity
+		
+		# Emit signal to notify UI of the update
+		inventory_updated.emit()
