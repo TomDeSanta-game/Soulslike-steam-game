@@ -54,14 +54,16 @@ func _input(event: InputEvent) -> void:
 
 
 func show_menu() -> void:
-	update_display()
-	show()
-	get_tree().paused = true
+	if InventoryStateManager.open_inventory("level_up"):
+		update_display()
+		show()
+		get_tree().paused = true
 
 
 func hide_menu() -> void:
 	hide()
 	get_tree().paused = false
+	InventoryStateManager.close_inventory("level_up")
 
 
 func update_display() -> void:

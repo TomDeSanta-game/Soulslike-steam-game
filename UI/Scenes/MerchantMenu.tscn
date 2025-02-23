@@ -25,6 +25,7 @@ Panel/styles/panel = SubResource("StyleBoxFlat_merchant")
 [sub_resource type="LabelSettings" id="LabelSettings_merchant"]
 font = ExtResource("2_font")
 font_size = 36
+font_color = Color(1, 0.2, 0.2, 1)
 
 [node name="MerchantMenu" type="Control"]
 process_mode = 3
@@ -43,13 +44,26 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -600.0
-offset_top = -400.0
-offset_right = 600.0
-offset_bottom = 400.0
+offset_left = -800.0
+offset_top = -500.0
+offset_right = 800.0
+offset_bottom = 500.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_merchant")
+
+[node name="CloseButton" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 50.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("4_m06v8")
+text = "X"
 
 [node name="Title" type="Label" parent="Panel"]
 layout_mode = 1
@@ -71,9 +85,9 @@ anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_left = 50.0
-offset_top = -300.0
-offset_right = 550.0
-offset_bottom = 235.0
+offset_top = -400.0
+offset_right = 750.0
+offset_bottom = 335.0
 grow_vertical = 2
 
 [node name="Title" type="Label" parent="Panel/MerchantInventory"]
@@ -97,14 +111,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -225.0
-offset_top = -250.0
-offset_right = 225.0
-offset_bottom = 250.0
+offset_left = -325.0
+offset_top = -317.5
+offset_right = 325.0
+offset_bottom = 352.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 20
+theme_override_constants/h_separation = 100
+theme_override_constants/v_separation = 80
 columns = 3
 
 [node name="PlayerInventory" type="Panel" parent="Panel"]
@@ -114,10 +128,10 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -550.0
-offset_top = -300.0
+offset_left = -750.0
+offset_top = -400.0
 offset_right = -50.0
-offset_bottom = 235.0
+offset_bottom = 335.0
 grow_horizontal = 0
 grow_vertical = 2
 
@@ -142,14 +156,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -225.0
-offset_top = -250.0
-offset_right = 225.0
-offset_bottom = 250.0
+offset_left = -325.0
+offset_top = -317.5
+offset_right = 325.0
+offset_bottom = 352.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 20
+theme_override_constants/h_separation = 100
+theme_override_constants/v_separation = 80
 columns = 3
 
 [node name="ItemDetails" type="Panel" parent="Panel"]
@@ -159,14 +173,37 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -300.0
-offset_top = -150.0
-offset_right = 300.0
+offset_left = -600.0
+offset_top = -200.0
+offset_right = 600.0
 offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ItemName" type="Label" parent="Panel/ItemDetails"]
+[node name="ItemSprite" type="TextureRect" parent="Panel/ItemDetails"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 20.0
+offset_top = -75.0
+offset_right = 170.0
+offset_bottom = 75.0
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoPanel" type="Panel" parent="Panel/ItemDetails"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ItemName" type="Label" parent="Panel/ItemDetails/InfoPanel"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -176,7 +213,7 @@ grow_horizontal = 2
 label_settings = ExtResource("3_3t85j")
 horizontal_alignment = 1
 
-[node name="ItemDescription" type="Label" parent="Panel/ItemDetails"]
+[node name="ItemDescription" type="Label" parent="Panel/ItemDetails/InfoPanel"]
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -190,7 +227,7 @@ label_settings = ExtResource("3_3t85j")
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Price" type="Label" parent="Panel/ItemDetails"]
+[node name="Price" type="Label" parent="Panel/ItemDetails/InfoPanel"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -203,7 +240,22 @@ grow_vertical = 0
 label_settings = ExtResource("3_3t85j")
 horizontal_alignment = 1
 
-[node name="BuyButton" type="Button" parent="Panel/ItemDetails"]
+[node name="InsufficientSouls" type="Label" parent="Panel/ItemDetails/InfoPanel"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -70.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Not enough souls!"
+label_settings = ExtResource("3_3t85j")
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/ItemDetails/InfoPanel"]
 visible = false
 layout_mode = 1
 anchors_preset = 3
@@ -211,16 +263,15 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -100.0
+offset_left = -120.0
 offset_top = -40.0
 offset_right = -20.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_fonts/font = ExtResource("4_m06v8")
 text = "Buy"
 
-[node name="SellButton" type="Button" parent="Panel/ItemDetails"]
+[node name="SellButton" type="Button" parent="Panel/ItemDetails/InfoPanel"]
 visible = false
 layout_mode = 1
 anchors_preset = 3
@@ -228,11 +279,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -100.0
+offset_left = -120.0
 offset_top = -40.0
 offset_right = -20.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_fonts/font = ExtResource("4_m06v8")
 text = "Sell"

@@ -44,33 +44,45 @@ func _ready() -> void:
 	texture_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
 func set_item(data: Dictionary) -> void:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
 	item_data = data
 	
 	if item_data.size() == 0:
-		texture_rect.texture = null
+		if is_instance_valid(texture_rect):
+			texture_rect.texture = null
 		return
 	
-	texture_rect.texture = item_data.texture
-	external_quantity_label.text = "x%d" % item_data.get("quantity", 1)
+	if is_instance_valid(texture_rect):
+		texture_rect.texture = item_data.texture
+	if is_instance_valid(external_quantity_label):
+		external_quantity_label.text = "x%d" % item_data.get("quantity", 1)
 	
 	# Clear existing instances
 	_clear_instances()
 	
 	# Set the item name
-	if data.has("name"):
-		name_label.text = data.name
-		name_label.show()
-	else:
-		name_label.text = data.id.capitalize().replace("_", " ")
-		name_label.show()
+	if is_instance_valid(name_label):
+		if data.has("name"):
+			name_label.text = data.name
+			name_label.show()
+		else:
+			name_label.text = data.id.capitalize().replace("_", " ")
+			name_label.show()
 	
 	# Show external quantity label with correct quantity
-	external_quantity_label.show()
+	if is_instance_valid(external_quantity_label):
+		external_quantity_label.show()
 	
 	# Handle different item types
 	if item_data.get("type") == "lore":  # Check by type instead of ID
 		# Wait a frame to ensure previous instance is fully cleaned up
 		await get_tree().process_frame
+		
+		if !is_instance_valid(self) or !is_inside_tree():
+			return
+			
 		lore_instance = LORE_FRAGMENT_SCENE.instantiate()
 		
 		# Make sure the item_container still exists before adding
@@ -85,10 +97,15 @@ func set_item(data: Dictionary) -> void:
 				lore_instance.position = slot_size / 2
 			
 			# Hide the default texture
-			texture_rect.hide()
+			if is_instance_valid(texture_rect):
+				texture_rect.hide()
 	elif item_data.id == "celestial_tear":
 		# Wait a frame to ensure previous instance is fully cleaned up
 		await get_tree().process_frame
+		
+		if !is_instance_valid(self) or !is_inside_tree():
+			return
+			
 		tear_instance = CELESTIAL_TEAR_SCENE.instantiate()
 		
 		# Make sure the item_container still exists before adding
@@ -103,15 +120,17 @@ func set_item(data: Dictionary) -> void:
 				tear_instance.position = slot_size / 2
 			
 			# Hide the default texture
-			texture_rect.hide()
+			if is_instance_valid(texture_rect):
+				texture_rect.hide()
 	else:
 		# Default case for other items
-		texture_rect.texture = data.texture
-		texture_rect.show()
-		texture_rect.material = null  # Clear any existing shader
-		texture_rect.scale = Vector2.ONE
-		texture_rect.custom_minimum_size = Vector2(80, 80)
-		texture_rect.pivot_offset = texture_rect.size / 2
+		if is_instance_valid(texture_rect):
+			texture_rect.texture = data.texture
+			texture_rect.show()
+			texture_rect.material = null  # Clear any existing shader
+			texture_rect.scale = Vector2.ONE
+			texture_rect.custom_minimum_size = Vector2(80, 80)
+			texture_rect.pivot_offset = texture_rect.size / 2
 
 func _clear_instances() -> void:
 	# Clear existing tear instance if any
@@ -129,61 +148,74 @@ func _clear_instances() -> void:
 		lore_instance = null
 
 func _update_item_details() -> void:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
 	var details_panel = get_node_or_null("../../ItemDetails")
-	if not details_panel:
+	if not details_panel or !is_instance_valid(details_panel):
 		return
 		
 	var detail_slot = details_panel.get_node_or_null("DetailSlot")
 	var item_name = details_panel.get_node_or_null("ItemName")
 	var item_description = details_panel.get_node_or_null("ItemDescription")
 	
-	if not detail_slot or not item_name or not item_description:
+	if not detail_slot or not item_name or not item_description or !is_instance_valid(detail_slot) or !is_instance_valid(item_name) or !is_instance_valid(item_description):
 		return
 	
 	# Clear any existing instances in the detail slot
 	for child in detail_slot.get_children():
-		child.queue_free()
+		if is_instance_valid(child):
+			child.queue_free()
 	
 	# Handle items based on type instead of ID
 	if item_data.get("type") == "lore":
-		item_name.text = item_data.get("name", "Ancient Fragment")
+		if is_instance_valid(item_name):
+			item_name.text = item_data.get("name", "Ancient Fragment")
 		# Always show description if it has been read
-		if item_data.get("has_been_read", false):
-			item_description.text = item_data.get("description", "A Piece Of Knowledge From The Old Era")
-			item_description.add_theme_font_size_override("font_size", 24)
-		else:
-			item_description.text = "....."
-			item_description.add_theme_font_size_override("font_size", 48)
+		if is_instance_valid(item_description):
+			if item_data.get("has_been_read", false):
+				item_description.text = item_data.get("description", "A Piece Of Knowledge From The Old Era")
+				item_description.add_theme_font_size_override("font_size", 24)
+			else:
+				item_description.text = "....."
+				item_description.add_theme_font_size_override("font_size", 48)
 		
 		# Create a larger instance of the lore fragment
-		var large_lore = LORE_FRAGMENT_SCENE.instantiate()
-		detail_slot.add_child(large_lore)
-		if large_lore is Node2D:
-			large_lore.scale = Vector2(5.5, 5.5)
-			if large_lore.has_node("Sprite2D"):
-				var sprite = large_lore.get_node("Sprite2D")
-				sprite.centered = true
-				large_lore.position = Vector2(
-					detail_slot.size.x / 2,
-					(detail_slot.size.y / 2) + 30
-				)
+		if is_instance_valid(detail_slot):
+			var large_lore = LORE_FRAGMENT_SCENE.instantiate()
+			detail_slot.add_child(large_lore)
+			if large_lore is Node2D:
+				large_lore.scale = Vector2(5.5, 5.5)
+				if large_lore.has_node("Sprite2D"):
+					var sprite = large_lore.get_node("Sprite2D")
+					sprite.centered = true
+					large_lore.position = Vector2(
+						detail_slot.size.x / 2,
+						(detail_slot.size.y / 2) + 30
+					)
 	elif item_data.id == "celestial_tear":
-		item_name.text = "Celestial Tear"
-		item_description.text = "A crystallized tear from the heavens. Restores full health and stamina when consumed."
-		item_description.add_theme_font_size_override("font_size", 24)
+		if is_instance_valid(item_name):
+			item_name.text = "Celestial Tear"
+		if is_instance_valid(item_description):
+			item_description.text = "A crystallized tear from the heavens. Restores full health and stamina when consumed."
+			item_description.add_theme_font_size_override("font_size", 24)
 		
-		var large_tear = CELESTIAL_TEAR_SCENE.instantiate()
-		detail_slot.add_child(large_tear)
-		if large_tear is Node2D:
-			large_tear.scale = Vector2(8.0, 8.0)
-			large_tear.position = detail_slot.size / 2
+		if is_instance_valid(detail_slot):
+			var large_tear = CELESTIAL_TEAR_SCENE.instantiate()
+			detail_slot.add_child(large_tear)
+			if large_tear is Node2D:
+				large_tear.scale = Vector2(8.0, 8.0)
+				large_tear.position = detail_slot.size / 2
 
 func _on_mouse_entered() -> void:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
 	if item_data.size() > 0:
 		_update_item_details()
 		is_hovering = true
 		
-		if item_data.get("use_function"):
+		if item_data.get("use_function") and is_instance_valid(use_button):
 			# Only show READ button if lore is unread and it's a lore item
 			if item_data.get("type") == "lore":
 				if not item_data.get("has_been_read", false):
@@ -199,18 +231,28 @@ func _on_mouse_entered() -> void:
 				(size.y - use_button.size.y) / 2  # Vertically centered
 			)
 			
-			hide_timer.stop()
+			if is_instance_valid(hide_timer):
+				hide_timer.stop()
 
 func _on_mouse_exited() -> void:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
 	is_hovering = false
 	if is_instance_valid(hide_timer) and hide_timer.is_inside_tree():
 		hide_timer.start()
 
 func _on_hide_timer_timeout() -> void:
-	if not is_hovering:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
+	if not is_hovering and is_instance_valid(use_button):
 		use_button.hide()
 
 func _on_use_button_pressed() -> void:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
 	if item_data.has("id"):  # Check if we have valid item data
 		# Emit the signal through SignalBus first
 		SignalBus.item_used.emit(item_data)
@@ -227,14 +269,19 @@ func _on_use_button_pressed() -> void:
 					var inventory = get_node("/root/Inventory")
 					inventory.update_item(item_data.id, item_data)
 				# Hide the READ button permanently for this lore item
-				use_button.hide()
+				if is_instance_valid(use_button):
+					use_button.hide()
 		else:
 			# For non-lore items, use them normally
 			Inventory.use_item(item_data.id)
 			clear_slot()
-			use_button.hide()
+			if is_instance_valid(use_button):
+				use_button.hide()
 
 func clear_slot() -> void:
+	if !is_instance_valid(self) or !is_inside_tree():
+		return
+		
 	# Clear item data and read state
 	item_data = {}
 	is_empty = true
@@ -244,19 +291,23 @@ func clear_slot() -> void:
 	_clear_instances()
 	
 	# Reset texture
-	texture_rect.texture = null
-	texture_rect.hide()
-	texture_rect.scale = Vector2.ONE
-	texture_rect.custom_minimum_size = Vector2(80, 80)  # Keep consistent size
+	if is_instance_valid(texture_rect):
+		texture_rect.texture = null
+		texture_rect.hide()
+		texture_rect.scale = Vector2.ONE
+		texture_rect.custom_minimum_size = Vector2(80, 80)  # Keep consistent size
 	
 	# Hide labels
-	name_label.hide()
-	name_label.text = ""
-	external_quantity_label.hide()
-	external_quantity_label.text = "x1"
+	if is_instance_valid(name_label):
+		name_label.hide()
+		name_label.text = ""
+	if is_instance_valid(external_quantity_label):
+		external_quantity_label.hide()
+		external_quantity_label.text = "x1"
 	
 	# Hide use button
-	use_button.hide()
+	if is_instance_valid(use_button):
+		use_button.hide()
 
 # Add cleanup on exit
 func _exit_tree() -> void:

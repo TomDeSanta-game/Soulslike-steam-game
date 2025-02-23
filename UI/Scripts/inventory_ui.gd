@@ -16,8 +16,15 @@ func _input(event: InputEvent) -> void:
 		toggle_inventory()
 
 func toggle_inventory() -> void:
-	visible = !visible
-	get_tree().paused = visible
+	if visible:
+		visible = false
+		get_tree().paused = false
+		InventoryStateManager.close_inventory("inventory")
+	else:
+		if InventoryStateManager.open_inventory("inventory"):
+			visible = true
+			get_tree().paused = true
+			_update_inventory_display()
 
 func _update_inventory_display() -> void:
 	# Clear existing slots

@@ -36,3 +36,6 @@ var heal: AudioStream = preload("res://assets/sounds/Other/Heal/heal.mp3")
 
 # Music
 var music: AudioStream = preload("res://assets/music/music.mp3")
+
+# Interface
+var menu_select: AudioStream = preload("res://assets/sounds/Menu/menu_select.mp3")

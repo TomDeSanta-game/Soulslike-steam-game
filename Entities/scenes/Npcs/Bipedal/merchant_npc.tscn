@@ -1,8 +1,7 @@
-[gd_scene load_steps=19 format=3 uid="uid://bt3gkgqdx5bd0"]
+[gd_scene load_steps=18 format=3 uid="uid://bt3gkgqdx5bd0"]
 
 [ext_resource type="PackedScene" uid="uid://bfexry3355fb" path="res://Entities/scenes/Npcs/npc_base.tscn" id="1_base"]
 [ext_resource type="Script" path="res://Entities/scripts/Npcs/Bipedal/merchant_npc.gd" id="2_script"]
-[ext_resource type="PackedScene" uid="uid://dkrkpa0tb16re" path="res://UI/Scenes/MerchantMenu.tscn" id="3_h4no0"]
 [ext_resource type="Shader" path="res://Shaders/Merchant/merchant.gdshader" id="4_shader"]
 [ext_resource type="Texture2D" uid="uid://bnueqonf1cykr" path="res://assets/Legacy Collection/Characters/bipedal-Unit/spritesheet.png" id="5_sprite"]
 [ext_resource type="FontFile" uid="uid://ckp0yattq52lf" path="res://assets/fonts/Oswald-VariableFont_wght.ttf" id="6_gsu7v"]
@@ -78,11 +77,12 @@ animations = [{
 radius = 21.5
 height = 54.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_merchant_interaction"]
-radius = 98.0051
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ap82o"]
+radius = 58.0
+height = 144.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_interact"]
-bg_color = Color(0, 0, 0, 0.6)
+bg_color = Color(0, 0, 0, 0.8)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -92,15 +92,15 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
 
 [node name="MerchantNpc" instance=ExtResource("1_base")]
-collision_layer = 4
-collision_mask = 3
+collision_layer = 16
+collision_mask = 1
 script = ExtResource("2_script")
-shop_interaction_distance = 100.0
-merchant_menu_scene = ExtResource("3_h4no0")
-idle_animation = &"Stop"
-run_animation = &"Run"
 metadata/entity_name = "Merchant"
 
 [node name="AnimatedSprite2D" parent="." index="0"]
@@ -118,22 +118,31 @@ debug_color = Color(1, 1, 1, 0.42)
 position = Vector2(-2.5, 5.5)
 scale = Vector2(2.15, 2.65)
 
+[node name="HitBox" parent="." index="3"]
+collision_layer = 0
+collision_mask = 0
+
+[node name="HurtBox" parent="." index="4"]
+collision_layer = 0
+collision_mask = 0
+
 [node name="ChatBoxArea" parent="." index="5"]
 collision_layer = 0
-collision_mask = 2
+collision_mask = 8
 
 [node name="CollisionShape2D" parent="ChatBoxArea" index="0"]
-shape = SubResource("CircleShape2D_merchant_interaction")
+position = Vector2(0, -25)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_ap82o")
 
 [node name="InteractButton" type="Button" parent="." index="7"]
-visible = false
 offset_left = -50.0
 offset_top = -80.0
 offset_right = 50.0
 offset_bottom = -50.0
 theme_override_fonts/font = ExtResource("6_gsu7v")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_interact")
-text = "Press E to Shop"
+text = "SHOP"
 
 [connection signal="pressed" from="InteractButton" to="." method="toggle_shop"]

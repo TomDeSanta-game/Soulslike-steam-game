@@ -370,8 +370,9 @@ func _ready() -> void:
 	if grab_collision_shape:
 		grab_collision_shape.disabled = true
 
+	# Initialize merchant menu
 	merchant_menu = merchant_menu_scene.instantiate()
-	get_tree().root.add_child(merchant_menu)
+	ui_layer.add_child(merchant_menu)
 	merchant_menu.visible = false
 
 
@@ -636,10 +637,6 @@ func _is_attack_animation() -> bool:
 
 # Input Handling
 func _handle_input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact"):
-		merchant_menu.visible = !merchant_menu.visible
-		get_tree().paused = merchant_menu.visible
-
 	if event.is_action_pressed("JUMP"):
 		is_jump_held = true
 		if (is_on_floor() or has_coyote_time) and not is_jump_active:
@@ -701,7 +698,7 @@ func _handle_input(event: InputEvent) -> void:
 
 
 func _handle_jump() -> void:
-	if (is_on_floor() or has_coyote_time) and not is_jump_active:  # Add check for is_jump_active
+	if (is_on_floor() or has_coyote_time) and not is_jump_active:
 		velocity.y = jump_power
 		is_jump_held = true
 		is_jump_active = true

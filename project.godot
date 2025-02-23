@@ -45,6 +45,8 @@ Inventory="*res://Singletons/Scripts/Inventory/inventory.gd"
 BagSpawner="*res://Singletons/Scripts/BagSpawner/bag_spawner.gd"
 SoulsSystem="*res://Singletons/Scripts/SoulsSystem/souls_system.gd"
 XPSystem="*res://Singletons/Scripts/XPSystem/xp_system.gd"
+InventoryStateManager="*res://Singletons/Scripts/InventoryStateManager.gd"
+Sales="*res://Singletons/Scripts/Sales/sales.gd"
 
 [display]
 
