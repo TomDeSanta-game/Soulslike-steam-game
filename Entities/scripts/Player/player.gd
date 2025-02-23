@@ -223,8 +223,8 @@ func _ready() -> void:
 	health_bar_style.bg_color = Color.from_string("#ff0033", Color.RED)  # Vibrant red
 	health_bar_style.corner_radius_top_left = 12
 	health_bar_style.corner_radius_top_right = 12
-	health_bar_style.corner_radius_bottom_right = 12
-	health_bar_style.corner_radius_bottom_left = 12
+	health_bar_style.corner_radius_bottom_right = 0  # Remove bottom corners
+	health_bar_style.corner_radius_bottom_left = 0  # Remove bottom corners
 	health_bar_style.border_width_left = 3
 	health_bar_style.border_width_top = 3
 	health_bar_style.border_width_right = 3
@@ -242,8 +242,8 @@ func _ready() -> void:
 	health_bar_bg_style.bg_color = Color.from_string("#1a1a1a", Color.BLACK)  # Darker background
 	health_bar_bg_style.corner_radius_top_left = 12
 	health_bar_bg_style.corner_radius_top_right = 12
-	health_bar_bg_style.corner_radius_bottom_right = 12
-	health_bar_bg_style.corner_radius_bottom_left = 12
+	health_bar_bg_style.corner_radius_bottom_right = 0  # Remove bottom corners
+	health_bar_bg_style.corner_radius_bottom_left = 0  # Remove bottom corners
 	health_bar_bg_style.border_width_left = 3
 	health_bar_bg_style.border_width_top = 3
 	health_bar_bg_style.border_width_right = 3
@@ -260,8 +260,8 @@ func _ready() -> void:
 	# Setup stamina bar style
 	var stamina_bar_style = StyleBoxFlat.new()
 	stamina_bar_style.bg_color = Color.from_string("#00cc66", Color.GREEN)  # Vibrant green
-	stamina_bar_style.corner_radius_top_left = 12
-	stamina_bar_style.corner_radius_top_right = 12
+	stamina_bar_style.corner_radius_top_left = 0  # Remove top corners
+	stamina_bar_style.corner_radius_top_right = 0  # Remove top corners
 	stamina_bar_style.corner_radius_bottom_right = 12
 	stamina_bar_style.corner_radius_bottom_left = 12
 	stamina_bar_style.border_width_left = 3
@@ -279,8 +279,8 @@ func _ready() -> void:
 
 	var stamina_bar_bg_style = StyleBoxFlat.new()
 	stamina_bar_bg_style.bg_color = Color.from_string("#1a1a1a", Color.BLACK)  # Darker background
-	stamina_bar_bg_style.corner_radius_top_left = 12
-	stamina_bar_bg_style.corner_radius_top_right = 12
+	stamina_bar_bg_style.corner_radius_top_left = 0  # Remove top corners
+	stamina_bar_bg_style.corner_radius_top_right = 0  # Remove top corners
 	stamina_bar_bg_style.corner_radius_bottom_right = 12
 	stamina_bar_bg_style.corner_radius_bottom_left = 12
 	stamina_bar_bg_style.border_width_left = 3
@@ -313,6 +313,28 @@ func _ready() -> void:
 	stamina_bar.min_value = 0
 	stamina_bar.custom_minimum_size = Vector2(250, 35)  # Make the bar wider and taller
 	stamina_bar.modulate.a = 0.95  # Slightly transparent
+
+	# Create a Control node to maintain stamina bar position
+	var stamina_container = Control.new()
+	stamina_container.custom_minimum_size = stamina_bar.custom_minimum_size
+	stamina_container.size = stamina_bar.size
+	
+	# Get the parent of the stamina bar
+	var stamina_parent = stamina_bar.get_parent()
+	if stamina_parent:
+		# Remove stamina bar from its current parent
+		stamina_parent.remove_child(stamina_bar)
+		# Add container to parent
+		stamina_parent.add_child(stamina_container)
+		# Add stamina bar to container
+		stamina_container.add_child(stamina_bar)
+		
+		# Position container relative to health bar
+		stamina_container.position.y = health_bar.position.y + health_bar.size.y + 8
+		stamina_container.position.x = health_bar.position.x
+		
+		# Reset stamina bar position within container
+		stamina_bar.position = Vector2.ZERO
 
 	# Setup UI displays
 	_setup_ui_displays()
@@ -539,13 +561,10 @@ func _update_health_bar() -> void:
 			new_color = Color.from_string("#ff9900", Color.ORANGE)  # Medium health color
 		else:
 			new_color = Color.from_string("#ff0000", Color.RED)  # Low health color
-		
+
 		# Tween the color change
 		tween.parallel().tween_method(
-			func(c): health_style.bg_color = c,
-			health_style.bg_color,
-			new_color,
-			0.4
+			func(c): health_style.bg_color = c, health_style.bg_color, new_color, 0.4
 		)
 
 	# Flash effect when taking damage
@@ -553,7 +572,7 @@ func _update_health_bar() -> void:
 		var flash_tween = create_tween()
 		flash_tween.tween_property(health_bar, "modulate", Color(2, 2, 2, 1), 0.1)
 		flash_tween.tween_property(health_bar, "modulate", Color(1, 1, 1, 0.95), 0.2)
-		
+
 		# Screen shake effect on significant damage
 		if (health_bar.value - current_health) > max_health * 0.1:  # More than 10% damage
 			camera.shake(10, 0.3, 0.85)
@@ -1038,13 +1057,10 @@ func _update_stamina_bar() -> void:
 			new_color = Color.from_string("#ffcc00", Color.YELLOW)  # Medium stamina color
 		else:
 			new_color = Color.from_string("#ff6600", Color.ORANGE)  # Low stamina color
-		
+
 		# Tween the color change
 		tween.parallel().tween_method(
-			func(c): stamina_style.bg_color = c,
-			stamina_style.bg_color,
-			new_color,
-			0.3
+			func(c): stamina_style.bg_color = c, stamina_style.bg_color, new_color, 0.3
 		)
 
 	# Pulse effect when stamina is low
@@ -1319,7 +1335,7 @@ func _setup_ui_displays() -> void:
 	# Position XP display below souls display with same horizontal alignment
 	xp_display.position = Vector2(
 		get_viewport_rect().size.x - xp_display.size.x - 20,  # 20 pixels from right edge
-		souls_display.position.y + souls_display.size.y + 10   # 10 pixels below souls display
+		souls_display.position.y + souls_display.size.y + 10  # 10 pixels below souls display
 	)
 
 	# Add level up menu

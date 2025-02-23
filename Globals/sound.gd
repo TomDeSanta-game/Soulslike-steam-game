@@ -39,3 +39,5 @@ var music: AudioStream = preload("res://assets/music/music.mp3")
 
 # Interface
 var menu_select: AudioStream = preload("res://assets/sounds/Menu/menu_select.mp3")
+
+var sell: AudioStream = preload("res://assets/sounds/Menu/sell.mp3")

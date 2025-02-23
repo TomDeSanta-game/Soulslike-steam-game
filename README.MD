@@ -24,13 +24,16 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
   - Visual feedback for affordable items
   - Automatic price calculations
 - Special item handling:
-  - Unread lore fragments have bonus value
-  - Celestial Tears for health/stamina restoration
+  - Lore Fragments are premium items:
+    - Merchants sell them for 250,000 souls
+    - Players can sell them for 100,000 souls
+  - Celestial Tears have fixed value (50,000 souls)
+  - Regular items sell for half their purchase price
   - Dynamic quantity tracking for merchant items
 - Trading features:
   - Buy rare items with collected souls
-  - Sell items for souls (half purchase price)
-  - Special values for unique items
+  - Sell items for appropriate value based on type
+  - Special fixed prices for unique items
   - Automatic inventory management
   - Sound effects for transactions
 

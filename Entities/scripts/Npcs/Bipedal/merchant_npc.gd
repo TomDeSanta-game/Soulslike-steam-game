@@ -19,7 +19,7 @@ var merchant_inventory: Dictionary = {
 		"id": "LORE_001",
 		"name": "Ancient Fragment",
 		"description": "A Piece Of Knowledge From The Old Era",
-		"price": 100000,
+		"price": 250000,
 		"type": "lore",
 		"texture": load("res://assets/cover.png"),
 		"use_function": "read_lore",
@@ -62,6 +62,9 @@ func _ready() -> void:
 	call_deferred("_setup_merchant_menu")
 
 func _setup_merchant_menu() -> void:
+	if merchant_menu and is_instance_valid(merchant_menu):
+		return
+	
 	# Create a new UI layer if needed
 	var canvas_layer = CanvasLayer.new()
 	canvas_layer.layer = 100  # Set to a high layer to ensure it's on top

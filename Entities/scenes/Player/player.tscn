@@ -393,6 +393,7 @@ font = ExtResource("65_g3sok")
 font_size = 148
 
 [node name="player" type="CharacterBody2D"]
+position = Vector2(-1, 0)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_lfhy7")

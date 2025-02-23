@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dkrkpa0tb16re"]
+[gd_scene load_steps=10 format=3 uid="uid://dkrkpa0tb16re"]
 
 [ext_resource type="Script" path="res://UI/Scripts/MerchantMenu.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://ck2b6aq1lk44q" path="res://assets/fonts/static/Oswald-Regular.ttf" id="2_font"]
 [ext_resource type="LabelSettings" uid="uid://dihms2mfxpk5d" path="res://assets/labelSettings/menu.tres" id="3_3t85j"]
 [ext_resource type="FontFile" uid="uid://7fal73nhmb20" path="res://assets/fonts/static/Oswald-Bold.ttf" id="4_m06v8"]
+[ext_resource type="FontFile" uid="uid://c15x14rjaoosy" path="res://assets/fonts/static/Oswald-Medium.ttf" id="5_3eqtf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_merchant"]
 bg_color = Color(0.12549, 0.12549, 0.12549, 0.901961)
@@ -27,6 +28,13 @@ font = ExtResource("2_font")
 font_size = 36
 font_color = Color(1, 0.2, 0.2, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_ekwr4"]
+font = ExtResource("5_3eqtf")
+font_size = 48
+font_color = Color(0.78, 0, 0, 1)
+shadow_size = 2
+shadow_color = Color(0.705882, 0, 0, 1)
+
 [node name="MerchantMenu" type="Control"]
 process_mode = 3
 layout_mode = 3
@@ -35,6 +43,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("1_script")
 
 [node name="Panel" type="Panel" parent="."]
@@ -47,9 +56,10 @@ anchor_bottom = 0.5
 offset_left = -800.0
 offset_top = -500.0
 offset_right = 800.0
-offset_bottom = 500.0
+offset_bottom = 465.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 theme = SubResource("Theme_merchant")
 
 [node name="CloseButton" type="Button" parent="Panel"]
@@ -57,12 +67,14 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -80.0
+offset_left = -120.0
 offset_top = 20.0
 offset_right = -20.0
-offset_bottom = 50.0
+offset_bottom = 80.0
 grow_horizontal = 0
+mouse_default_cursor_shape = 2
 theme_override_fonts/font = ExtResource("4_m06v8")
+theme_override_font_sizes/font_size = 36
 text = "X"
 
 [node name="Title" type="Label" parent="Panel"]
@@ -179,6 +191,7 @@ offset_right = 600.0
 offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 1
 
 [node name="ItemSprite" type="TextureRect" parent="Panel/ItemDetails"]
 custom_minimum_size = Vector2(150, 150)
@@ -202,6 +215,7 @@ anchor_bottom = 1.0
 offset_left = 190.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="ItemName" type="Label" parent="Panel/ItemDetails/InfoPanel"]
 layout_mode = 1
@@ -241,35 +255,36 @@ label_settings = ExtResource("3_3t85j")
 horizontal_alignment = 1
 
 [node name="InsufficientSouls" type="Label" parent="Panel/ItemDetails/InfoPanel"]
-visible = false
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -70.0
-offset_bottom = -40.0
+offset_top = -10.0
+offset_bottom = 120.0
 grow_horizontal = 2
 grow_vertical = 0
 text = "Not enough souls!"
-label_settings = ExtResource("3_3t85j")
+label_settings = SubResource("LabelSettings_ekwr4")
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="BuyButton" type="Button" parent="Panel/ItemDetails/InfoPanel"]
-visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -120.0
-offset_top = -40.0
+offset_left = -220.0
+offset_top = -70.0
 offset_right = -20.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
-text = "Buy"
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 24
+text = "BUY"
 
 [node name="SellButton" type="Button" parent="Panel/ItemDetails/InfoPanel"]
 visible = false
@@ -279,10 +294,11 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -120.0
-offset_top = -40.0
+offset_left = -220.0
+offset_top = -70.0
 offset_right = -20.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
-text = "Sell"
+theme_override_font_sizes/font_size = 24
+text = "SELL"
