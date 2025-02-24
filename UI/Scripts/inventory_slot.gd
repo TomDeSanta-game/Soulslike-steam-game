@@ -21,7 +21,7 @@ var has_been_read: bool = false  # Track if lore has been read
 func _ready() -> void:
 	# Hide use button initially
 	use_button.hide()
-	use_button.text = "READ"  # Change to READ for lore items
+	use_button.text = "EAT"  # Only show EAT button, no more READ
 
 	# Setup timer
 	hide_timer.one_shot = true
@@ -42,6 +42,54 @@ func _ready() -> void:
 	texture_rect.custom_minimum_size = Vector2(80, 80)  # Adjusted size
 	texture_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	texture_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+	# Enhanced EAT button styling
+	use_button.add_theme_font_size_override("font_size", 24)
+	use_button.custom_minimum_size = Vector2(80, 40)
+	
+	var normal_style = StyleBoxFlat.new()
+	normal_style.bg_color = Color(0.2, 0.6, 0.2, 0.9)
+	normal_style.border_color = Color(0.3, 0.8, 0.3, 1.0)
+	normal_style.border_width_left = 2
+	normal_style.border_width_top = 2
+	normal_style.border_width_right = 2
+	normal_style.border_width_bottom = 2
+	normal_style.corner_radius_top_left = 8
+	normal_style.corner_radius_top_right = 8
+	normal_style.corner_radius_bottom_right = 8
+	normal_style.corner_radius_bottom_left = 8
+	
+	var hover_style = StyleBoxFlat.new()
+	hover_style.bg_color = Color(0.3, 0.7, 0.3, 1.0)
+	hover_style.border_color = Color(0.4, 1.0, 0.4, 1.0)
+	hover_style.border_width_left = 3
+	hover_style.border_width_top = 3
+	hover_style.border_width_right = 3
+	hover_style.border_width_bottom = 3
+	hover_style.corner_radius_top_left = 8
+	hover_style.corner_radius_top_right = 8
+	hover_style.corner_radius_bottom_right = 8
+	hover_style.corner_radius_bottom_left = 8
+	
+	var pressed_style = StyleBoxFlat.new()
+	pressed_style.bg_color = Color(0.15, 0.45, 0.15, 1.0)
+	pressed_style.border_color = Color(0.2, 0.6, 0.2, 1.0)
+	pressed_style.border_width_left = 2
+	pressed_style.border_width_top = 2
+	pressed_style.border_width_right = 2
+	pressed_style.border_width_bottom = 2
+	pressed_style.corner_radius_top_left = 8
+	pressed_style.corner_radius_top_right = 8
+	pressed_style.corner_radius_bottom_right = 8
+	pressed_style.corner_radius_bottom_left = 8
+	
+	use_button.add_theme_stylebox_override("normal", normal_style)
+	use_button.add_theme_stylebox_override("hover", hover_style)
+	use_button.add_theme_stylebox_override("pressed", pressed_style)
+	
+	use_button.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+	use_button.add_theme_color_override("font_hover_color", Color(1, 1, 1, 1))
+	use_button.add_theme_color_override("font_pressed_color", Color(0.9, 0.9, 0.9, 1))
 
 func set_item(data: Dictionary) -> void:
 	if !is_instance_valid(self) or !is_inside_tree():
@@ -171,14 +219,10 @@ func _update_item_details() -> void:
 	if item_data.get("type") == "lore":
 		if is_instance_valid(item_name):
 			item_name.text = item_data.get("name", "Ancient Fragment")
-		# Always show description if it has been read
+		# Always show description
 		if is_instance_valid(item_description):
-			if item_data.get("has_been_read", false):
-				item_description.text = item_data.get("description", "A Piece Of Knowledge From The Old Era")
-				item_description.add_theme_font_size_override("font_size", 24)
-			else:
-				item_description.text = "....."
-				item_description.add_theme_font_size_override("font_size", 48)
+			item_description.text = item_data.get("description", "A Piece Of Knowledge From The Old Era. Sells For A Really High Price")
+			item_description.add_theme_font_size_override("font_size", 24)
 		
 		# Create a larger instance of the lore fragment
 		if is_instance_valid(detail_slot):
@@ -215,23 +259,11 @@ func _on_mouse_entered() -> void:
 		_update_item_details()
 		is_hovering = true
 		
-		if item_data.get("use_function") and is_instance_valid(use_button):
-			# Only show READ button if lore is unread and it's a lore item
-			if item_data.get("type") == "lore":
-				if not item_data.get("has_been_read", false):
-					use_button.text = "READ"
-					use_button.show()
-			else:
+		if item_data.get("use_function"):
+			# Only show EAT button for non-lore items
+			if item_data.get("type") != "lore":
 				use_button.text = "EAT"
 				use_button.show()
-			
-			# Position the button to the right of the slot
-			use_button.position = Vector2(
-				size.x + 10,  # 10 pixels gap from the slot
-				(size.y - use_button.size.y) / 2  # Vertically centered
-			)
-			
-			if is_instance_valid(hide_timer):
 				hide_timer.stop()
 
 func _on_mouse_exited() -> void:

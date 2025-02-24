@@ -10,6 +10,23 @@ var player = null
 @onready var raycast_near_right: RayCast2D = $RayCastNearRight
 @onready var raycast_mid_right: RayCast2D = $RayCastMidRight
 @onready var raycast_far_right: RayCast2D = $RayCastFarRight
+@onready var bag_sprite: Sprite2D = $Sprite2D
+@onready var light_sprite: Sprite2D = $LightSprite
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
+
+# Shader properties
+var shader_material: ShaderMaterial
+const SHADER_PARAMS = {
+	"glow_color": Color(1.0, 0.92, 0.75, 0.4),
+	"inner_glow_color": Color(1.0, 0.8, 0.4, 0.6),
+	"pulse_speed": 2.0,
+	"sparkle_speed": 3.0,
+	"edge_thickness": 1.0,
+	"glow_intensity": 1.2,
+	"inner_glow_intensity": 0.8,
+	"sparkle_intensity": 0.5,
+	"sparkle_density": 15.0
+}
 
 # Physics properties
 var velocity: Vector2 = Vector2.ZERO
@@ -19,6 +36,9 @@ const TERMINAL_VELOCITY: float = 600.0  # Reduced terminal velocity for better c
 func _ready() -> void:
 	# Wait one frame to ensure all nodes are ready
 	await get_tree().process_frame
+	
+	# Initialize shader
+	_setup_shader()
 	
 	var players = get_tree().get_nodes_in_group("Player")
 	player = players[0] if not players.is_empty() else null
@@ -40,6 +60,48 @@ func _ready() -> void:
 	# Check initial position and adjust if needed
 	call_deferred("_check_and_adjust_position")
 
+func _setup_shader() -> void:
+	shader_material = ShaderMaterial.new()
+	shader_material.shader = load("res://Shaders/Collectibles/bag_shader.gdshader")
+	
+	# Set all shader parameters
+	for param in SHADER_PARAMS:
+		set_shader_parameter(param, SHADER_PARAMS[param])
+	
+	# Apply shader to bag sprite
+	bag_sprite.material = shader_material
+
+# Shader control functions
+func set_shader_parameter(param: String, value: Variant) -> void:
+	if shader_material:
+		shader_material.set_shader_parameter(param, value)
+
+func set_glow_color(color: Color) -> void:
+	set_shader_parameter("glow_color", color)
+
+func set_inner_glow_color(color: Color) -> void:
+	set_shader_parameter("inner_glow_color", color)
+
+func set_pulse_speed(speed: float) -> void:
+	set_shader_parameter("pulse_speed", speed)
+
+func set_sparkle_speed(speed: float) -> void:
+	set_shader_parameter("sparkle_speed", speed)
+
+func set_edge_thickness(thickness: float) -> void:
+	set_shader_parameter("edge_thickness", thickness)
+
+func set_glow_intensity(intensity: float) -> void:
+	set_shader_parameter("glow_intensity", intensity)
+
+func set_inner_glow_intensity(intensity: float) -> void:
+	set_shader_parameter("inner_glow_intensity", intensity)
+
+func set_sparkle_intensity(intensity: float) -> void:
+	set_shader_parameter("sparkle_intensity", intensity)
+
+func set_sparkle_density(density: float) -> void:
+	set_shader_parameter("sparkle_density", density)
 
 func _physics_process(delta: float) -> void:
 	# Apply gravity
@@ -99,6 +161,25 @@ func store_items(items: Dictionary) -> void:
 	stored_items = items.duplicate(true)
 
 
+func _cleanup_physics() -> void:
+	# Disable all raycasts
+	var raycasts = [raycast_far_left, raycast_mid_left, raycast_near_left, 
+					raycast_near_right, raycast_mid_right, raycast_far_right]
+	
+	for raycast in raycasts:
+		if raycast != null:
+			raycast.enabled = false
+			raycast.collision_mask = 0
+	
+	# Disable collision shape
+	if collision_shape:
+		collision_shape.set_deferred("disabled", true)
+		
+	# Clear collision masks
+	collision_layer = 0
+	collision_mask = 0
+
+
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player") and not stored_items.is_empty():
 		# Restore items to inventory
@@ -114,5 +195,8 @@ func _on_body_entered(body: Node2D) -> void:
 		# Emit signal that items were recovered
 		items_recovered.emit()
 
-		# Queue free the bag
+		# Clean up physics before freeing
+		_cleanup_physics()
+		
+		# Queue free after cleanup
 		queue_free()

@@ -184,6 +184,7 @@ interact={
 2d_physics/layer_5="NPC"
 2d_physics/layer_6="COLLECTIBLE"
 2d_physics/layer_7="TRAPS"
+2d_physics/layer_8="BOSS"
 
 [maaacks_game_template]
 

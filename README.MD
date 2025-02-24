@@ -24,9 +24,10 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
   - Visual feedback for affordable items
   - Automatic price calculations
 - Special item handling:
-  - Lore Fragments are premium items:
+  - Lore Fragments are premium collectibles:
     - Merchants sell them for 250,000 souls
     - Players can sell them for 100,000 souls
+    - Valuable ancient knowledge with no readable content
   - Celestial Tears have fixed value (50,000 souls)
   - Regular items sell for half their purchase price
   - Dynamic quantity tracking for merchant items
@@ -44,6 +45,8 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
     - Dynamic wave distortion
     - Pulsing glow effect
     - Edge highlighting
+    - Camera focus effect on first encounter (2-second dramatic zoom)
+    - Optional teleport effect with dissolve shader
   - **Celestial Tears**: Ethereal blue glow with smooth pulsing
 - Enhanced UI Elements:
   - Dynamic health bar with:
@@ -56,6 +59,10 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
     - Pulsing effect at low stamina
     - Smooth regeneration animation
     - Usage feedback effects
+  - Improved item buttons:
+    - Stylish EAT button with green gradient
+    - Smooth hover and click effects
+    - Clear visual feedback
 - Smooth character animations
 - Visual feedback for all actions
 - Particle effects for impacts and interactions
@@ -103,14 +110,28 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
 
 ## Controls
 
-- WASD/Arrow Keys: Movement
+Movement & Combat:
+- A/D or Left/Right Arrow: Move left/right
 - Space: Jump
-- Shift: Dash
-- Left Click: Attack
-- Right Click: Block/Parry
-- E: Interact
-- I: Inventory
-- ESC: Menu
+- Left Mouse Button: Attack
+- R: Heal
+- P: Dash
+- M: Roll
+- N: Slide
+- G: Grab
+- S: Shoot
+
+Character Management:
+- E: Open/Close Inventory
+- L: Level Up Menu
+- I: Interact
+
+System Controls:
+- ESC: Back/Pause
+- Q: Quit
+- \: Toggle Console
+- X: Debug: Reduce Health
+- `: Debug: Die Instantly
 
 ## Development
 

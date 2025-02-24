@@ -174,7 +174,9 @@ var merchant_menu: MerchantMenu = null
 
 
 func _ready() -> void:
+	# Add only the player node to the Player group
 	add_to_group("Player")
+	
 	super._ready()  # Call parent _ready to initialize health system
 	types.player = self
 
@@ -195,13 +197,14 @@ func _ready() -> void:
 		hitbox.hit_stun_duration = 0.2
 		hitbox.collision_layer = C_Layers.LAYER_HITBOX
 		hitbox.collision_mask = C_Layers.MASK_HITBOX
-		hitbox.add_to_group("Hitbox")
+		hitbox.add_to_group("Player_Hitbox")  # Changed from "Hitbox" to "Player_Hitbox"
 		hitbox.active = true
 
 	if hurtbox:
 		hurtbox.hurtbox_owner = self
 		hurtbox.collision_layer = C_Layers.LAYER_HURTBOX
 		hurtbox.collision_mask = C_Layers.MASK_HURTBOX
+		hurtbox.add_to_group("Player_Hurtbox")  # Changed from "Hurtbox" to "Player_Hurtbox"
 		hurtbox.active = true
 
 	set_jump_power(-410.0)
@@ -736,8 +739,12 @@ func _shoot() -> void:
 
 # Override parent's die function
 func _die() -> void:
+	# Disable physics processing first
 	state_machine.set_active(false)
 	set_physics_process(false)
+
+	# Clean up all physics components
+	_cleanup_physics_components()
 
 	# Play death animation
 	animated_sprite.play(ANIMATIONS.DEATH)
@@ -771,12 +778,10 @@ func _die() -> void:
 	if is_on_floor():
 		spawn_position = global_position
 	else:
-		spawn_position = (
-			last_floor_position if last_floor_position != Vector2.ZERO else global_position
-		)
+		spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
 
 	# Adjust X position based on player direction
-	spawn_position.x += 20 if animated_sprite.flip_h else -20  # Offset left or right based on direction
+	spawn_position.x += 20 if animated_sprite.flip_h else -20
 
 	# Create and spawn bag with items if there are any
 	if not items.is_empty():
@@ -1361,3 +1366,45 @@ func _on_chat_box_area_entered(area: Area2D) -> void:
 func _on_chat_box_area_exited(area: Area2D) -> void:
 	if area.get_parent() == current_merchant:
 		current_merchant = null
+
+
+# Add new function to handle physics cleanup
+func _cleanup_physics_components() -> void:
+	# Disable collision shapes
+	if grab_collision_shape:
+		grab_collision_shape.set_deferred("disabled", true)
+
+	# Clean up hitbox
+	if hitbox:
+		hitbox.active = false
+		hitbox.collision_layer = 0
+		hitbox.collision_mask = 0
+		hitbox.set_deferred("monitoring", false)
+		hitbox.set_deferred("monitorable", false)
+
+	# Clean up hurtbox
+	if hurtbox:
+		hurtbox.active = false
+		hurtbox.collision_layer = 0
+		hurtbox.collision_mask = 0
+		hurtbox.set_deferred("monitoring", false)
+		hurtbox.set_deferred("monitorable", false)
+
+	# Disable all raycasts
+	if ledge_check:
+		ledge_check.enabled = false
+
+	# Clear collision layers and masks
+	collision_layer = 0
+	collision_mask = 0
+
+	# Disable physics process
+	set_physics_process(false)
+	set_process_input(false)
+
+	# Clear any remaining physics state
+	velocity = Vector2.ZERO
+	is_grabbing = false
+	is_dashing = false
+	is_ledge_climbing = false
+	gravity_enabled = false

@@ -18,7 +18,7 @@ var merchant_inventory: Dictionary = {
 	"LORE_001": {
 		"id": "LORE_001",
 		"name": "Ancient Fragment",
-		"description": "A Piece Of Knowledge From The Old Era",
+		"description": "A Piece Of Knowledge From The Old Era. Sells For A Really High Price",
 		"price": 250000,
 		"type": "lore",
 		"texture": load("res://assets/cover.png"),

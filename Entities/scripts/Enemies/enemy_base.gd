@@ -121,13 +121,13 @@ func _setup_frame_data() -> void:
 		animated_sprite.animation_changed.connect(_on_animation_changed)
 
 func _on_hit_landed(target_hurtbox: Node) -> void:
-	# Play hit effect or sound
-	if target_hurtbox.hurtbox_owner.is_in_group("Player"):
+	if target_hurtbox.hurtbox_owner.is_in_group("Player") or target_hurtbox.is_in_group("Player_Hurtbox"):
 		SoundManager.play_sound(Sound.hit, "SFX")
 
 func _on_hit_taken(attacker_hitbox: Node) -> void:
-	if attacker_hitbox.hitbox_owner and attacker_hitbox.hitbox_owner.is_in_group("Player") and attacker_hitbox.has_method("get_damage"):
-		take_damage(attacker_hitbox.damage)
+	if attacker_hitbox.hitbox_owner and (attacker_hitbox.hitbox_owner.is_in_group("Player") or attacker_hitbox.is_in_group("Player_Hitbox")) and attacker_hitbox.has_method("get_damage"):
+		take_damage(attacker_hitbox.get_damage())
+		SoundManager.play_sound(Sound.hit, "SFX")
 
 func move(move_direction: int, move_speed: float) -> void:
 	velocity.x = move_direction * move_speed
