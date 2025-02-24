@@ -1,0 +1,102 @@
+[gd_resource type="BehaviorTree" load_steps=28 format=3 uid="uid://coci7s5xjvf0n"]
+
+[ext_resource type="Script" path="res://ai/tasks/frost_phase_transition.gd" id="1_6l0r0"]
+[ext_resource type="Script" path="res://ai/tasks/check_health.gd" id="1_xvjmj"]
+[ext_resource type="Script" path="res://ai/tasks/detect_targets.gd" id="2_wbc0o"]
+[ext_resource type="Script" path="res://ai/tasks/find_target.gd" id="3_u70tl"]
+[ext_resource type="Script" path="res://ai/tasks/persistent_chase.gd" id="4_lbrgp"]
+[ext_resource type="Script" path="res://ai/tasks/frost_attack.gd" id="5_khduj"]
+[ext_resource type="Script" path="res://ai/tasks/move_to_target.gd" id="6_ahpkm"]
+[ext_resource type="Script" path="res://ai/tasks/patrol.gd" id="7_ticvg"]
+[ext_resource type="Script" path="res://ai/tasks/move_to_position.gd" id="8_vwvtx"]
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_fbir5"]
+
+[sub_resource type="BTAction" id="BTAction_skld6"]
+script = ExtResource("1_xvjmj")
+health_threshold = 0.5
+
+[sub_resource type="BTAction" id="BTAction_su3gy"]
+script = ExtResource("1_6l0r0")
+
+[sub_resource type="BTSequence" id="BTSequence_1n1mv"]
+custom_name = "Phase Transition"
+children = [SubResource("BTAction_skld6"), SubResource("BTAction_su3gy")]
+
+[sub_resource type="BTProbability" id="BTProbability_mjyw2"]
+run_chance = 0.2
+children = [SubResource("BTSequence_1n1mv")]
+
+[sub_resource type="BTAction" id="BTAction_a6p4b"]
+script = ExtResource("7_ticvg")
+speed = 100.0
+tolerance = 10.0
+position_var = &"pos"
+direction_var = &"dir"
+default_wait_time = 1.0
+
+[sub_resource type="BTAction" id="BTAction_ekdwg"]
+script = ExtResource("8_vwvtx")
+target_pos = "pos"
+direction = "dir"
+speed = 100.0
+tolerance = 10.0
+
+[sub_resource type="BTSequence" id="BTSequence_ipb1k"]
+custom_name = "Patrol"
+children = [SubResource("BTAction_a6p4b"), SubResource("BTAction_ekdwg")]
+
+[sub_resource type="BTProbability" id="BTProbability_mv84x"]
+children = [SubResource("BTSequence_ipb1k")]
+
+[sub_resource type="BTAction" id="BTAction_0n31l"]
+script = ExtResource("2_wbc0o")
+target_type = "Enemy"
+target_var = &"target"
+targets_var = &"known_targets"
+detection_radius = 300.0
+
+[sub_resource type="BTAction" id="BTAction_e1v14"]
+script = ExtResource("3_u70tl")
+group = &""
+target_var = &"target"
+
+[sub_resource type="BTAction" id="BTAction_3kxgr"]
+script = ExtResource("4_lbrgp")
+target_var = &"target"
+max_search_attempts = 5
+search_interval = 0.5
+
+[sub_resource type="BTAction" id="BTAction_rbdg0"]
+script = ExtResource("5_khduj")
+target_var = &"target"
+attack_range = 60.0
+frost_damage = 15.0
+attack_cooldown = 1.5
+frost_effect_duration = 3.0
+
+[sub_resource type="BTAction" id="BTAction_r6xt1"]
+script = ExtResource("6_ahpkm")
+target_var = &"target"
+speed = 100.0
+tolerance = 10.0
+
+[sub_resource type="BTSequence" id="BTSequence_rhfr5"]
+custom_name = "Attack"
+children = [SubResource("BTAction_rbdg0"), SubResource("BTAction_r6xt1")]
+
+[sub_resource type="BTSequence" id="BTSequence_v4bf5"]
+custom_name = "Combat"
+children = [SubResource("BTAction_0n31l"), SubResource("BTAction_e1v14"), SubResource("BTAction_3kxgr"), SubResource("BTSequence_rhfr5")]
+
+[sub_resource type="BTProbability" id="BTProbability_r517e"]
+run_chance = 0.3
+children = [SubResource("BTSequence_v4bf5")]
+
+[sub_resource type="BTSelector" id="BTSelector_u558i"]
+custom_name = "FrostGuardian"
+children = [SubResource("BTProbability_mjyw2"), SubResource("BTProbability_mv84x"), SubResource("BTProbability_r517e")]
+
+[resource]
+blackboard_plan = SubResource("BlackboardPlan_fbir5")
+root_task = SubResource("BTSelector_u558i")

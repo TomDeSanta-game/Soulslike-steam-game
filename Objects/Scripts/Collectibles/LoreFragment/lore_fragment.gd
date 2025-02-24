@@ -218,7 +218,15 @@ func _handle_teleport() -> void:
 			
 			# Wait briefly then transition
 			await get_tree().create_timer(0.25).timeout
-			SceneManager.change_scene(get_tree().current_scene.scene_file_path)
+			
+			# Verify the scene exists before attempting to change to it
+			var target_scene = "res://levels/boss_areas/FrostGuardian/frost_guardian_boss_area.tscn"
+			if ResourceLoader.exists(target_scene):
+				print("Boss area scene found, changing scene...")
+				SceneManager.change_scene(target_scene, { "pattern_enter": "scribbles", "pattern_leave": "curtains"})
+			else:
+				push_error("Boss area scene not found at path: " + target_scene)
+				return
 			
 			print("Starting teleport animation...")
 			await tween.finished

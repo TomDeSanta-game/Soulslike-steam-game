@@ -101,6 +101,38 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
 - Environmental hazards
 - Secret areas
 
+### Boss System
+- Advanced boss AI behavior system using LimboAI
+- Dynamic phase transitions with visual effects
+- Customizable attack patterns and movement strategies
+
+### Frost Guardian Boss
+- Ice-themed boss with unique frost abilities
+- Dynamic shader system:
+  - Base frost shader for constant ice effects
+  - Powered-up shader during phase transition
+  - Enhanced visual effects at 50% health threshold
+- Strategic AI behavior:
+  - Intelligent target tracking
+  - Phase-based combat patterns
+  - Responsive movement system
+- Combat mechanics:
+  - Frost-based attacks with slowing effects
+  - Power-up system at 50% health
+  - Enhanced damage and speed in powered state
+
+## Technical Details
+
+### Shaders
+- Custom frost shader implementation
+- Dynamic power-up transition effects
+- Real-time shader parameter updates
+
+### AI System
+- LimboAI integration for boss behavior
+- Phase-based difficulty scaling
+- Strategic target acquisition and tracking
+
 ## Installation
 
 1. Install Godot 4.x
@@ -142,6 +174,8 @@ Built using:
 - Custom frame data system for precise combat
 - State machine for character control
 - Signal system for event handling
+- Modular boss system for easy expansion
+- Extensible shader framework
 
 ## Contributing
 

@@ -21,8 +21,6 @@ class_name BossBase
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var detection_area: Area2D = $DetectionArea
 
-var current_health: float
-var current_direction: int = 1
 var target: Node2D = null
 var can_attack: bool = true
 var attack_timer: float = 0.0
@@ -40,16 +38,11 @@ func _ready() -> void:
 	super._ready()
 	_setup_boss()
 	
-	# Initialize health
-	current_health = max_health
+	# Set initial health
+	health_manager.set_vigour(int(max_health))
 	
 	# Set team to 2 (bosses)
 	team = 2
-	
-	# Initialize health system with boss-specific settings
-	health_system = HealthSystem.new()
-	add_child(health_system)
-	health_system.set_vigour(initial_vigour)
 	
 	# Set collision layers/masks for boss
 	collision_layer = C_Layers.LAYER_BOSS
@@ -109,7 +102,7 @@ func _check_phase_transition() -> void:
 	if is_phase_transitioning:
 		return
 	
-	var health_percentage = current_health / max_health
+	var health_percentage = get_health_percentage()
 	for i in range(phase_health_thresholds.size()):
 		if health_percentage <= phase_health_thresholds[i] and current_phase == i:
 			_transition_to_next_phase()
@@ -151,8 +144,20 @@ func _execute_attack_pattern(attack_name: String) -> void:
 	pass
 
 func move(move_direction: int, move_speed: float) -> void:
+	# Apply movement
 	velocity.x = move_direction * move_speed
+	
+	# Update animations based on movement
+	if is_instance_valid(animated_sprite):
+		if abs(velocity.x) > 0:
+			animated_sprite.play("Run")
+		else:
+			animated_sprite.play("Idle")
+	
+	# Update facing direction
 	_update_facing_direction(move_direction)
+	
+	# Apply movement
 	move_and_slide()
 
 func _update_facing_direction(face_direction: int) -> void:
@@ -182,17 +187,39 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 		target = null
 
 func _on_hit_landed(target_hurtbox: Node) -> void:
+	if target_hurtbox.hurtbox_owner.has_method("take_damage"):
+		target_hurtbox.hurtbox_owner.take_damage(attack_damage)
 	if target_hurtbox.hurtbox_owner.is_in_group("Player") or target_hurtbox.is_in_group("Player_Hurtbox"):
 		SoundManager.play_sound(Sound.boss_hit, "SFX")
 
 func _on_hit_taken(attacker_hitbox: Node) -> void:
 	if attacker_hitbox.hitbox_owner and (attacker_hitbox.hitbox_owner.is_in_group("Player") or attacker_hitbox.is_in_group("Player_Hitbox")):
 		take_damage(attacker_hitbox.damage)
-		SignalBus.boss_damaged.emit(self, current_health, max_health)
+		SignalBus.boss_damaged.emit(self, get_health(), get_max_health())
 
 func take_damage(amount: float) -> void:
 	super.take_damage(amount)
-	current_health = health_system.get_health()
+	if animated_sprite and animated_sprite.has_animation("Hurt"):
+		animated_sprite.play("Hurt")
+
+func get_health() -> float:
+	return health_manager.get_health()
+
+func get_max_health() -> float:
+	return health_manager.get_max_health()
+
+func get_health_percentage() -> float:
+	return health_manager.get_health_percentage()
+
+func _on_health_changed(new_health: float, max_health: float) -> void:
+	super._on_health_changed(new_health, max_health)
+	SignalBus.boss_damaged.emit(self, new_health, max_health)
+
+func _on_character_died() -> void:
+	if animated_sprite and animated_sprite.has_animation("Death"):
+		animated_sprite.play("Death")
+		await animated_sprite.animation_finished
+	die()
 
 func die() -> void:
 	SignalBus.boss_defeated.emit(self)

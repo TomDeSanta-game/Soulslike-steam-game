@@ -38,11 +38,6 @@ func _ready() -> void:
 	# Set team to 1 (enemies)
 	team = 1
 
-	# Initialize health system
-	health_system = HealthSystem.new()
-	add_child(health_system)
-	health_system.set_vigour(initial_vigour)
-
 	# Set collision layers/masks
 	collision_layer = C_Layers.LAYER_ENEMY
 	collision_mask = C_Layers.MASK_ENEMY
@@ -188,7 +183,7 @@ func _on_animation_changed() -> void:
 
 func take_damage(amount: float) -> void:
 	super.take_damage(amount)
-	if health_system.get_health() <= 0:
+	if health_manager.get_health() <= 0:
 		SignalBus.enemy_died.emit(self)
 
 func die() -> void:

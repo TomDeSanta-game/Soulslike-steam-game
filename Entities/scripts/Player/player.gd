@@ -160,8 +160,8 @@ var is_ledge_climbing: bool = false
 @onready var ui_layer: CanvasLayer = $UILayer
 
 # UI Elements
-@onready var xp_display = preload("res://UI/Scenes/xp_display.tscn").instantiate()
-@onready var level_up_menu = preload("res://UI/Scenes/level_up_menu.tscn").instantiate()
+@onready var xp_display: Node = null
+@onready var level_up_menu: Node = null
 
 # Add near other class variables
 var gravity_enabled: bool = true
@@ -177,7 +177,7 @@ func _ready() -> void:
 	# Add only the player node to the Player group
 	add_to_group("Player")
 	
-	super._ready()  # Call parent _ready to initialize health system
+	super._ready()  # Call parent _ready to initialize health manager
 	types.player = self
 
 	place_label.add_to_group("PlaceLabel")
@@ -197,29 +197,22 @@ func _ready() -> void:
 		hitbox.hit_stun_duration = 0.2
 		hitbox.collision_layer = C_Layers.LAYER_HITBOX
 		hitbox.collision_mask = C_Layers.MASK_HITBOX
-		hitbox.add_to_group("Player_Hitbox")  # Changed from "Hitbox" to "Player_Hitbox"
+		hitbox.add_to_group("Player_Hitbox")
 		hitbox.active = true
 
 	if hurtbox:
 		hurtbox.hurtbox_owner = self
 		hurtbox.collision_layer = C_Layers.LAYER_HURTBOX
 		hurtbox.collision_mask = C_Layers.MASK_HURTBOX
-		hurtbox.add_to_group("Player_Hurtbox")  # Changed from "Hurtbox" to "Player_Hurtbox"
+		hurtbox.add_to_group("Player_Hurtbox")
 		hurtbox.active = true
 
 	set_jump_power(-410.0)
 
-	# Initialize health system first
-	health_system = HealthSystem.new()
-	add_child(health_system)
-	health_system._health_changed.connect(_on_health_changed)
-	health_system._character_died.connect(_on_character_died)
-	set_vigour(10)
-
 	# Get initial health values
-	current_health = health_system.get_health()
-	max_health = health_system.get_max_health()
-	health_percent = health_system.get_health_percentage()
+	current_health = health_manager.get_health()
+	max_health = health_manager.get_max_health()
+	health_percent = health_manager.get_health_percentage()
 
 	# Setup health bar style
 	var health_bar_style = StyleBoxFlat.new()
@@ -809,18 +802,18 @@ func _on_death_timer_timeout() -> void:
 # Magic System
 func _handle_magic(healing_amount: float) -> void:
 	if magic >= STATS.MAGIC_COST:
-		health_system.heal(healing_amount)
+		health_manager.heal(healing_amount)
 		magic = max(0, magic - STATS.MAGIC_COST)
 
 
 # Take Damage
 func take_damage(damage_amount: float) -> void:
 	if is_invincible:
-		return  # Skip damage if invincible
+		return
 
-	current_health -= damage_amount
-	current_health = clamp(current_health, 0.0, max_health)
-	health_percent = (current_health / max_health) * 100.0
+	super.take_damage(damage_amount)
+	current_health = health_manager.get_health()
+	health_percent = health_manager.get_health_percentage()
 
 	if current_health <= 0:
 		_die()
@@ -830,12 +823,12 @@ func take_damage(damage_amount: float) -> void:
 		SoundManager.play_sound(Sound.oof, "SFX")
 
 		# Enhanced screen shake with more impact
-		camera.shake(12, 0.3, 0.85)  # Increased intensity and duration for more impact
+		camera.shake(12, 0.3, 0.85)
 
 		# Damage pause effect
-		Engine.time_scale = 0.05  # Slow down time dramatically
-		await get_tree().create_timer(0.3 * Engine.time_scale).timeout  # Account for time scale in pause duration
-		Engine.time_scale = 1.0  # Return to normal time
+		Engine.time_scale = 0.05
+		await get_tree().create_timer(0.3 * Engine.time_scale).timeout
+		Engine.time_scale = 1.0
 
 		# Start invincibility
 		_start_invincibility()
@@ -846,10 +839,9 @@ func take_damage(damage_amount: float) -> void:
 
 # Health the health
 func _heal(amount: float) -> void:
-	current_health += amount
-	current_health = clamp(current_health, 0.0, max_health)
-	health_percent = (current_health / max_health) * 100.0
-
+	super.heal(amount)
+	current_health = health_manager.get_health()
+	health_percent = health_manager.get_health_percentage()
 	_update_health_bar()
 	_check_health()
 
@@ -1018,7 +1010,7 @@ func _trigger_lifesteal_effect() -> void:
 func _on_health_changed(new_health: float, new_max_health: float) -> void:
 	current_health = new_health
 	max_health = new_max_health
-	health_percent = health_system.get_health_percentage()
+	health_percent = health_manager.get_health_percentage()
 	_update_health_bar()
 
 
@@ -1191,14 +1183,10 @@ func _end_invincibility() -> void:
 
 # Silent version of heal that doesn't trigger effects
 func _heal_silent(amount: float) -> void:
-	if health_system:
-		# Directly set health in the health system
-		var new_health = min(current_health + amount, max_health)
-		health_system.set_health_silent(new_health)  # Use silent method
-	else:
-		current_health += amount
-		current_health = clamp(current_health, 0.0, max_health)
-		health_percent = (current_health / max_health) * 100.0
+	if health_manager:
+		health_manager.heal(amount)
+		current_health = health_manager.get_health()
+		health_percent = health_manager.get_health_percentage()
 		_update_health_bar()
 		_check_health()
 
@@ -1327,25 +1315,37 @@ func _start_ledge_climb() -> void:
 
 # Add this function near the end of the file
 func _setup_ui_displays() -> void:
-	# Add souls display
-	var souls_display = preload("res://UI/Scenes/souls_display.tscn").instantiate()
-	ui_layer.add_child(souls_display)
-
-	# Position souls display on the right side
-	souls_display.position = Vector2(get_viewport_rect().size.x - souls_display.size.x - 20, 20)  # 20 pixels from right edge  # 20 pixels from top
-
-	# Add XP display below souls display
-	ui_layer.add_child(xp_display)
-
-	# Position XP display below souls display with same horizontal alignment
-	xp_display.position = Vector2(
-		get_viewport_rect().size.x - xp_display.size.x - 20,  # 20 pixels from right edge
-		souls_display.position.y + souls_display.size.y + 10  # 10 pixels below souls display
-	)
-
-	# Add level up menu
-	ui_layer.add_child(level_up_menu)
-	level_up_menu.hide()  # Start hidden
+	# Load UI scenes
+	var xp_display_scene = load("res://UI/Scenes/xp_display.tscn")
+	var level_up_menu_scene = load("res://UI/Scenes/level_up_menu.tscn")
+	
+	if xp_display_scene and level_up_menu_scene:
+		# Add souls display
+		var souls_display_scene = load("res://UI/Scenes/souls_display.tscn")
+		if souls_display_scene:
+			var souls_display = souls_display_scene.instantiate()
+			ui_layer.add_child(souls_display)
+			
+			# Position souls display on the right side
+			souls_display.position = Vector2(
+				get_viewport_rect().size.x - souls_display.size.x - 20,  # 20 pixels from right edge
+				20  # 20 pixels from top
+			)
+			
+			# Add XP display
+			xp_display = xp_display_scene.instantiate()
+			ui_layer.add_child(xp_display)
+			
+			# Position XP display below souls display
+			xp_display.position = Vector2(
+				get_viewport_rect().size.x - xp_display.size.x - 20,  # 20 pixels from right edge
+				souls_display.position.y + souls_display.size.y + 10  # 10 pixels below souls display
+			)
+			
+			# Add level up menu
+			level_up_menu = level_up_menu_scene.instantiate()
+			ui_layer.add_child(level_up_menu)
+			level_up_menu.hide()  # Start hidden
 
 
 func set_gravity_enabled(enabled: bool) -> void:

@@ -1,8 +1,9 @@
-[gd_scene load_steps=61 format=3 uid="uid://jlmfejnps25"]
+[gd_scene load_steps=63 format=3 uid="uid://jlmfejnps25"]
 
 [ext_resource type="PackedScene" uid="uid://cs1w3cq7krofg" path="res://Entities/scenes/Bosses/boss_base.tscn" id="1_fuut8"]
 [ext_resource type="Script" path="res://Entities/scripts/Bosses/FrostGuardian/frost_guardian.gd" id="2_4cdir"]
 [ext_resource type="Texture2D" uid="uid://ciw0jkcp4qpeh" path="res://assets/boss/frost_guardian/frost_guardian_free_192x128_SpriteSheet.png" id="2_05lhs"]
+[ext_resource type="BehaviorTree" uid="uid://coci7s5xjvf0n" path="res://ai/trees/frost_guardian.tres" id="4_bosnv"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n2xlg"]
 atlas = ExtResource("2_05lhs")
@@ -404,6 +405,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qidf"]
+radius = 39.0
+height = 98.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yaex7"]
 radius = 25.0
@@ -412,6 +415,8 @@ height = 96.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ceryl"]
 radius = 40.0
 height = 102.0
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_niin1"]
 
 [node name="FrostGuardian" instance=ExtResource("1_fuut8")]
 script = ExtResource("2_4cdir")
@@ -423,7 +428,7 @@ sprite_frames = SubResource("SpriteFrames_ionqr")
 animation = &"Attack"
 
 [node name="CollisionShape2D" parent="." index="1"]
-visible = false
+position = Vector2(0, 4)
 shape = SubResource("CapsuleShape2D_0qidf")
 
 [node name="VisibleOnScreenEnabler2D" parent="." index="2"]
@@ -444,3 +449,7 @@ position = Vector2(0, 2.5)
 [node name="CollisionShape2D" parent="HurtBox" index="0"]
 shape = SubResource("CapsuleShape2D_ceryl")
 debug_color = Color(0.343118, 0.496231, 0, 0.419608)
+
+[node name="BTPlayer" type="BTPlayer" parent="." index="7"]
+behavior_tree = ExtResource("4_bosnv")
+blackboard_plan = SubResource("BlackboardPlan_niin1")

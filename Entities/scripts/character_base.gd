@@ -1,6 +1,8 @@
 class_name CharacterBase
 extends CharacterBody2D
 
+const CharacterHealthManager = preload("res://Globals/character_health_manager.gd")
+
 @export_group("Character Properties")
 @warning_ignore("unused_private_class_variable")
 @export var initial_health: float = 100.0
@@ -19,7 +21,7 @@ extends CharacterBody2D
 @warning_ignore("unused_private_class_variable")
 @export var hurtboxes: Array[Node] = []
 
-var health_system: HealthSystem
+var health_manager: Node
 @warning_ignore("unused_private_class_variable")
 var current_speed: float = base_run_speed
 @warning_ignore("unused_private_class_variable")
@@ -34,10 +36,11 @@ func _ready() -> void:
 
 
 func _setup_character() -> void:
-	health_system = HealthSystem.new()
-	add_child(health_system)
-	health_system._health_changed.connect(_on_health_changed)
-	health_system._character_died.connect(_on_character_died)
+	health_manager = CharacterHealthManager.new()
+	add_child(health_manager)
+	health_manager._health_changed.connect(_on_health_changed)
+	health_manager._character_died.connect(_on_character_died)
+	health_manager.set_vigour(initial_vigour)
 
 	set_physics_process(true)
 
@@ -65,7 +68,7 @@ func _setup_combat_system() -> void:
 
 
 func set_vigour(value: int) -> void:
-	health_system.set_vigour(value)
+	health_manager.set_vigour(value)
 
 
 func set_jump_power(value: float) -> void:
@@ -94,11 +97,23 @@ func take_damage(amount: float) -> void:
 	if is_invincible:
 		return
 
-	health_system.take_damage(amount)
+	health_manager.take_damage(amount)
 
 
 func heal(amount: float) -> void:
-	health_system.heal(amount)
+	health_manager.heal(amount)
+
+
+func get_health() -> float:
+	return health_manager.get_health()
+
+
+func get_max_health() -> float:
+	return health_manager.get_max_health()
+
+
+func get_health_percentage() -> float:
+	return health_manager.get_health_percentage()
 
 
 func set_hit_stun(duration: float) -> void:

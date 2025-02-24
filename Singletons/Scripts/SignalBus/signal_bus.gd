@@ -89,3 +89,13 @@ signal level_up_completed(new_level: int)
 signal stat_point_gained
 @warning_ignore("unused_signal")
 signal stat_increased(stat_name: String, new_value: int)
+
+# Boss Signals
+@warning_ignore("unused_signal")
+signal boss_damaged(boss: Node, current_health: float, max_health: float)
+@warning_ignore("unused_signal")
+signal boss_defeated(boss: Node)
+@warning_ignore("unused_signal")
+signal boss_phase_changed(boss: Node, phase: int)
+@warning_ignore("unused_signal")
+signal boss_attack_started(boss: Node, attack_name: String)
