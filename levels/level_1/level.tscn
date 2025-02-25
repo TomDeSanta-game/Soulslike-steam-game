@@ -3469,9 +3469,9 @@ energy = 3.0
 texture = SubResource("GradientTexture2D_nc1dk")
 
 [node name="SideLight" type="PointLight2D" parent="PointLights"]
-position = Vector2(520, 0)
-scale = Vector2(3.75, 1)
-energy = 2.0
+position = Vector2(456, 8.5)
+scale = Vector2(0.145, 0.735)
+energy = 3.0
 texture = SubResource("GradientTexture2D_hucv8")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]

@@ -13,9 +13,9 @@ func _ready() -> void:
 	invincibility_timer.timeout.connect(_on_invincibility_timer_timeout)
 	add_to_group("Hurtbox")
 	
-	# Set collision layer and mask
-	collision_layer = 4  # Layer 4 for hurtboxes
-	collision_mask = 2   # Layer 2 for hitboxes
+	# Set collision layer and mask using C_Layers constants
+	collision_layer = C_Layers.LAYER_HURTBOX
+	collision_mask = C_Layers.MASK_HURTBOX
 
 func take_hit(hitbox: Node) -> void:
 	if not active or invincible:

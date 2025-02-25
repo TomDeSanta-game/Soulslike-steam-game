@@ -15,10 +15,10 @@ const DEBUG_COLORS = {
 # Predefined positions for different animations and their active frames
 const ANIMATION_DATA = {
 	"Attack": {
-		"frames": [1, 2],
+		"frames": [6, 7, 8],
 		"positions": {
-			"hitbox": Vector2(0, 0),
-			"hurtbox": Vector2(0, 5)
+			"hitbox": Vector2(-50, 5),
+			"hurtbox": Vector2(0, 4)
 		}
 	},
 	"Run_Attack": {

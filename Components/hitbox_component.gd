@@ -24,9 +24,9 @@ func _ready() -> void:
 	# Get owner reference (usually the character/weapon)
 	hitbox_owner = get_parent()
 	
-	# Set collision layer and mask
-	collision_layer = 2  # Layer 2 for hitboxes
-	collision_mask = 4   # Layer 3 for hurtboxes
+	# Set collision layer and mask using C_Layers constants
+	collision_layer = C_Layers.LAYER_HITBOX
+	collision_mask = C_Layers.MASK_HITBOX
 	
 	# Ensure hitbox is active by default
 	active = true

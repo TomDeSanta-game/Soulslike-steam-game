@@ -18,6 +18,9 @@ const EXCLUDED_SCENES = [
 func _ready() -> void:
 	# Connect to SceneManager's scene_loaded signal
 	SceneManager.scene_loaded.connect(_on_scene_loaded)
+	
+	# Connect to the SignalBus souls_recovered signal
+	SignalBus.souls_recovered.connect(_on_souls_recovered)
 
 func spawn_bag(position: Vector2, items: Dictionary) -> void:
 	# Don't spawn bags in excluded scenes
@@ -30,7 +33,8 @@ func spawn_bag(position: Vector2, items: Dictionary) -> void:
 	# Store the bag data
 	active_bags[bag_id] = {
 		"position": position,
-		"items": items.duplicate(true)
+		"items": items.duplicate(true),
+		"instance_id": 0  # Will store the instance ID of the bag
 	}
 	
 	# Create and setup the bag instance
@@ -38,11 +42,28 @@ func spawn_bag(position: Vector2, items: Dictionary) -> void:
 	bag.position = position
 	bag.store_items(items)
 	
-	# Connect to the bag's items_recovered signal
-	bag.items_recovered.connect(func(): _on_bag_recovered(bag_id))
+	# Store the bag's instance ID to identify it later
+	active_bags[bag_id]["instance_id"] = bag.get_instance_id()
 	
 	# Add the bag to the current scene
 	get_tree().current_scene.add_child(bag)
+
+# Called when souls_recovered signal is emitted
+func _on_souls_recovered(_amount_recovered: int) -> void:
+	# Find which bag was recovered based on instance ID
+	var bag_id_to_remove = ""
+	
+	for bag_id in active_bags.keys():
+		var bag_instance_id = active_bags[bag_id]["instance_id"]
+		
+		# Check if this bag instance still exists in the scene
+		if not is_instance_valid(instance_from_id(bag_instance_id)):
+			bag_id_to_remove = bag_id
+			break
+	
+	# If we found a bag that was recovered
+	if bag_id_to_remove != "":
+		_on_bag_recovered(bag_id_to_remove)
 
 func _on_bag_recovered(bag_id: String) -> void:
 	# Remove the bag data from active_bags when it's recovered
@@ -61,7 +82,11 @@ func respawn_active_bags() -> void:
 		var bag = bag_scene.instantiate()
 		bag.position = bag_data["position"]
 		bag.store_items(bag_data["items"])
-		bag.items_recovered.connect(func(): _on_bag_recovered(bag_id))
+		
+		# Update the instance ID for the new bag instance
+		active_bags[bag_id]["instance_id"] = bag.get_instance_id()
+		
+		# Add the bag to the scene
 		get_tree().current_scene.add_child(bag)
 
 # Call this when a scene is loaded

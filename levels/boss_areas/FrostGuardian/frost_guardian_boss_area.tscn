@@ -1059,7 +1059,7 @@ scale = Vector2(3.3, 3)
 texture = ExtResource("8_84ibl")
 
 [node name="FrostGuardian" parent="." instance=ExtResource("9_oy0dg")]
-position = Vector2(150, -45)
+position = Vector2(301, -45)
 
 [node name="player" parent="." instance=ExtResource("10_lfi45")]
 position = Vector2(0, -20)
@@ -1076,6 +1076,7 @@ energy = 1.5
 texture = SubResource("GradientTexture2D_yctgo")
 
 [node name="DoomPit" type="Area2D" parent="."]
+visible = false
 position = Vector2(0, 150)
 script = ExtResource("12_xkr3d")
 
@@ -1083,6 +1084,7 @@ script = ExtResource("12_xkr3d")
 shape = SubResource("RectangleShape2D_doom")
 
 [node name="Label" type="Label" parent="."]
+visible = false
 offset_top = -150.0
 offset_right = 258.0
 offset_bottom = -114.0
@@ -1092,6 +1094,7 @@ There is a BUG!. Stopping the BT ( Behavior Tree )"
 label_settings = ExtResource("12_aea15")
 
 [node name="DetectionArea" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
 position = Vector2(0.5, -68)

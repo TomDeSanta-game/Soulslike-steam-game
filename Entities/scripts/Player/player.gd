@@ -172,6 +172,9 @@ var current_merchant: Node = null
 @export var merchant_menu_scene_resource: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")
 var merchant_menu: MerchantMenu = null
 
+# Add a class variable to track if death transition is in progress
+var _is_death_transition_active: bool = false
+
 
 func _ready() -> void:
 	# Add only the player node to the Player group
@@ -752,6 +755,12 @@ func _shoot() -> void:
 
 # Override parent's die function
 func _die() -> void:
+	# Prevent multiple calls to _die() from happening at once
+	if _is_death_transition_active:
+		return
+		
+	_is_death_transition_active = true
+	
 	# Disable physics processing first
 	state_machine.set_active(false)
 	set_physics_process(false)
@@ -813,31 +822,49 @@ func _die() -> void:
 	if not items.is_empty():
 		BagSpawner.spawn_bag(spawn_position, items)
 
-	# Clean up physics components
-	_cleanup_physics_components()
+	# Signal that player has died
+	SignalBus.player_died.emit()
 
-	# Create a timer for delayed scene transition
+	# Create a timer for scene transition
 	var transition_timer = Timer.new()
-	add_child(transition_timer)
+	get_tree().root.add_child(transition_timer)
 	transition_timer.wait_time = 2.0
 	transition_timer.one_shot = true
 	transition_timer.timeout.connect(
 		func():
-			if is_instance_valid(self):
-				SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
-			if is_instance_valid(transition_timer):
-				transition_timer.queue_free()
+			# Only proceed if we're not already transitioning
+			if not SceneManager.is_transitioning:
+				# Change to the game over scene
+				SceneManager.change_scene(
+					"res://UI/Scenes/game_over.tscn",
+					{
+						"skip_fade_out": true,  # We have our own fade
+						"skip_fade_in": false,  # Allow fade in of new scene
+						"wait_time": 0.1,  # Quick transition
+						"skip_scene_change": false,
+					}
+				)
+			
+			# Clean up timer
+			transition_timer.queue_free()
 	)
 	transition_timer.start()
 
-	# Start death timer
-	if death_timer and is_instance_valid(death_timer):
+	# Start death timer after the transition timer
+	if is_instance_valid(death_timer):
+		death_timer.wait_time = 2.5  # Longer than transition timer
 		death_timer.start()
 
 
 func _on_death_timer_timeout() -> void:
+	# Only clean up if we still exist
 	if is_instance_valid(self):
+		# Clean up physics before hiding/freeing
+		_cleanup_physics_components()
 		hide()
+		# Reset flag (though not really needed since we're freeing)
+		_is_death_transition_active = false
+		# Queue free after scene transition
 		queue_free()
 
 

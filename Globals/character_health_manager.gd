@@ -14,7 +14,7 @@ func take_damage(amount: float) -> void:
 	SignalBus.health_changed.emit(_health_system.get_health(), _health_system.get_max_health())
 	
 	if _health_system.current_health <= 0:
-		SignalBus.character_died.emit(null)
+		SignalBus.character_died.emit()
 
 func heal(amount: float) -> void:
 	_health_system.current_health = min(_health_system.max_health, _health_system.current_health + amount)

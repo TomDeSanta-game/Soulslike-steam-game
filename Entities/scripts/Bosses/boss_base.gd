@@ -190,7 +190,8 @@ func _on_hit_landed(_hitbox_node: Node, target_hurtbox: Node) -> void:
 	if target_hurtbox.hurtbox_owner.has_method("take_damage"):
 		target_hurtbox.hurtbox_owner.take_damage(attack_damage)
 	if target_hurtbox.hurtbox_owner.is_in_group("Player") or target_hurtbox.is_in_group("Player_Hurtbox"):
-		SoundManager.play_sound(Sound.boss_hit, "SFX")
+		#SoundManager.play_sound(Sound.boss_hit, "SFX")
+		pass
 
 func _on_hit_taken(attacker_hitbox: Node, _defender_hitbox: Node) -> void:
 	if attacker_hitbox.hitbox_owner and (attacker_hitbox.hitbox_owner.is_in_group("Player") or attacker_hitbox.is_in_group("Player_Hitbox")):
@@ -216,7 +217,7 @@ func _on_health_changed(new_health: float, _max_health: float) -> void:
 	SignalBus.boss_damaged.emit(self, new_health, _max_health)
 
 func _on_character_died() -> void:
-	if animated_sprite and animated_sprite.has_animation("Death"):
+	if animated_sprite:
 		animated_sprite.play("Death")
 		await animated_sprite.animation_finished
 	die()

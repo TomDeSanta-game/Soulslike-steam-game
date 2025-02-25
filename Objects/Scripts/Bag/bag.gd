@@ -41,22 +41,22 @@ func _ready() -> void:
 	var players = get_tree().get_nodes_in_group("Player")
 	player = players[0] if not players.is_empty() else null
 	
-	# Set collision layer and mask for interaction
-	collision_layer = C_Layers.LAYER_COLLECTIBLE
-	collision_mask = C_Layers.MASK_COLLECTIBLE | C_Layers.LAYER_WORLD
+	# Set collision layer and mask for interaction using deferred calls
+	set_deferred("collision_layer", C_Layers.LAYER_COLLECTIBLE)
+	set_deferred("collision_mask", C_Layers.MASK_COLLECTIBLE | C_Layers.LAYER_WORLD)
 
-	# Initialize raycasts
+	# Initialize raycasts with deferred calls
 	var raycasts = [raycast_far_left, raycast_mid_left, raycast_near_left, 
 					raycast_near_right, raycast_mid_right, raycast_far_right]
 	
 	# Validate that all raycasts exist
 	for raycast in raycasts:
 		if raycast != null:
-			raycast.target_position = Vector2(0, 32)  # Set downward raycast
-			raycast.collision_mask = C_Layers.LAYER_WORLD
+			raycast.set_deferred("target_position", Vector2(0, 32))
+			raycast.set_deferred("collision_mask", C_Layers.LAYER_WORLD)
 
-	# Check initial position and adjust if needed
-	call_deferred("_check_and_adjust_position")
+	# Schedule position adjustment for next physics frame
+	call_deferred("_schedule_position_adjustment")
 
 func _setup_shader() -> void:
 	shader_material = ShaderMaterial.new()
@@ -123,66 +123,94 @@ func _physics_process(delta: float) -> void:
 	if not is_grounded:
 		position += velocity * delta
 
+func _schedule_position_adjustment() -> void:
+	# Wait for next physics frame before checking position
+	await get_tree().physics_frame
+	_check_and_adjust_position()
 
 func _check_and_adjust_position() -> void:
-	var raycasts = [
-		{"node": raycast_far_left, "offset": -30},
-		{"node": raycast_mid_left, "offset": -20},
-		{"node": raycast_near_left, "offset": -10},
-		{"node": raycast_near_right, "offset": 10},
-		{"node": raycast_mid_right, "offset": 20},
-		{"node": raycast_far_right, "offset": 30}
-	]
+	# Ensure we're in a physics frame
+	if Engine.is_in_physics_frame():
+		var raycasts = [
+			{"node": raycast_far_left, "offset": -30},
+			{"node": raycast_mid_left, "offset": -20},
+			{"node": raycast_near_left, "offset": -10},
+			{"node": raycast_near_right, "offset": 10},
+			{"node": raycast_mid_right, "offset": 20},
+			{"node": raycast_far_right, "offset": 30}
+		]
 
-	# Force update all raycasts
-	for raycast_data in raycasts:
-		if raycast_data["node"] != null:
-			raycast_data["node"].force_raycast_update()
+		# Find the furthest colliding raycast from center
+		var furthest_colliding = null
+		var max_distance = 0
 
-	# Find the furthest colliding raycast from center
-	var furthest_colliding = null
-	var max_distance = 0
+		for raycast_data in raycasts:
+			if raycast_data["node"] != null:
+				raycast_data["node"].force_raycast_update()
+				if raycast_data["node"].is_colliding():
+					var distance = abs(raycast_data["offset"])
+					if distance > max_distance:
+						max_distance = distance
+						furthest_colliding = raycast_data
 
-	for raycast_data in raycasts:
-		if raycast_data["node"] != null and raycast_data["node"].is_colliding():
-			var distance = abs(raycast_data["offset"])
-			if distance > max_distance:
-				max_distance = distance
-				furthest_colliding = raycast_data
-
-	# Teleport to the furthest colliding raycast's position
-	if furthest_colliding:
-		position.x += furthest_colliding["offset"]
-
+		# Use set_deferred for position changes
+		if furthest_colliding:
+			set_deferred("position", Vector2(position.x + furthest_colliding["offset"], position.y))
+	else:
+		# If we're not in a physics frame, reschedule the check
+		call_deferred("_schedule_position_adjustment")
 
 func store_items(items: Dictionary) -> void:
 	stored_items = items.duplicate(true)
 
-
 func _cleanup_physics() -> void:
-	# Disable all raycasts
+	# First, disable monitoring and monitorable states
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	
+	# Disable all raycasts with deferred calls
 	var raycasts = [raycast_far_left, raycast_mid_left, raycast_near_left, 
 					raycast_near_right, raycast_mid_right, raycast_far_right]
 	
 	for raycast in raycasts:
 		if raycast != null:
-			raycast.enabled = false
-			raycast.collision_mask = 0
+			raycast.set_deferred("enabled", false)
+			raycast.set_deferred("collision_mask", 0)
 	
-	# Disable collision shape
+	# Clear collision masks
+	set_deferred("collision_layer", 0)
+	set_deferred("collision_mask", 0)
+	
+	# Schedule collision shape disabling for next frame
+	if collision_shape:
+		call_deferred("_disable_collision_shape")
+
+func _disable_collision_shape() -> void:
+	# Wait for physics to settle
+	await get_tree().physics_frame
 	if collision_shape:
 		collision_shape.set_deferred("disabled", true)
-		
-	# Clear collision masks
-	collision_layer = 0
-	collision_mask = 0
+	# Schedule free operation after physics state is cleaned up
+	call_deferred("_safe_free")
 
+func _safe_free() -> void:
+	# Final cleanup and queue_free
+	queue_free()
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player") and not stored_items.is_empty():
-		# Restore items to inventory
-		for item_id in stored_items.keys():
-			Inventory.add_item(item_id, stored_items[item_id])
+		# Calculate total value of recovered items
+		var total_value: int = 0
+		
+		# Restore items to inventory and sum up total value
+		for item_id in stored_items:
+			var item_count = stored_items[item_id]
+			# Ensure we're passing a dictionary with count for inventory
+			var item_data = {"count": item_count} if item_count is int else item_count
+			# Add item to inventory
+			Inventory.add_item(item_id, item_data)
+			# Add to total value
+			total_value += item_count if item_count is int else item_data.get("count", 0)
 
 		# Play recovery sound and effect
 		SoundManager.play_sound(Sound.heal, "SFX")
@@ -191,10 +219,7 @@ func _on_body_entered(body: Node2D) -> void:
 		stored_items.clear()
 
 		# Emit signal that items were recovered using SignalBus
-		SignalBus.souls_recovered.emit(0)  # Using existing signal, or add a specific one in SignalBus if needed
+		SignalBus.souls_recovered.emit(total_value)
 
-		# Clean up physics before freeing
+		# Start the cleanup process
 		_cleanup_physics()
-		
-		# Queue free after cleanup
-		queue_free()
