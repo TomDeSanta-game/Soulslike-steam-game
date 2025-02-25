@@ -1,7 +1,5 @@
 extends Node
 
-signal trade_completed(item_id: String, souls_gained: int)
-
 const UNREAD_LORE_VALUE = 10000  # Souls value for unread lore
 
 func get_item_value(item_data: Dictionary) -> int:
@@ -29,5 +27,6 @@ func sell_item(item_id: String, item_data: Dictionary) -> void:
 			var inventory = get_node("/root/Inventory")
 			inventory.remove_item(item_id)
 		
-		# Emit trade completed signal
-		trade_completed.emit(item_id, value) 
+		# Emit trade completed signal through SignalBus
+		# Create a trade_completed signal in SignalBus if it doesn't exist
+		SignalBus.trade_completed.emit(item_id, value) 

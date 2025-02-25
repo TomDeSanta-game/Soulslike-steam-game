@@ -7,15 +7,13 @@ const OBJECT_SCENES: Dictionary = {
 	preload("res://Objects/Scenes/Traps/Shuriken_Trap/shuriken_trap.tscn")
 }
 
-var types: Types = Types.new()
-
 
 func _ready() -> void:
-	pass
+	SignalBus.on_create_projectile.connect(_on_create_projectile)
 
 
 func _process(_delta: float) -> void:
-	types.on_create_projectile.connect(_on_create_projectile)
+	pass
 
 
 func _on_create_projectile(

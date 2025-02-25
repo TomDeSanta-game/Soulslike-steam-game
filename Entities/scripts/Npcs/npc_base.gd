@@ -1,10 +1,5 @@
 class_name NpcBase extends CharacterBase
 
-@warning_ignore("unused_signal")
-signal chat_started(player: CharacterBody2D)
-@warning_ignore("unused_signal")
-signal chat_ended(player: CharacterBody2D)
-
 @export_group("NPC Behavior")
 @export var is_roaming: bool = true
 @export var chat_enabled: bool = true

@@ -124,7 +124,7 @@ func _on_phase_transition() -> void:
 	# Override in child class to implement specific phase transition behavior
 	pass
 
-func _update_boss_behavior(delta: float) -> void:
+func _update_boss_behavior(_delta: float) -> void:
 	# Override in child class to implement specific boss behavior
 	pass
 
@@ -139,7 +139,7 @@ func perform_attack(attack_name: String) -> void:
 	_execute_attack_pattern(attack_name)
 	SignalBus.boss_attack_started.emit(self, attack_name)
 
-func _execute_attack_pattern(attack_name: String) -> void:
+func _execute_attack_pattern(_attack_name: String) -> void:
 	# Override in child class to implement specific attack patterns
 	pass
 
@@ -186,13 +186,13 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 		SignalBus.player_lost.emit(self, body)
 		target = null
 
-func _on_hit_landed(target_hurtbox: Node) -> void:
+func _on_hit_landed(_hitbox_node: Node, target_hurtbox: Node) -> void:
 	if target_hurtbox.hurtbox_owner.has_method("take_damage"):
 		target_hurtbox.hurtbox_owner.take_damage(attack_damage)
 	if target_hurtbox.hurtbox_owner.is_in_group("Player") or target_hurtbox.is_in_group("Player_Hurtbox"):
 		SoundManager.play_sound(Sound.boss_hit, "SFX")
 
-func _on_hit_taken(attacker_hitbox: Node) -> void:
+func _on_hit_taken(attacker_hitbox: Node, _defender_hitbox: Node) -> void:
 	if attacker_hitbox.hitbox_owner and (attacker_hitbox.hitbox_owner.is_in_group("Player") or attacker_hitbox.is_in_group("Player_Hitbox")):
 		take_damage(attacker_hitbox.damage)
 		SignalBus.boss_damaged.emit(self, get_health(), get_max_health())
@@ -211,9 +211,9 @@ func get_max_health() -> float:
 func get_health_percentage() -> float:
 	return health_manager.get_health_percentage()
 
-func _on_health_changed(new_health: float, max_health: float) -> void:
-	super._on_health_changed(new_health, max_health)
-	SignalBus.boss_damaged.emit(self, new_health, max_health)
+func _on_health_changed(new_health: float, _max_health: float) -> void:
+	super._on_health_changed(new_health, _max_health)
+	SignalBus.boss_damaged.emit(self, new_health, _max_health)
 
 func _on_character_died() -> void:
 	if animated_sprite and animated_sprite.has_animation("Death"):
@@ -226,8 +226,8 @@ func die() -> void:
 	queue_free()
 
 func _setup_frame_data() -> void:
-	var frame_data_component = get_node_or_null("FrameDataComponent")
-	if not frame_data_component:
+	var _frame_data_component = get_node_or_null("FrameDataComponent")
+	if not _frame_data_component:
 		return
 	
 	if not animated_sprite:
@@ -247,11 +247,11 @@ func _setup_frame_data() -> void:
 		animated_sprite.animation_changed.connect(_on_animation_changed)
 
 func _on_frame_changed() -> void:
-	var frame_data_component = get_node_or_null("FrameDataComponent")
-	if frame_data_component:
-		frame_data_component.update_frame_data()
+	var _frame_data_component = get_node_or_null("FrameDataComponent")
+	if _frame_data_component:
+		_frame_data_component.update_frame_data()
 
 func _on_animation_changed() -> void:
-	var frame_data_component = get_node_or_null("FrameDataComponent")
-	if frame_data_component:
-		frame_data_component.update_frame_data()
+	var _frame_data_component = get_node_or_null("FrameDataComponent")
+	if _frame_data_component:
+		_frame_data_component.update_frame_data()

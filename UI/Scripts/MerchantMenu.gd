@@ -116,6 +116,8 @@ func _ready() -> void:
 	# Connect button signals
 	if !buy_button.gui_input.is_connected(_on_buy_button_gui_input):
 		buy_button.gui_input.connect(_on_buy_button_gui_input)
+	if !buy_button.button_down.is_connected(_on_buy_button_click):
+		buy_button.button_down.connect(_on_buy_button_click)
 
 	# Set up sell button similarly
 	sell_button.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -133,8 +135,8 @@ func _ready() -> void:
 		sell_button.pressed.connect(_on_sell_pressed)
 	if !Inventory.inventory_updated.is_connected(_on_inventory_updated):
 		Inventory.inventory_updated.connect(_on_inventory_updated)
-	if !Sales.trade_completed.is_connected(_on_trade_completed):
-		Sales.trade_completed.connect(_on_trade_completed)
+	if !SignalBus.trade_completed.is_connected(_on_trade_completed):
+		SignalBus.trade_completed.connect(_on_trade_completed)
 
 	# Setup button styles
 	_setup_button_styles()
@@ -153,8 +155,8 @@ func _cleanup_signals() -> void:
 		close_button.pressed.disconnect(_on_close_pressed)
 	if Inventory.inventory_updated.is_connected(_on_inventory_updated):
 		Inventory.inventory_updated.disconnect(_on_inventory_updated)
-	if Sales.trade_completed.is_connected(_on_trade_completed):
-		Sales.trade_completed.disconnect(_on_trade_completed)
+	if SignalBus.trade_completed.is_connected(_on_trade_completed):
+		SignalBus.trade_completed.disconnect(_on_trade_completed)
 
 
 func _setup_button_styles() -> void:
@@ -348,11 +350,11 @@ func _setup_item_sprite(item_data: Dictionary) -> void:
 			timer.start()
 
 
-func _update_button_state(button: Button, visible: bool, disabled: bool, text: String = "") -> void:
+func _update_button_state(button: Button, _visible: bool, disabled: bool, text: String = "") -> void:
 	if !is_instance_valid(button):
 		return
 
-	button.visible = visible
+	button.visible = _visible
 	button.disabled = disabled
 	if text:
 		button.text = text
@@ -752,7 +754,10 @@ func _on_sell_pressed() -> void:
 		# Add souls
 		SoulsSystem.add_souls(sell_value)
 		# Remove item from inventory
-		Inventory.remove_item(selected_item.get("id", ""))
+		var item_id = selected_item.get("id", "")
+		Inventory.remove_item(item_id)
+		# Emit trade completed signal
+		SignalBus.trade_completed.emit(item_id, sell_value)
 		# Update display
 		_update_display()
 		# Play sell sound
@@ -779,6 +784,6 @@ func _on_inventory_updated() -> void:
 		_update_display()
 
 
-func _on_trade_completed() -> void:
+func _on_trade_completed(_item_id: String, _souls_gained: int) -> void:
 	if visible:
 		_update_display()

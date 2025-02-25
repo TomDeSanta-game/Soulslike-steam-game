@@ -1,10 +1,5 @@
 class_name Types extends Node
 
-@warning_ignore("unused_signal")
-signal on_create_projectile(
-	pos: Vector2, dir: Vector2, life_span: float, speed: float, ob_type: ObjectType
-)
-
 # ObjectType
 enum ObjectType { EXPLOSION, SHURIKEN }
 

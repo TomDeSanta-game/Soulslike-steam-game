@@ -15,16 +15,29 @@ func _ready() -> void:
 	
 	# Set collision layers/masks
 	collision_layer = C_Layers.LAYER_COLLECTIBLE
-	collision_mask = C_Layers.MASK_COLLECTIBLE
+	collision_mask = C_Layers.MASK_COLLECTIBLE | C_Layers.LAYER_PLAYER  # Add LAYER_PLAYER to mask
 	
 	# Connect the area entered signal to handle collection
 	area_entered.connect(_on_area_entered)
+	
+	# Also connect to body_entered for direct player collision
+	body_entered.connect(_on_body_entered)
 
 func _on_area_entered(area: Area2D) -> void:
 	if _is_collected:
 		return
 
-	if area.get_parent() == player:
+	# Check if this is the player's area or a child of the player
+	var area_parent = area.get_parent()
+	if area_parent == player or area_parent.is_in_group("Player"):
+		collect()
+
+func _on_body_entered(body: Node2D) -> void:
+	if _is_collected:
+		return
+		
+	# Check if this is the player directly
+	if body == player or body.is_in_group("Player"):
 		collect()
 
 func collect() -> void:

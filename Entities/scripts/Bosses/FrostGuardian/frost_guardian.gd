@@ -88,11 +88,11 @@ func _setup_detection_area() -> void:
 	add_child(detection_area)
 	
 	# Create collision shape for detection area
-	var collision_shape = CollisionShape2D.new()
-	var circle_shape = CircleShape2D.new()
-	circle_shape.radius = detection_range  # Using detection_range from parent
-	collision_shape.shape = circle_shape
-	detection_area.add_child(collision_shape)
+	var detection_collision_shape = CollisionShape2D.new()
+	var detection_circle_shape = CircleShape2D.new()
+	detection_circle_shape.radius = detection_range  # Using detection_range from parent
+	detection_collision_shape.shape = detection_circle_shape
+	detection_area.add_child(detection_collision_shape)
 	
 	print("FrostGuardian: Configuring detection area")
 	detection_area.collision_layer = 0  # Detection area doesn't need a layer
@@ -144,23 +144,23 @@ func _print_debug_info() -> void:
 	if detection_area:
 		print("- Overlapping Bodies: ", detection_area.get_overlapping_bodies())
 
-func _handle_movement(delta: float) -> void:
+func _handle_movement(_delta: float) -> void:
 	if not target or not is_instance_valid(target):
 		if animated_sprite:
 			animated_sprite.play("Idle")
 		return
 	
 	# Calculate direction to target
-	var direction = (target.global_position - global_position).normalized()
-	var distance = global_position.distance_to(target.global_position)
+	var target_direction = (target.global_position - global_position).normalized()
+	var target_distance = global_position.distance_to(target.global_position)
 	
 	# Move towards target if outside attack range
-	if distance > attack_range and not is_attacking:
-		velocity.x = direction.x * MOVEMENT_SPEEDS.RUN
+	if target_distance > attack_range and not is_attacking:
+		velocity.x = target_direction.x * MOVEMENT_SPEEDS.RUN
 		
 		if animated_sprite:
 			animated_sprite.play("Run")
-			animated_sprite.flip_h = direction.x < 0
+			animated_sprite.flip_h = target_direction.x < 0
 	else:
 		velocity.x = 0
 		if can_attack:  # Using can_attack from parent
@@ -229,8 +229,8 @@ func _perform_frozen_ground() -> void:
 	# Implement frozen ground attack pattern
 	pass
 
-func _on_hit_landed(target_hurtbox: Node) -> void:
-	super._on_hit_landed(target_hurtbox)
+func _on_hit_landed(_hitbox_node: Node, target_hurtbox: Node) -> void:
+	super._on_hit_landed(_hitbox_node, target_hurtbox)
 	
 	# Apply frost effect to the target
 	if target_hurtbox.hurtbox_owner.has_method("apply_frost_effect"):

@@ -6,6 +6,7 @@ var active_bags: Dictionary = {}
 var bag_scene: PackedScene = preload("res://Objects/Scenes/Bag/bag.tscn")
 
 # Signal for when a bag is recovered
+@warning_ignore("unused_signal")
 signal bag_recovered(bag_id: String)
 
 # List of scene paths where bags should not be spawned

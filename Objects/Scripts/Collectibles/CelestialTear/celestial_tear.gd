@@ -24,35 +24,35 @@ func _ready() -> void:
 	# Make sure the sprite has the shader material assigned
 	if sprite:
 		@warning_ignore("shadowed_variable_base_class")
-		var material = ShaderMaterial.new()
-		material.shader = preload("res://Shaders/Collectibles/glow_effect.gdshader")
+		var shader_material = ShaderMaterial.new()
+		shader_material.shader = preload("res://Shaders/Collectibles/glow_effect.gdshader")
 		
 		# Core colors
-		material.set_shader_parameter("inner_light", Color(1.0, 0.95, 0.7, 1.0))  # Warm divine core
-		material.set_shader_parameter("outer_light", Color(0.4, 0.6, 1.0, 1.0))   # Celestial aura
-		material.set_shader_parameter("void_color", Color(0.0, 0.0, 0.0, 1.0))    # Pure black
-		material.set_shader_parameter("void_accent", Color(0.2, 0.2, 0.2, 1.0))   # Dark gray
+		shader_material.set_shader_parameter("inner_light", Color(1.0, 0.95, 0.7, 1.0))  # Warm divine core
+		shader_material.set_shader_parameter("outer_light", Color(0.4, 0.6, 1.0, 1.0))   # Celestial aura
+		shader_material.set_shader_parameter("void_color", Color(0.0, 0.0, 0.0, 1.0))    # Pure black
+		shader_material.set_shader_parameter("void_accent", Color(0.2, 0.2, 0.2, 1.0))   # Dark gray
 		
 		# Animation timing
-		material.set_shader_parameter("cycle_speed", 0.7)        # Overall effect speed
-		material.set_shader_parameter("void_duration", 1.0)      # Dark phase duration
-		material.set_shader_parameter("transition_speed", 1.5)   # Phase transition speed
+		shader_material.set_shader_parameter("cycle_speed", 0.7)        # Overall effect speed
+		shader_material.set_shader_parameter("void_duration", 1.0)      # Dark phase duration
+		shader_material.set_shader_parameter("transition_speed", 1.5)   # Phase transition speed
 		
 		# Effect parameters
-		material.set_shader_parameter("energy_rings", 4.0)       # Number of energy rings
-		material.set_shader_parameter("vortex_strength", 1.0)    # Rotation intensity
-		material.set_shader_parameter("light_intensity", 1.5)    # Brightness of light phase
+		shader_material.set_shader_parameter("energy_rings", 4.0)       # Number of energy rings
+		shader_material.set_shader_parameter("vortex_strength", 1.0)    # Rotation intensity
+		shader_material.set_shader_parameter("light_intensity", 1.5)    # Brightness of light phase
 		
 		# Pattern controls
-		material.set_shader_parameter("spiral_count", 6.0)       # Number of spiral arms
-		material.set_shader_parameter("spiral_tightness", 5.0)   # Spiral density
-		material.set_shader_parameter("distortion_strength", 0.3) # Pattern distortion
+		shader_material.set_shader_parameter("spiral_count", 6.0)       # Number of spiral arms
+		shader_material.set_shader_parameter("spiral_tightness", 5.0)   # Spiral density
+		shader_material.set_shader_parameter("distortion_strength", 0.3) # Pattern distortion
 		
 		# Void phase parameters
-		material.set_shader_parameter("void_ring_count", 3.0)    # Number of void rings
-		material.set_shader_parameter("void_ring_speed", 0.5)    # Ring expansion speed
+		shader_material.set_shader_parameter("void_ring_count", 3.0)    # Number of void rings
+		shader_material.set_shader_parameter("void_ring_speed", 0.5)    # Ring expansion speed
 		
-		sprite.material = material
+		sprite.material = shader_material
 
 func _process(_delta: float) -> void:
 	if animation_player and !_is_collected:
@@ -95,15 +95,15 @@ func use_celestial_tear() -> void:
 	# Get player reference
 	var players = get_tree().get_nodes_in_group("Player")
 	if players.size() > 0:
-		var player = players[0]
+		var P = players[0]
 		
 		# Heal to full health silently by directly updating health system
-		if player.has_method("get_max_health"):
-			var max_health = player.get_max_health()
-			if player.health_system:
-				player.health_system.set_health_silent(max_health)
+		if P.has_method("get_max_health"):
+			var max_health = P.get_max_health()
+			if P.health_system:
+				P.health_system.set_health_silent(max_health)
 
 		# Restore stamina to full
-		if player.has_method("get_max_stamina") and player.has_method("restore_stamina"):
-			var max_stamina = player.get_max_stamina()
-			player.restore_stamina(max_stamina)
+		if P.has_method("get_max_stamina") and P.has_method("restore_stamina"):
+			var max_stamina = P.get_max_stamina()
+			P.restore_stamina(max_stamina)

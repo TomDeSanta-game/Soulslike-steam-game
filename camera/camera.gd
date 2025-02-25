@@ -23,7 +23,7 @@ func _process(delta: float) -> void:
 
 
 # Call this function to start the screenshake
-func shake(intensity: float, duration: float, decay: float = 0.9) -> void:
-	shake_intensity = intensity
-	shake_duration = duration
-	shake_decay = decay
+func shake(new_intensity: float, new_duration: float, new_decay: float = 0.9) -> void:
+	shake_intensity = new_intensity
+	shake_duration = new_duration
+	shake_decay = new_decay

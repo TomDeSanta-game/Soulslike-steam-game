@@ -1,8 +1,6 @@
 extends Area2D
 class_name HitboxComponent
 
-signal hit_landed(hurtbox: Node)
-
 # Hitbox properties
 @export var damage: float = 10.0
 @export var knockback_force: float = 200.0
@@ -53,14 +51,10 @@ func _on_area_entered(area: Area2D) -> void:
 	if one_shot and _hit_targets.has(hurtbox.get_path()):
 		return
 	
-	# Calculate knockback direction
-	var knockback_dir = (hurtbox.global_position - global_position).normalized()
-	
 	# Apply damage and effects
 	if hurtbox.active:
 		_hit_targets.append(hurtbox.get_path())
-		hit_landed.emit(hurtbox)  # Emit local signal
-		SignalBus.hit_landed.emit(self, hurtbox)  # Emit global signal
+		SignalBus.hit_landed.emit(self, hurtbox)  # Use global signal only
 		hurtbox.take_hit(self)
 		
 		# Handle one-shot behavior

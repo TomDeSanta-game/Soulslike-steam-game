@@ -115,11 +115,11 @@ func _setup_frame_data() -> void:
 	if not animated_sprite.animation_changed.is_connected(_on_animation_changed):
 		animated_sprite.animation_changed.connect(_on_animation_changed)
 
-func _on_hit_landed(target_hurtbox: Node) -> void:
+func _on_hit_landed(_hitbox_node: Node, target_hurtbox: Node) -> void:
 	if target_hurtbox.hurtbox_owner.is_in_group("Player") or target_hurtbox.is_in_group("Player_Hurtbox"):
 		SoundManager.play_sound(Sound.hit, "SFX")
 
-func _on_hit_taken(attacker_hitbox: Node) -> void:
+func _on_hit_taken(attacker_hitbox: Node, _defender_hurtbox: Node) -> void:
 	if attacker_hitbox.hitbox_owner and (attacker_hitbox.hitbox_owner.is_in_group("Player") or attacker_hitbox.is_in_group("Player_Hitbox")) and attacker_hitbox.has_method("get_damage"):
 		take_damage(attacker_hitbox.get_damage())
 		SoundManager.play_sound(Sound.hit, "SFX")

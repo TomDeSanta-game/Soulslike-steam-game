@@ -7,9 +7,6 @@ var player: CharacterBody2D
 # State configurations
 var states: Dictionary = {}
 
-signal attack_started
-signal attack_ended
-
 # Constants for state names
 const STATE_IDLE: String = "idle"
 const STATE_RUN: String = "run"
@@ -168,12 +165,12 @@ func attack_start() -> void:
 	player.animated_sprite.play(player.ANIMATIONS.ATTACK)
 	SoundManager.play_sound(Sound._attack, "SFX")
 	player.attack_timer.start()
-	attack_started.emit()
+	SignalBus.attack_started.emit(player)
 
 
 func attack_update(_delta: float) -> void:
 	if player.attack_timer.is_stopped():
-		attack_ended.emit()
+		SignalBus.attack_ended.emit(player)
 		# If we were crouching before the attack, return to crouch
 		if Input.is_action_pressed("CROUCH"):
 			dispatch(&"crouch")

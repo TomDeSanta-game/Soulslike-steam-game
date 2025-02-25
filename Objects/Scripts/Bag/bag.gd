@@ -1,7 +1,5 @@
 extends Area2D
 
-signal items_recovered
-
 var stored_items: Dictionary = {}
 var player = null
 @onready var raycast_far_left: RayCast2D = $RayCastFarLeft
@@ -192,8 +190,8 @@ func _on_body_entered(body: Node2D) -> void:
 		# Clear stored items
 		stored_items.clear()
 
-		# Emit signal that items were recovered
-		items_recovered.emit()
+		# Emit signal that items were recovered using SignalBus
+		SignalBus.souls_recovered.emit(0)  # Using existing signal, or add a specific one in SignalBus if needed
 
 		# Clean up physics before freeing
 		_cleanup_physics()

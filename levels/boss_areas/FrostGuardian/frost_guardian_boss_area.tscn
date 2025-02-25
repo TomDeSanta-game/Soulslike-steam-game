@@ -1045,6 +1045,7 @@ texture = ExtResource("7_qmsdv")
 [node name="ParallaxBackground2" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground2"]
+position = Vector2(1, 0)
 motion_scale = Vector2(1.1, 1.1)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground2/ParallaxLayer"]

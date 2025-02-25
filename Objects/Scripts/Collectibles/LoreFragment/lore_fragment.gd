@@ -1,7 +1,5 @@
 extends Area2D
 
-signal lore_collected(lore_id: String)
-
 @export_group("Lore Fragment Properties")
 @export var lore_id: String = "LORE_001"
 @export var lore_title: String = "Ancient Fragment"
@@ -30,18 +28,18 @@ func _ready() -> void:
 	
 	# Set up shader material
 	if sprite:
-		var material = ShaderMaterial.new()
-		material.shader = preload("res://Shaders/Collectibles/lore_fragment.gdshader")
+		var fragment_shader_material = ShaderMaterial.new()
+		fragment_shader_material.shader = preload("res://Shaders/Collectibles/lore_fragment.gdshader")
 		
 		# Set shader parameters
-		material.set_shader_parameter("glow_color", Color(1.0, 0.8, 0.4, 1.0))
-		material.set_shader_parameter("glow_intensity", 2.0)
-		material.set_shader_parameter("pulse_speed", 3.0)
-		material.set_shader_parameter("ray_speed", 2.0)
-		material.set_shader_parameter("ray_intensity", 1.0)
-		material.set_shader_parameter("distortion_strength", 0.02)
+		fragment_shader_material.set_shader_parameter("glow_color", Color(1.0, 0.8, 0.4, 1.0))
+		fragment_shader_material.set_shader_parameter("glow_intensity", 2.0)
+		fragment_shader_material.set_shader_parameter("pulse_speed", 3.0)
+		fragment_shader_material.set_shader_parameter("ray_speed", 2.0)
+		fragment_shader_material.set_shader_parameter("ray_intensity", 1.0)
+		fragment_shader_material.set_shader_parameter("distortion_strength", 0.02)
 		
-		sprite.material = material
+		sprite.material = fragment_shader_material
 	
 	# Connect mouse signals
 	mouse_entered.connect(_on_mouse_entered)
@@ -78,18 +76,18 @@ func _on_body_entered(body: Node2D) -> void:
 			has_focused = true
 			_focus_camera(body)
 
-func _focus_camera(player: Node2D) -> void:
-	if player and player.camera:
-		var original_zoom = player.camera.zoom
-		var original_position = player.camera.position
+func _focus_camera(player_node: Node2D) -> void:
+	if player_node and player_node.camera:
+		var original_zoom = player_node.camera.zoom
+		var original_position = player_node.camera.position
 		
 		# Create tween for smooth camera movement
 		var tween = create_tween()
 		tween.set_parallel(true)
 		
 		# Zoom in on the lore fragment
-		tween.tween_property(player.camera, "zoom", Vector2(1.5, 1.5), 0.5)
-		tween.tween_property(player.camera, "position", global_position - player.global_position, 0.5)
+		tween.tween_property(player_node.camera, "zoom", Vector2(1.5, 1.5), 0.5)
+		tween.tween_property(player_node.camera, "position", global_position - player_node.global_position, 0.5)
 		
 		# Wait for focus duration then reset
 		await get_tree().create_timer(camera_focus_duration).timeout
@@ -97,11 +95,11 @@ func _focus_camera(player: Node2D) -> void:
 		# Reset camera
 		tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(player.camera, "zoom", original_zoom, 0.5)
-		tween.tween_property(player.camera, "position", original_position, 0.5)
+		tween.tween_property(player_node.camera, "zoom", original_zoom, 0.5)
+		tween.tween_property(player_node.camera, "position", original_position, 0.5)
 
 func _on_body_exited(body: Node2D) -> void:
-	if body.is_in_group("player"):
+	if body.is_in_group("Player"):
 		player_in_range = false
 		hide_interaction_prompt()
 
@@ -144,8 +142,9 @@ func collect_lore() -> void:
 		animation_player.play("collect")
 		await animation_player.animation_finished
 	
-	# Emit signal with lore data
-	lore_collected.emit(lore_id)
+	# Emit signal with lore data using SignalBus
+	# Add a lore_collected signal to SignalBus if needed
+	SignalBus.collectible_collected.emit(self)
 	
 	# Add to player's collected lore (assuming we have a global lore manager)
 	if has_node("/root/LoreManager"):
@@ -164,8 +163,8 @@ func collect_lore() -> void:
 
 func _handle_teleport() -> void:
 	# Find the player
-	var player = get_tree().get_first_node_in_group("Player")
-	if not player:
+	var player_node = get_tree().get_first_node_in_group("Player")
+	if not player_node:
 		print("Player not found!")
 		return
 		
@@ -173,23 +172,23 @@ func _handle_teleport() -> void:
 	is_teleporting = true
 	
 	# Apply teleport shader to player
-	if player.animated_sprite:
-		var material = ShaderMaterial.new()
+	if player_node.animated_sprite:
+		var teleport_shader_material = ShaderMaterial.new()
 		var shader = load("res://Shaders/Collectibles/teleport.gdshader")
 		if shader:
 			print("Shader loaded successfully")
-			material.shader = shader
+			teleport_shader_material.shader = shader
 			
 			# Store the original material to restore later
-			var original_material = player.animated_sprite.material
-			player.animated_sprite.material = material
+			var original_material = player_node.animated_sprite.material
+			player_node.animated_sprite.material = teleport_shader_material
 			
 			# Set default shader parameters
-			material.set_shader_parameter("flash_color", Color(0.0, 0.8, 1.0, 1.0))  # Bright cyan
-			material.set_shader_parameter("noise_scale", 40.0)  # Increased noise detail
-			material.set_shader_parameter("alpha_threshold", 0.4)
-			material.set_shader_parameter("progress", 0.0)
-			material.set_shader_parameter("time", 0.0)
+			teleport_shader_material.set_shader_parameter("flash_color", Color(0.0, 0.8, 1.0, 1.0))  # Bright cyan
+			teleport_shader_material.set_shader_parameter("noise_scale", 40.0)  # Increased noise detail
+			teleport_shader_material.set_shader_parameter("alpha_threshold", 0.4)
+			teleport_shader_material.set_shader_parameter("progress", 0.0)
+			teleport_shader_material.set_shader_parameter("time", 0.0)
 			
 			# Create time update timer
 			var time_timer = Timer.new()
@@ -197,24 +196,24 @@ func _handle_teleport() -> void:
 			time_timer.wait_time = 1.0/60.0  # 60 FPS update
 			time_timer.timeout.connect(
 				func():
-					if is_instance_valid(material):
-						var current_time = material.get_shader_parameter("time")
-						material.set_shader_parameter("time", fmod(current_time + 0.05, 3.14159))
+					if is_instance_valid(teleport_shader_material):
+						var current_time = teleport_shader_material.get_shader_parameter("time")
+						teleport_shader_material.set_shader_parameter("time", fmod(current_time + 0.05, 3.14159))
 			)
 			time_timer.start()
 			
 			# Create dramatic camera effects
-			if player.camera:
+			if player_node.camera:
 				var zoom_tween = create_tween()
-				zoom_tween.tween_property(player.camera, "zoom", Vector2(1.2, 1.2), 0.3)
+				zoom_tween.tween_property(player_node.camera, "zoom", Vector2(1.2, 1.2), 0.3)
 				
 				var shake_amount = 0.5
 				var shake_duration = 0.3
-				player.camera.shake(5, shake_duration, shake_amount)
+				player_node.camera.shake(5, shake_duration, shake_amount)
 			
 			# Create teleport effect tween with shorter duration
 			var tween = create_tween()
-			tween.tween_property(material, "shader_parameter/progress", 1.0, 0.3)
+			tween.tween_property(teleport_shader_material, "shader_parameter/progress", 1.0, 0.3)
 			
 			# Wait briefly then transition
 			await get_tree().create_timer(0.25).timeout
@@ -236,8 +235,8 @@ func _handle_teleport() -> void:
 			time_timer.queue_free()
 			
 			# Restore original material
-			if is_instance_valid(player) and is_instance_valid(player.animated_sprite):
-				player.animated_sprite.material = original_material
+			if is_instance_valid(player_node) and is_instance_valid(player_node.animated_sprite):
+				player_node.animated_sprite.material = original_material
 		else:
 			print("Failed to load teleport shader!")
 	else:

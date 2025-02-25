@@ -1,10 +1,6 @@
 extends Area2D
 class_name HurtboxComponent
 
-signal hit_taken(hitbox: Node)
-signal invincibility_started
-signal invincibility_ended
-
 var hurtbox_owner: Node2D
 var active: bool = true
 var invincible: bool = false
@@ -25,8 +21,7 @@ func take_hit(hitbox: Node) -> void:
 	if not active or invincible:
 		return
 
-	hit_taken.emit(hitbox)  # Emit local signal
-	SignalBus.hit_taken.emit(hitbox, self)  # Emit global signal
+	SignalBus.hit_taken.emit(hitbox, self)  # Use global signal only
 	
 	if hurtbox_owner and hurtbox_owner.has_method("take_damage"):
 		if hitbox.has_method("get_damage"):
@@ -36,17 +31,14 @@ func take_hit(hitbox: Node) -> void:
 
 func start_invincibility(duration: float = 0.5) -> void:
 	invincible = true
-	invincibility_started.emit()  # Emit local signal
-	SignalBus.invincibility_started.emit(hurtbox_owner)  # Emit global signal
+	SignalBus.invincibility_started.emit(hurtbox_owner)  # Use global signal only
 	invincibility_timer.start(duration)
 
 func end_invincibility() -> void:
 	invincible = false
 	invincibility_timer.stop()
-	invincibility_ended.emit()  # Emit local signal
-	SignalBus.invincibility_ended.emit(hurtbox_owner)  # Emit global signal
+	SignalBus.invincibility_ended.emit(hurtbox_owner)  # Use global signal only
 
 func _on_invincibility_timer_timeout() -> void:
 	invincible = false
-	invincibility_ended.emit()  # Emit local signal
-	SignalBus.invincibility_ended.emit(hurtbox_owner)  # Emit global signal 
+	SignalBus.invincibility_ended.emit(hurtbox_owner)  # Use global signal only 

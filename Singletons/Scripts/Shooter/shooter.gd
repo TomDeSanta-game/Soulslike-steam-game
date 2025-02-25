@@ -9,8 +9,6 @@ class_name Shooter extends Node2D
 
 var can_shoot: bool = true
 
-@onready var types: Types = Types.new()
-
 
 func _ready() -> void:
 	add_child(shoot_timer)
@@ -28,7 +26,7 @@ func shoot(dir: Vector2) -> void:
 
 	can_shoot = false
 
-	types.on_create_projectile.emit(global_position, dir, life_span, speed, bullet_key)
+	SignalBus.on_create_projectile.emit(global_position, dir, life_span, speed, bullet_key)
 
 	shoot_timer.start()
 

@@ -1,7 +1,7 @@
 extends NpcBase
 
 @onready var interact_button: Button = $InteractButton
-@onready var merchant_menu_scene: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")
+@onready var merchant_menu_scene_resource: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")
 var merchant_menu: MerchantMenu = null
 
 var merchant_name: String = "Merchant#1"
@@ -71,7 +71,7 @@ func _setup_merchant_menu() -> void:
 	add_child(canvas_layer)
 	
 	# Initialize merchant menu
-	merchant_menu = merchant_menu_scene.instantiate()
+	merchant_menu = merchant_menu_scene_resource.instantiate()
 	canvas_layer.add_child(merchant_menu)
 	merchant_menu.visible = false
 	merchant_menu.set_merchant_name(merchant_name)

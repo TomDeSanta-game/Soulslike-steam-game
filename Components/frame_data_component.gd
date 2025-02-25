@@ -52,20 +52,20 @@ func _draw() -> void:
 			_draw_collision_shape(hurtbox_shape, DEBUG_COLORS.HURTBOX)
 
 func _draw_collision_shape(shape_node: CollisionShape2D, color: Color) -> void:
-	var shape = shape_node.shape
+	var collision_shape = shape_node.shape
 	
-	if shape is RectangleShape2D:
-		var rect = Rect2(-shape.extents, shape.extents * 2)
+	if collision_shape is RectangleShape2D:
+		var rect = Rect2(-collision_shape.extents, collision_shape.extents * 2)
 		draw_rect(rect, color)
-	elif shape is CircleShape2D:
-		draw_circle(Vector2.ZERO, shape.radius, color)
-	elif shape is CapsuleShape2D:
-		var height = shape.height
-		var radius = shape.radius
-		var rect = Rect2(Vector2(-radius, -height/2), Vector2(radius * 2, height))
+	elif collision_shape is CircleShape2D:
+		draw_circle(Vector2.ZERO, collision_shape.radius, color)
+	elif collision_shape is CapsuleShape2D:
+		var capsule_height = collision_shape.height
+		var capsule_radius = collision_shape.radius
+		var rect = Rect2(Vector2(-capsule_radius, -capsule_height/2), Vector2(capsule_radius * 2, capsule_height))
 		draw_rect(rect, color)
-		draw_circle(Vector2(0, -height/2), radius, color)
-		draw_circle(Vector2(0, height/2), radius, color)
+		draw_circle(Vector2(0, -capsule_height/2), capsule_radius, color)
+		draw_circle(Vector2(0, capsule_height/2), capsule_radius, color)
 
 func update_frame_data() -> void:
 	if not sprite:

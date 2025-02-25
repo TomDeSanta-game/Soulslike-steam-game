@@ -38,8 +38,8 @@ func _ready() -> void:
 func _setup_character() -> void:
 	health_manager = CharacterHealthManager.new()
 	add_child(health_manager)
-	health_manager._health_changed.connect(_on_health_changed)
-	health_manager._character_died.connect(_on_character_died)
+	SignalBus.health_changed.connect(_on_health_changed)
+	SignalBus.character_died.connect(_on_character_died)
 	health_manager.set_vigour(initial_vigour)
 
 	set_physics_process(true)
@@ -51,20 +51,22 @@ func _setup_combat_system() -> void:
 		if not hitbox:
 			continue
 		hitbox.hitbox_owner = self
-		if hitbox.has_signal("hit_landed"):
-			hitbox.hit_landed.connect(_on_hit_landed)
 
 	# Setup hurtboxes
 	for hurtbox in hurtboxes:
 		if not hurtbox:
 			continue
 		hurtbox.hurtbox_owner = self
-		if hurtbox.has_signal("hit_taken"):
-			hurtbox.hit_taken.connect(_on_hit_taken)
-		if hurtbox.has_signal("invincibility_started"):
-			hurtbox.invincibility_started.connect(_on_invincibility_started)
-		if hurtbox.has_signal("invincibility_ended"):
-			hurtbox.invincibility_ended.connect(_on_invincibility_ended)
+	
+	# Connect to SignalBus signals
+	if !SignalBus.hit_landed.is_connected(_on_hit_landed):
+		SignalBus.hit_landed.connect(_on_hit_landed)
+	if !SignalBus.hit_taken.is_connected(_on_hit_taken):
+		SignalBus.hit_taken.connect(_on_hit_taken)
+	if !SignalBus.invincibility_started.is_connected(_on_invincibility_started):
+		SignalBus.invincibility_started.connect(_on_invincibility_started)
+	if !SignalBus.invincibility_ended.is_connected(_on_invincibility_ended):
+		SignalBus.invincibility_ended.connect(_on_invincibility_ended)
 
 
 func set_vigour(value: int) -> void:
@@ -123,32 +125,33 @@ func set_hit_stun(duration: float) -> void:
 
 
 @warning_ignore("unused_parameter")
-func _on_hit_landed(hurtbox: Node) -> void:
+func _on_hit_landed(hitbox: Node, hurtbox: Node) -> void:
 	# Override in child classes to handle hit effects
 	pass
 
 
 @warning_ignore("unused_parameter")
-func _on_hit_taken(hitbox: Node) -> void:
+func _on_hit_taken(hitbox: Node, hurtbox: Node) -> void:
 	# Override in child classes to handle being hit
 	pass
 
 
-func _on_invincibility_started() -> void:
+func _on_invincibility_started(_entity: Node) -> void:
 	is_invincible = true
 
 
-func _on_invincibility_ended() -> void:
+func _on_invincibility_ended(_entity: Node) -> void:
 	is_invincible = false
 
 
 @warning_ignore("unused_parameter")
 func _on_health_changed(new_health: float, max_health: float) -> void:
-	SignalBus.health_changed.emit(new_health, max_health)
+	# Do not re-emit the signal to avoid infinite recursion
+	pass
 
 
 func _on_character_died() -> void:
-	SignalBus.character_died.emit(self)
+	# Do not re-emit the signal to avoid infinite recursion
 	die()
 
 

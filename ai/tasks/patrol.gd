@@ -1,7 +1,5 @@
 extends BTAction
 
-const PatrolPath = preload("res://Resources/patrol_path.gd")
-
 @export var patrol_path: PatrolPath
 @export var speed: float = 100.0
 @export var tolerance: float = 10.0

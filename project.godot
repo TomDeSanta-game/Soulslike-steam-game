@@ -60,7 +60,7 @@ window/vsync/vsync_mode=0
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/limbo_console/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/resources_spreadsheet_view/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/script-ide/plugin.cfg", "res://addons/sound_manager/plugin.cfg")
+enabled=PackedStringArray("res://addons/limbo_console/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/script-ide/plugin.cfg", "res://addons/sound_manager/plugin.cfg")
 
 [file_customization]
 
@@ -204,7 +204,6 @@ settings/notify_about_pre-releases=false
 
 2d/run_on_separate_thread=true
 common/physics_ticks_per_second=120
-2d/physics_engine="Rapier2D"
 2d/default_gravity=900.0
 
 [rendering]

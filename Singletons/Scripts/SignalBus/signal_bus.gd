@@ -37,6 +37,8 @@ signal player_lost(enemy: Node, player: Node)
 signal projectile_expired(projectile: Node)
 @warning_ignore("unused_signal")
 signal projectile_hit(projectile: Node, target: Node)
+@warning_ignore("unused_signal")
+signal on_create_projectile(position: Vector2, direction: Vector2, life_span: float, speed: float, bullet_key: String)
 
 # Trap Signals
 @warning_ignore("unused_signal")
@@ -79,6 +81,10 @@ signal souls_changed(new_amount: int)
 signal souls_lost(amount_lost: int)
 @warning_ignore("unused_signal")
 signal souls_recovered(amount_recovered: int)
+
+# Trade Signals
+@warning_ignore("unused_signal")
+signal trade_completed(item_id: String, souls_gained: int)
 
 # XP System Signals
 @warning_ignore("unused_signal")

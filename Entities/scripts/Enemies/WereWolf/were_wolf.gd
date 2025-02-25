@@ -127,8 +127,8 @@ func die() -> void:
 
 
 # Override parent's combat functions for werewolf-specific behavior
-func _on_hit_landed(target_hurtbox: Node) -> void:
-	super._on_hit_landed(target_hurtbox)
+func _on_hit_landed(_hitbox_node: Node, target_hurtbox: Node) -> void:
+	super._on_hit_landed(_hitbox_node, target_hurtbox)
 	
 	# Add werewolf-specific hit effects
 	if target_hurtbox is HurtboxComponent and target_hurtbox.hurtbox_owner.is_in_group("Player"):
@@ -141,8 +141,8 @@ func _on_hit_landed(target_hurtbox: Node) -> void:
 			camera.shake(15.0, 0.3, 0.7)
 
 
-func _on_hit_taken(attacker_hitbox: Node) -> void:
-	super._on_hit_taken(attacker_hitbox)
+func _on_hit_taken(attacker_hitbox: Node, _defender_hurtbox: Node) -> void:
+	super._on_hit_taken(attacker_hitbox, _defender_hurtbox)
 	
 	# Add werewolf-specific hurt effects
 	if attacker_hitbox is HitboxComponent and attacker_hitbox.hitbox_owner.is_in_group("Player"):

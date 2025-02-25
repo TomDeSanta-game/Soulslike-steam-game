@@ -169,14 +169,14 @@ var gravity_enabled: bool = true
 # Add near other class variables
 var current_merchant: Node = null
 
-@export var merchant_menu_scene: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")
+@export var merchant_menu_scene_resource: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")
 var merchant_menu: MerchantMenu = null
 
 
 func _ready() -> void:
 	# Add only the player node to the Player group
 	add_to_group("Player")
-	
+
 	super._ready()  # Call parent _ready to initialize health manager
 	types.player = self
 
@@ -314,7 +314,7 @@ func _ready() -> void:
 	var stamina_container = Control.new()
 	stamina_container.custom_minimum_size = stamina_bar.custom_minimum_size
 	stamina_container.size = stamina_bar.size
-	
+
 	# Get the parent of the stamina bar
 	var stamina_parent = stamina_bar.get_parent()
 	if stamina_parent:
@@ -324,11 +324,11 @@ func _ready() -> void:
 		stamina_parent.add_child(stamina_container)
 		# Add stamina bar to container
 		stamina_container.add_child(stamina_bar)
-		
+
 		# Position container relative to health bar
 		stamina_container.position.y = health_bar.position.y + health_bar.size.y + 8
 		stamina_container.position.x = health_bar.position.x
-		
+
 		# Reset stamina bar position within container
 		stamina_bar.position = Vector2.ZERO
 
@@ -361,20 +361,19 @@ func _ready() -> void:
 
 	state_machine.init(self)
 
-	# Connect state machine signals
-	state_machine.attack_started.connect(_on_attack_started)
-	state_machine.attack_ended.connect(_on_attack_ended)
+	# Connect attack signals through SignalBus
+	SignalBus.attack_started.connect(_on_attack_started)
+	SignalBus.attack_ended.connect(_on_attack_ended)
 
 	# Connect frame changed signal for redrawing
 	if !animated_sprite.frame_changed.is_connected(_on_frame_changed):
 		animated_sprite.frame_changed.connect(_on_frame_changed)
 
-	# Connect hitbox and hurtbox signals properly
-	if hitbox and !hitbox.hit_landed.is_connected(_on_hit_landed):
-		hitbox.hit_landed.connect(_on_hit_landed)
-	if hurtbox:
-		if !hurtbox.hit_taken.is_connected(_on_hit_taken):
-			hurtbox.hit_taken.connect(_on_hit_taken)
+	# Connect hitbox and hurtbox signals through SignalBus
+	if !SignalBus.hit_landed.is_connected(_on_hit_landed):
+		SignalBus.hit_landed.connect(_on_hit_landed)
+	if !SignalBus.hit_taken.is_connected(_on_hit_taken):
+		SignalBus.hit_taken.connect(_on_hit_taken)
 
 	# Initialize frame data
 	_frame_data_init()
@@ -389,9 +388,30 @@ func _ready() -> void:
 		grab_collision_shape.disabled = true
 
 	# Initialize merchant menu
-	merchant_menu = merchant_menu_scene.instantiate()
+	merchant_menu = merchant_menu_scene_resource.instantiate()
 	ui_layer.add_child(merchant_menu)
 	merchant_menu.visible = false
+
+	# Setup collection area if it doesn't exist
+	if not has_node("CollectionArea"):
+		var collection_area = Area2D.new()
+		collection_area.name = "CollectionArea"
+		add_child(collection_area)
+		
+		# Add collision shape
+		var collection_shape = CollisionShape2D.new()
+		var shape = CircleShape2D.new()
+		shape.radius = 20.0  # Adjust radius as needed
+		collection_shape.shape = shape
+		collection_area.add_child(collection_shape)
+		
+		# Set proper collision layer and mask for collection
+		collection_area.collision_layer = C_Layers.LAYER_PLAYER
+		collection_area.collision_mask = C_Layers.LAYER_COLLECTIBLE
+	else:
+		var collection_area = get_node("CollectionArea")
+		collection_area.collision_layer = C_Layers.LAYER_PLAYER
+		collection_area.collision_mask = C_Layers.LAYER_COLLECTIBLE
 
 
 func _process(delta: float) -> void:
@@ -549,11 +569,11 @@ func _update_health_bar() -> void:
 	# Dynamic color change based on health percentage
 	var health_style = health_bar.get_theme_stylebox("fill") as StyleBoxFlat
 	if health_style:
-		var health_percent = (current_health / max_health) * 100
+		var current_health_percent = (current_health / max_health) * 100
 		var new_color: Color
-		if health_percent > 60:
+		if current_health_percent > 60:
 			new_color = Color.from_string("#ff0033", Color.RED)  # Full health color
-		elif health_percent > 30:
+		elif current_health_percent > 30:
 			new_color = Color.from_string("#ff9900", Color.ORANGE)  # Medium health color
 		else:
 			new_color = Color.from_string("#ff0000", Color.RED)  # Low health color
@@ -606,7 +626,7 @@ func _get_current_speed() -> float:
 	# Return different speeds based on current state
 	if is_crouching:
 		return MOVEMENT_SPEEDS.CROUCH
-	elif _is_running():
+	if _is_running():
 		return MOVEMENT_SPEEDS.RUN
 	return MOVEMENT_SPEEDS.WALK
 
@@ -736,17 +756,34 @@ func _die() -> void:
 	state_machine.set_active(false)
 	set_physics_process(false)
 
-	# Clean up all physics components
-	_cleanup_physics_components()
+	# Store references to UI elements we need to hide
+	var ui_elements = []
+	if label and is_instance_valid(label):
+		ui_elements.append(label)
+	if health_bar and is_instance_valid(health_bar):
+		ui_elements.append(health_bar)
+	if stamina_bar and is_instance_valid(stamina_bar):
+		ui_elements.append(stamina_bar)
+	if xp_display and is_instance_valid(xp_display):
+		ui_elements.append(xp_display)
+	if level_up_menu and is_instance_valid(level_up_menu):
+		ui_elements.append(level_up_menu)
+
+	# Hide UI elements that are still valid
+	for element in ui_elements:
+		if is_instance_valid(element):
+			element.hide()
 
 	# Play death animation
-	animated_sprite.play(ANIMATIONS.DEATH)
+	if animated_sprite and is_instance_valid(animated_sprite):
+		animated_sprite.play(ANIMATIONS.DEATH)
+		# Switch to the death shader material
+		if _death_shader_material:
+			animated_sprite.material = _death_shader_material
 
-	# Switch to the death shader material
-	animated_sprite.material = _death_shader_material
-
-	# Screen Shake
-	camera.shake(10, 0.5, 0.9)
+	# Screen Shake if camera is valid
+	if camera and is_instance_valid(camera):
+		camera.shake(10, 0.5, 0.9)
 
 	# Death Sound
 	SoundManager.play_sound(Sound.death, "SFX")
@@ -754,11 +791,6 @@ func _die() -> void:
 	# Start the fade effect
 	is_fading = true
 	fade_timer = 0.0
-
-	# Hide UI elements
-	label.hide()
-	health_bar.hide()
-	stamina_bar.hide()
 
 	# Get current inventory items before clearing
 	var items = Inventory.get_items().duplicate(true)
@@ -774,11 +806,15 @@ func _die() -> void:
 		spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
 
 	# Adjust X position based on player direction
-	spawn_position.x += 20 if animated_sprite.flip_h else -20
+	if animated_sprite and is_instance_valid(animated_sprite):
+		spawn_position.x += 20 if animated_sprite.flip_h else -20
 
 	# Create and spawn bag with items if there are any
 	if not items.is_empty():
 		BagSpawner.spawn_bag(spawn_position, items)
+
+	# Clean up physics components
+	_cleanup_physics_components()
 
 	# Create a timer for delayed scene transition
 	var transition_timer = Timer.new()
@@ -787,16 +823,22 @@ func _die() -> void:
 	transition_timer.one_shot = true
 	transition_timer.timeout.connect(
 		func():
-			SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
-			transition_timer.queue_free()
+			if is_instance_valid(self):
+				SceneManager.change_scene("res://UI/Scenes/game_over.tscn")
+			if is_instance_valid(transition_timer):
+				transition_timer.queue_free()
 	)
 	transition_timer.start()
 
-	death_timer.start()
+	# Start death timer
+	if death_timer and is_instance_valid(death_timer):
+		death_timer.start()
 
 
 func _on_death_timer_timeout() -> void:
-	hide()
+	if is_instance_valid(self):
+		hide()
+		queue_free()
 
 
 # Magic System
@@ -906,15 +948,23 @@ func _jump_timer_timeout() -> void:
 	velocity.y = 0
 
 
-func _on_hit_landed(target_hurtbox: Node) -> void:
+func _on_hit_landed(hitbox_node: Node, target_hurtbox: Node) -> void:
+	# Only process hits from our own hitbox
+	if hitbox_node.hitbox_owner != self:
+		return
+		
 	if target_hurtbox.hurtbox_owner and target_hurtbox.hurtbox_owner.is_in_group("Enemy"):
 		# Play hit effect or sound
 		SoundManager.play_sound(Sound.hit, "SFX")
 		# Apply lifesteal if enabled
-		_apply_lifesteal(hitbox.damage)
+		_apply_lifesteal(hitbox_node.damage)
 
 
-func _on_hit_taken(attacker_hitbox: Node) -> void:
+func _on_hit_taken(attacker_hitbox: Node, defender_hurtbox: Node) -> void:
+	# Only process hits to our own hurtbox
+	if defender_hurtbox.hurtbox_owner != self:
+		return
+		
 	if attacker_hitbox.hitbox_owner and attacker_hitbox.hitbox_owner.is_in_group("Enemy"):
 		take_damage(attacker_hitbox.damage)
 
@@ -1018,11 +1068,17 @@ func _on_character_died() -> void:
 	_die()
 
 
-func _on_attack_started() -> void:
+func _on_attack_started(attacker: Node) -> void:
+	# Only process if we are the attacker
+	if attacker != self:
+		return
 	frame_data_component.update_frame_data()
 
 
-func _on_attack_ended() -> void:
+func _on_attack_ended(attacker: Node) -> void:
+	# Only process if we are the attacker
+	if attacker != self:
+		return
 	frame_data_component.clear_active_boxes()
 
 
@@ -1194,12 +1250,12 @@ func _heal_silent(amount: float) -> void:
 # Add this function near other healing-related functions
 func use_celestial_tear() -> void:
 	# Heal to full health silently
-	var max_health = get_max_health()
-	_heal_silent(max_health)
+	var H = get_max_health()
+	_heal_silent(H)
 
 	# Restore stamina to full
-	var max_stamina = get_max_stamina()
-	restore_stamina(max_stamina)
+	var S = get_max_stamina()
+	restore_stamina(S)
 
 	# Play heal sound when using the tear
 	SoundManager.play_sound(Sound.heal, "SFX")
@@ -1318,30 +1374,30 @@ func _setup_ui_displays() -> void:
 	# Load UI scenes
 	var xp_display_scene = load("res://UI/Scenes/xp_display.tscn")
 	var level_up_menu_scene = load("res://UI/Scenes/level_up_menu.tscn")
-	
+
 	if xp_display_scene and level_up_menu_scene:
 		# Add souls display
 		var souls_display_scene = load("res://UI/Scenes/souls_display.tscn")
 		if souls_display_scene:
 			var souls_display = souls_display_scene.instantiate()
 			ui_layer.add_child(souls_display)
-			
+
 			# Position souls display on the right side
 			souls_display.position = Vector2(
 				get_viewport_rect().size.x - souls_display.size.x - 20,  # 20 pixels from right edge
 				20  # 20 pixels from top
 			)
-			
+
 			# Add XP display
 			xp_display = xp_display_scene.instantiate()
 			ui_layer.add_child(xp_display)
-			
+
 			# Position XP display below souls display
 			xp_display.position = Vector2(
 				get_viewport_rect().size.x - xp_display.size.x - 20,  # 20 pixels from right edge
 				souls_display.position.y + souls_display.size.y + 10  # 10 pixels below souls display
 			)
-			
+
 			# Add level up menu
 			level_up_menu = level_up_menu_scene.instantiate()
 			ui_layer.add_child(level_up_menu)
@@ -1370,9 +1426,21 @@ func _on_chat_box_area_exited(area: Area2D) -> void:
 
 # Add new function to handle physics cleanup
 func _cleanup_physics_components() -> void:
-	# Disable collision shapes
+	# First, remove all collision shapes from their parents
+	for child in get_children():
+		if child is CollisionShape2D:
+			remove_child(child)
+			child.queue_free()
+		elif child is CollisionPolygon2D:
+			remove_child(child)
+			child.queue_free()
+
+	# Disable and clean up grab collision shape
 	if grab_collision_shape:
 		grab_collision_shape.set_deferred("disabled", true)
+		if grab_collision_shape.get_parent():
+			grab_collision_shape.get_parent().remove_child(grab_collision_shape)
+			grab_collision_shape.queue_free()
 
 	# Clean up hitbox
 	if hitbox:
@@ -1381,6 +1449,14 @@ func _cleanup_physics_components() -> void:
 		hitbox.collision_mask = 0
 		hitbox.set_deferred("monitoring", false)
 		hitbox.set_deferred("monitorable", false)
+		# Clean up hitbox's collision shapes
+		for child in hitbox.get_children():
+			if child is CollisionShape2D or child is CollisionPolygon2D:
+				hitbox.remove_child(child)
+				child.queue_free()
+		if hitbox.get_parent():
+			hitbox.get_parent().remove_child(hitbox)
+			hitbox.queue_free()
 
 	# Clean up hurtbox
 	if hurtbox:
@@ -1389,10 +1465,21 @@ func _cleanup_physics_components() -> void:
 		hurtbox.collision_mask = 0
 		hurtbox.set_deferred("monitoring", false)
 		hurtbox.set_deferred("monitorable", false)
+		# Clean up hurtbox's collision shapes
+		for child in hurtbox.get_children():
+			if child is CollisionShape2D or child is CollisionPolygon2D:
+				hurtbox.remove_child(child)
+				child.queue_free()
+		if hurtbox.get_parent():
+			hurtbox.get_parent().remove_child(hurtbox)
+			hurtbox.queue_free()
 
-	# Disable all raycasts
+	# Disable and clean up ledge check
 	if ledge_check:
 		ledge_check.enabled = false
+		if ledge_check.get_parent():
+			ledge_check.get_parent().remove_child(ledge_check)
+			ledge_check.queue_free()
 
 	# Clear collision layers and masks
 	collision_layer = 0
@@ -1408,3 +1495,7 @@ func _cleanup_physics_components() -> void:
 	is_dashing = false
 	is_ledge_climbing = false
 	gravity_enabled = false
+
+	# Call queue_free on self after a short delay to ensure cleanup
+	await get_tree().create_timer(0.1).timeout
+	queue_free()
