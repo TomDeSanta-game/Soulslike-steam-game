@@ -113,13 +113,15 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
   - Powered-up shader during phase transition
   - Enhanced visual effects at 50% health threshold
 - Strategic AI behavior:
-  - Intelligent target tracking
-  - Phase-based combat patterns
-  - Responsive movement system
+  - Intelligent target tracking with proper facing direction
+  - Phase-based combat patterns with increased difficulty
+  - Responsive movement system with dynamic hitbox positioning
+  - Patrol behavior when no targets are detected
 - Combat mechanics:
   - Frost-based attacks with slowing effects
   - Power-up system at 50% health
   - Enhanced damage and speed in powered state
+  - Properly positioned hitboxes that adjust based on facing direction
 
 ## Technical Details
 
@@ -132,6 +134,10 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
 - LimboAI integration for boss behavior
 - Phase-based difficulty scaling
 - Strategic target acquisition and tracking
+- Improved behavior tree structure:
+  - Phase transition based on health
+  - Combat sequence with target detection and attack
+  - Patrol behavior when no targets are present
 
 ## Installation
 

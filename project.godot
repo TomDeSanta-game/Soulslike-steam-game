@@ -47,6 +47,7 @@ SoulsSystem="*res://Singletons/Scripts/SoulsSystem/souls_system.gd"
 XPSystem="*res://Singletons/Scripts/XPSystem/xp_system.gd"
 InventoryStateManager="*res://Singletons/Scripts/InventoryStateManager.gd"
 Sales="*res://Singletons/Scripts/Sales/sales.gd"
+LocationLabelManager="*res://Singletons/Scripts/LabelLocationManager/location_label_manager.gd"
 
 [display]
 

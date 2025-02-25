@@ -528,10 +528,12 @@ offset_bottom = 185.0
 text = "000"
 label_settings = SubResource("LabelSettings_kpg22")
 
-[node name="PlaceLabel" type="Label" parent="UILayer"]
+[node name="PlaceLabel" type="Label" parent="UILayer" groups=["PlaceLabel"]]
 unique_name_in_owner = true
 anchors_preset = 10
 anchor_right = 1.0
+offset_left = 1.0
+offset_right = 1.0
 offset_bottom = 468.0
 grow_horizontal = 2
 size_flags_horizontal = 0

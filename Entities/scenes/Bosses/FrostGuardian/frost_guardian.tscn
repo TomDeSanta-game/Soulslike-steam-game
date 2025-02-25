@@ -406,7 +406,7 @@ animations = [{
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qidf"]
 radius = 39.0
-height = 98.0
+height = 86.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yaex7"]
 radius = 25.0
@@ -414,7 +414,7 @@ height = 96.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ceryl"]
 radius = 40.0
-height = 102.0
+height = 86.0
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_niin1"]
 
@@ -433,9 +433,11 @@ shape = SubResource("CapsuleShape2D_0qidf")
 
 [node name="VisibleOnScreenEnabler2D" parent="." index="2"]
 visible = false
+position = Vector2(-1.90735e-06, 1.5)
+scale = Vector2(3.9, 4.55)
+enable_node_path = NodePath("")
 
 [node name="HitBox" parent="." index="3"]
-visible = false
 position = Vector2(-50, 5)
 
 [node name="CollisionShape2D" parent="HitBox" index="0"]
@@ -444,7 +446,7 @@ shape = SubResource("CapsuleShape2D_yaex7")
 debug_color = Color(0.7, 0, 0.0116665, 0.419608)
 
 [node name="HurtBox" parent="." index="4"]
-position = Vector2(0, 2.5)
+position = Vector2(0, 4)
 
 [node name="CollisionShape2D" parent="HurtBox" index="0"]
 shape = SubResource("CapsuleShape2D_ceryl")
