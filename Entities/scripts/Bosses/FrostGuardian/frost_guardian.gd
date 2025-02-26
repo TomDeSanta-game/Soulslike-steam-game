@@ -6,6 +6,10 @@ class_name FrostGuardian
 @export var ice_damage_multiplier: float = 1.2
 @export var frost_effect_duration: float = 3.0
 
+# Health system variables
+@export var base_vigour: float = 1000.0
+var current_health: float
+
 var is_attacking: bool = false
 var attack_frame: int = 0
 
@@ -33,7 +37,29 @@ var attack_delay_timer: float = 0.0
 
 func _ready() -> void:
 	Log.info("FrostGuardian: _ready called")
-	super._ready()  # This will initialize health_manager
+	super._ready()  # This will initialize health_manager from parent class
+	
+	# Initialize health values
+	current_health = max_health  # Using max_health from BossBase
+	
+	# Initialize health through health manager
+	if health_manager:
+		health_manager.set_vigour(int(base_vigour))
+		
+		# Connect to health signals - CRITICAL FIX: Connect to SignalBus health_changed
+		if not SignalBus.health_changed.is_connected(_on_health_changed):
+			SignalBus.health_changed.connect(_on_health_changed)
+		
+		# Get current health values
+		current_health = health_manager.get_health()
+		
+		# Emit boss spawned signal with proper health values
+		SignalBus.boss_spawned.emit(self)
+		SignalBus.boss_damaged.emit(self, current_health, max_health)
+		
+		Log.info("FrostGuardian: Initialized with health {0}/{1}".format([current_health, max_health]))
+	else:
+		push_error("FrostGuardian: No health manager found!")
 	
 	# CRITICAL FIX: Disable the behavior tree completely
 	var bt_node = get_node_or_null("BTPlayer")
@@ -44,16 +70,7 @@ func _ready() -> void:
 		Log.info("FrostGuardian: DISABLED BEHAVIOR TREE")
 	
 	# Set Frost Guardian specific properties
-	boss_name = "Frost Guardian"
 	attack_damage *= ice_damage_multiplier
-	
-	# Initialize health through health_manager
-	if health_manager and health_manager.has_method("set_vigour"):
-		health_manager.set_vigour(int(max_health))
-	else:
-		Log.info("FrostGuardian: health_manager doesn't have set_vigour method")
-		if health_manager and health_manager.has_method("set_health"):
-			health_manager.set_health(max_health)
 	
 	# Create a dedicated attack timer for this boss
 	frost_attack_timer = Timer.new()
@@ -66,7 +83,7 @@ func _ready() -> void:
 	Log.info("FrostGuardian: Setting up collision layers")
 	# Set collision layers and masks for the boss itself
 	collision_layer = C_Layers.LAYER_BOSS
-	collision_mask = C_Layers.LAYER_WORLD | C_Layers.LAYER_PLAYER | C_Layers.LAYER_PROJECTILES
+	collision_mask = C_Layers.MASK_BOSS
 	Log.info("FrostGuardian: Collision layers set to {0} and mask to {1}".format([collision_layer, collision_mask]))
 	
 	# Create and configure detection area
@@ -77,13 +94,17 @@ func _ready() -> void:
 		Log.info("FrostGuardian: Configuring hitbox")
 		boss_hitbox.position = Vector2(50, 5)  # Default position (will be flipped based on direction)
 		boss_hitbox.active = false  # Start with hitbox inactive
-		boss_hitbox.collision_layer = C_Layers.LAYER_HITBOX  # CRITICAL FIX: Use standard hitbox layer
-		boss_hitbox.collision_mask = C_Layers.LAYER_HURTBOX  # CRITICAL FIX: Use standard hurtbox layer
 		boss_hitbox.damage = attack_damage  # Set the damage value
 		boss_hitbox.hitbox_owner = self
 		boss_hitbox.monitoring = true  # CRITICAL FIX: Ensure monitoring is enabled
 		boss_hitbox.monitorable = false  # CRITICAL FIX: We don't need to be monitorable
 		boss_hitbox.show()  # CRITICAL FIX: Make sure hitbox is visible
+		
+		# CRITICAL FIX: Set collision layers using deferred calls
+		boss_hitbox.set_deferred("collision_layer", C_Layers.LAYER_HITBOX)  # Layer 7
+		boss_hitbox.set_deferred("collision_mask", C_Layers.LAYER_HURTBOX)  # Layer 9
+		boss_hitbox.set_deferred("monitoring", true)
+		boss_hitbox.set_deferred("monitorable", false)
 		
 		# CRITICAL FIX: Verify hitbox configuration
 		Log.info("FrostGuardian: Initial attack_damage value: {0}".format([attack_damage]))
@@ -105,9 +126,14 @@ func _ready() -> void:
 		Log.info("FrostGuardian: Configuring hurtbox")
 		boss_hurtbox.position = Vector2(0, 2.5)
 		boss_hurtbox.active = true  # Always active
-		boss_hurtbox.collision_layer = C_Layers.LAYER_HURTBOX  # CRITICAL FIX: Use standard hurtbox layer
-		boss_hurtbox.collision_mask = C_Layers.LAYER_HITBOX  # CRITICAL FIX: Use standard hitbox layer
 		boss_hurtbox.hurtbox_owner = self
+		
+		# CRITICAL FIX: Set collision layers using deferred calls
+		boss_hurtbox.set_deferred("collision_layer", C_Layers.LAYER_HURTBOX)  # Layer 9
+		boss_hurtbox.set_deferred("collision_mask", C_Layers.LAYER_HITBOX)  # Layer 7
+		boss_hurtbox.set_deferred("monitoring", true)
+		boss_hurtbox.set_deferred("monitorable", true)
+		
 		Log.info("FrostGuardian: Hurtbox configured with layer: {0} and mask: {1}".format([boss_hurtbox.collision_layer, boss_hurtbox.collision_mask]))
 	else:
 		push_error("FrostGuardian: boss_hurtbox is null!")
@@ -155,9 +181,7 @@ func _ready() -> void:
 			
 			# Get current health using the appropriate method
 			var current_health_value = 0
-			if health_manager and health_manager.has_method("get_vigour"):
-				current_health_value = health_manager.get_vigour()
-			elif health_manager and health_manager.has_method("get_health"):
+			if health_manager and health_manager.has_method("get_health"):
 				current_health_value = health_manager.get_health()
 			else:
 				current_health_value = max_health  # Default to max health if no method available
@@ -170,8 +194,6 @@ func _ready() -> void:
 			Log.info("FrostGuardian: Initialized blackboard variables")
 	else:
 		push_error("FrostGuardian: BTPlayer node not found!")
-
-	Log.info("FrostGuardian: _ready completed")
 
 func _setup_detection_area() -> void:
 	# Remove existing detection area if it exists
@@ -284,59 +306,48 @@ func _physics_process(delta: float) -> void:
 
 func _handle_attack_frames() -> void:
 	if not animated_sprite:
-		Log.info("FrostGuardian: No animated_sprite in _handle_attack_frames")
+		Log.info("FrostGuardian: No animated_sprite found")
 		return
 		
 	if not boss_hitbox:
-		Log.info("FrostGuardian: No boss_hitbox in _handle_attack_frames")
+		Log.info("FrostGuardian: No boss_hitbox found")
 		return
-	
+		
 	# Only handle attack frames during Attack animation
 	if animated_sprite.animation != "Attack":
 		if is_attacking:
-			Log.info("FrostGuardian: CRITICAL - Attack frames handler forcing Attack animation")
+			# Force attack animation if we're attacking but not in the right animation
 			animated_sprite.play("Attack")
 		return
+		
+	# Get current frame
+	var current_frame = animated_sprite.frame
 	
-	attack_frame = animated_sprite.frame
-	
-	# Log the current attack frame for debugging
-	Log.info("FrostGuardian: Attack frame: {0}, animation: {1}, is_attacking: {2}".format(
-		[attack_frame, animated_sprite.animation, is_attacking]))
-	
-	# CRITICAL FIX: Activate hitbox during specific frames (frames 6, 7, 8)
-	if attack_frame in [6, 7, 8]:
+	# Activate hitbox during specific frames (6, 7, 8)
+	if current_frame in [6, 7, 8]:
 		if not boss_hitbox.active:
-			Log.info("FrostGuardian: ACTIVATING hitbox at frame {0}".format([attack_frame]))
+			Log.info("FrostGuardian: Activating hitbox at frame {0}".format([current_frame]))
 			boss_hitbox.active = true
-			boss_hitbox.show()  # CRITICAL FIX: Make sure hitbox is visible
-			boss_hitbox.monitoring = true  # CRITICAL FIX: Make sure hitbox is monitoring
-			
-			# CRITICAL FIX: Ensure damage value is set
+			boss_hitbox.show()
 			boss_hitbox.damage = attack_damage
-			Log.info("FrostGuardian: Set hitbox damage to {0}".format([attack_damage]))
-		
-		# Make sure hitbox is positioned correctly based on facing direction
-		if animated_sprite.flip_h:
-			# Facing left
-			boss_hitbox.position.x = -50
-		else:
-			# Facing right
-			boss_hitbox.position.x = 50
-		
-		# Keep Y position consistent
-		boss_hitbox.position.y = 5
-		
-		# Debug hitbox state
-		Log.info("FrostGuardian: Hitbox state - active: {0}, position: {1}, damage: {2}, monitoring: {3}, visible: {4}, collision_layer: {5}, collision_mask: {6}".format(
-			[boss_hitbox.active, boss_hitbox.position, boss_hitbox.damage, boss_hitbox.monitoring, 
-			boss_hitbox.visible, boss_hitbox.collision_layer, boss_hitbox.collision_mask]))
+			boss_hitbox.set_deferred("monitoring", true)
+			boss_hitbox.set_deferred("monitorable", false)
+			
+			# Position hitbox based on facing direction
+			var hitbox_position = Vector2(50, 5)
+			if animated_sprite.flip_h:
+				hitbox_position.x = -hitbox_position.x
+			boss_hitbox.position = hitbox_position
+			
+			Log.info("FrostGuardian: Hitbox activated with damage {0} at position {1}".format([boss_hitbox.damage, boss_hitbox.position]))
 	else:
 		if boss_hitbox.active:
-			Log.info("FrostGuardian: Deactivating hitbox at frame {0}".format([attack_frame]))
-		boss_hitbox.active = false
-		boss_hitbox.hide()  # CRITICAL FIX: Hide hitbox when inactive
-		boss_hitbox.monitoring = false  # CRITICAL FIX: Stop monitoring when inactive
+			Log.info("FrostGuardian: Deactivating hitbox at frame {0}".format([current_frame]))
+			boss_hitbox.active = false
+			boss_hitbox.hide()
+			boss_hitbox.set_deferred("monitoring", false)
+			boss_hitbox.set_deferred("monitorable", false)
+			Log.info("FrostGuardian: Hitbox deactivated")
 
 func _print_debug_info() -> void:
 	Log.info("FrostGuardian Debug Info:")
@@ -508,62 +519,23 @@ func _perform_frozen_ground() -> void:
 
 # CRITICAL FIX: Replace _on_hit_landed with _on_hitbox_area_entered
 func _on_hitbox_area_entered(area: Area2D) -> void:
-	Log.info("FrostGuardian: ========= HITBOX COLLISION START =========")
-	Log.info("FrostGuardian: Hitbox collision detected with area: {0}".format([area.name if area else "null"]))
-	
-	if not boss_hitbox:
-		Log.info("FrostGuardian: boss_hitbox is null")
+	if not boss_hitbox or not boss_hitbox.active:
+		Log.info("FrostGuardian: Hitbox is null or inactive")
 		return
 		
-	if not boss_hitbox.active:
-		Log.info("FrostGuardian: boss_hitbox is inactive, active={0}, monitoring={1}, visible={2}, damage={3}, layer={4}, mask={5}".format(
-			[boss_hitbox.active, boss_hitbox.monitoring, boss_hitbox.visible, boss_hitbox.damage,
-			boss_hitbox.collision_layer, boss_hitbox.collision_mask]))
-		return
-	
 	if not area is HurtboxComponent:
-		Log.info("FrostGuardian: Area {0} is not a hurtbox, it is a {1}".format([area.name, area.get_class()]))
+		Log.info("FrostGuardian: Area is not a hurtbox")
 		return
-	
+		
 	var hurtbox = area as HurtboxComponent
-	Log.info("FrostGuardian: Found hurtbox, active={0}, owner={1}, layer={2}, mask={3}, invincible={4}".format(
-		[hurtbox.active, hurtbox.hurtbox_owner.name if hurtbox.hurtbox_owner else "null",
-		hurtbox.collision_layer, hurtbox.collision_mask, hurtbox.invincible]))
-	
-	if not hurtbox.active:
-		Log.info("FrostGuardian: Hurtbox is inactive")
+	if not hurtbox.hurtbox_owner or not hurtbox.hurtbox_owner.is_in_group("Player"):
+		Log.info("FrostGuardian: Hurtbox owner is not player")
 		return
-	
-	if not hurtbox.hurtbox_owner:
-		Log.info("FrostGuardian: Hurtbox has no owner")
-		return
-	
-	if hurtbox.hurtbox_owner == self:
-		Log.info("FrostGuardian: Hurtbox belongs to self")
-		return
-	
-	if not hurtbox.hurtbox_owner.is_in_group("Player"):
-		Log.info("FrostGuardian: Hurtbox owner is not a player")
-		return
-	
-	Log.info("FrostGuardian: Valid hit detected on {0}, applying damage: {1}".format(
-		[hurtbox.hurtbox_owner.name, boss_hitbox.damage]))
-	
-	# CRITICAL FIX: Ensure damage is set before hit
-	boss_hitbox.damage = attack_damage
-	Log.info("FrostGuardian: Set hitbox damage to {0} before applying hit".format([boss_hitbox.damage]))
-	
-	# Call take_hit and log the result
-	hurtbox.take_hit(boss_hitbox)
-	Log.info("FrostGuardian: Called take_hit on hurtbox")
-	
-	Log.info("FrostGuardian: Hit applied with hitbox state - active: {0}, damage: {1}, monitoring: {2}".format(
-		[boss_hitbox.active, boss_hitbox.damage, boss_hitbox.monitoring]))
-	
-	# CRITICAL FIX: Emit the hit_landed signal
-	SignalBus.hit_landed.emit(boss_hitbox, hurtbox)
-	Log.info("FrostGuardian: Emitted hit_landed signal")
-	Log.info("FrostGuardian: ========= HITBOX COLLISION END =========")
+		
+	Log.info("FrostGuardian: Valid hit on player detected")
+	boss_hitbox.damage = attack_damage  # Ensure damage is set
+	hurtbox.take_hit(boss_hitbox)  # Apply damage
+	Log.info("FrostGuardian: Applied damage {0} to player".format([attack_damage]))
 
 func _on_phase_transition() -> void:
 	match current_phase:
@@ -719,3 +691,56 @@ func _perform_frost_slash() -> void:
 	
 	# Start cooldown timer
 	frost_attack_timer.start(attack_cooldown)
+
+# Override the die method from BossBase
+func die() -> void:
+	if health_manager and health_manager.get_health() <= 0:
+		return
+		
+	SignalBus.boss_died.emit(self)
+	if animated_sprite:
+		animated_sprite.play("Death")
+		await animated_sprite.animation_finished
+	super.die()  # Call parent's die method
+
+# Handle character death
+func _on_character_died() -> void:
+	die()  # Call our die method which will handle the death animation and cleanup
+
+# Update the health change handler to match SignalBus signal signature
+func _on_health_changed(new_health: float, max_health_value: float) -> void:
+	Log.info("FrostGuardian: Health changed signal received - new_health: {0}, max_health: {1}".format([new_health, max_health_value]))
+	current_health = new_health
+	
+	# Emit boss damaged signal
+	SignalBus.boss_damaged.emit(self, new_health, max_health)
+	
+	# Check for phase transition
+	var health_percentage = (new_health / max_health) * 100.0
+	if health_percentage <= 50.0:
+		_enter_phase_two()
+
+# Phase transition handler
+func _enter_phase_two() -> void:
+	attack_damage *= 1.2
+	attack_cooldown *= 0.9
+	frost_effect_duration *= 1.2
+
+func take_damage(amount: float) -> void:
+	if health_manager:
+		health_manager.take_damage(amount)
+		current_health = health_manager.get_health()
+
+func heal(amount: float) -> void:
+	if health_manager:
+		health_manager.heal(amount)
+		current_health = health_manager.get_health()
+
+func get_health() -> float:
+	return current_health
+
+func get_max_health() -> float:
+	return max_health  # Using max_health from BossBase
+
+func get_health_percentage() -> float:
+	return (current_health / max_health) * 100.0 if max_health > 0 else 0.0

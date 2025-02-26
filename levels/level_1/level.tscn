@@ -3527,7 +3527,6 @@ position = Vector2(-100, -15)
 [node name="LoreFragment" parent="." instance=ExtResource("4_6w14d")]
 position = Vector2(600, -50)
 enables_teleport = true
-camera_focus_duration = 2.0
 
 [connection signal="body_entered" from="DetectionSystem" to="." method="_on_detection_system_body_entered"]
 [connection signal="body_entered" from="DoomPit" to="." method="_on_doom_pit_body_entered"]

@@ -9,6 +9,14 @@ func _tick(_delta: float) -> Status:
 	var target = blackboard.get_var(target_var)
 
 	if not is_instance_valid(target):
+		agent.velocity.x = 0.0
+		
+		# Play idle animation if available
+		if agent.has_node("AnimatedSprite2D"):
+			var sprite = agent.get_node("AnimatedSprite2D")
+			if sprite.sprite_frames.has_animation("Idle"):
+				sprite.play("Idle")
+		
 		return FAILURE
 
 	var target_position: Vector2 = target.global_position

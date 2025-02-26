@@ -1060,6 +1060,7 @@ texture = ExtResource("8_84ibl")
 
 [node name="FrostGuardian" parent="." instance=ExtResource("9_oy0dg")]
 position = Vector2(301, -45)
+base_vigour = 1000.0
 
 [node name="player" parent="." instance=ExtResource("10_lfi45")]
 position = Vector2(0, -20)

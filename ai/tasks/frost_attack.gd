@@ -16,6 +16,27 @@ func _tick(delta: float) -> Status:
 	Log.info("FrostAttack: _tick called, cooldown={0}, is_attacking={1}, attack_finished={2}".format(
 		[_current_cooldown, _is_attacking, _attack_finished]))
 	
+	# Check target validity and life status FIRST, before any other logic
+	var target = blackboard.get_var(target_var)
+	if not is_instance_valid(target):
+		Log.info("FrostAttack: No valid target")
+		_stop_attack_and_play_idle()
+		_stop_behavior_tree()
+		return FAILURE
+		
+	# Check if target is alive by checking if it has health_manager and is not dead
+	if target.has_method("is_dead") and target.is_dead():
+		Log.info("FrostAttack: Target is dead")
+		_stop_attack_and_play_idle()
+		_stop_behavior_tree()
+		return FAILURE
+		
+	if "health_manager" in target and target.health_manager.get_health() <= 0:
+		Log.info("FrostAttack: Target has no health")
+		_stop_attack_and_play_idle()
+		_stop_behavior_tree()
+		return FAILURE
+	
 	if _current_cooldown > 0:
 		_current_cooldown -= delta
 		return RUNNING
@@ -36,11 +57,6 @@ func _tick(delta: float) -> Status:
 			Log.info("FrostAttack: Attack finished, setting cooldown to {0}".format([attack_cooldown]))
 			return SUCCESS
 		return RUNNING
-
-	var target = blackboard.get_var(target_var)
-	if not is_instance_valid(target):
-		Log.info("FrostAttack: No valid target")
-		return FAILURE
 
 	var distance = agent.global_position.distance_to(target.global_position)
 	Log.info("FrostAttack: Distance to target: {0}, attack_range: {1}".format([distance, attack_range]))
@@ -149,4 +165,37 @@ func _adjust_hitbox_position() -> void:
 			hitbox.position.x = 50   # Fixed position for right facing
 		
 		hitbox.position.y = 5  # Keep the Y position consistent
-		Log.info("FrostAttack: Adjusted hitbox position to {0}".format([hitbox.position])) 
+		Log.info("FrostAttack: Adjusted hitbox position to {0}".format([hitbox.position]))
+
+# Add new helper function to stop attack and play idle animation
+func _stop_attack_and_play_idle() -> void:
+	_is_attacking = false
+	_attack_finished = false
+	
+	# Stop any ongoing attack animation and play idle
+	if agent.has_node("AnimatedSprite2D"):
+		var sprite = agent.get_node("AnimatedSprite2D")
+		if sprite.animation == "Attack":
+			sprite.stop()
+		if sprite.sprite_frames.has_animation("Idle"):
+			sprite.play("Idle")
+			
+	# Reset any attack-related state in the agent
+	if "is_attacking" in agent:
+		agent.is_attacking = false
+	if "can_attack" in agent:
+		agent.can_attack = false
+	
+	# Deactivate hitbox if it exists
+	if agent.has_node("HitBox"):
+		var hitbox = agent.get_node("HitBox")
+		if hitbox.has_method("deactivate"):
+			hitbox.deactivate() 
+
+# Add new helper function to stop the behavior tree
+func _stop_behavior_tree() -> void:
+	if agent.has_node("BTPlayer"):
+		var bt_player = agent.get_node("BTPlayer")
+		bt_player.behavior_tree = null
+		bt_player.enabled = false
+		Log.info("FrostAttack: Stopped behavior tree") 

@@ -105,6 +105,12 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
 - Advanced boss AI behavior system using LimboAI
 - Dynamic phase transitions with visual effects
 - Customizable attack patterns and movement strategies
+- Soulslike boss health bar system:
+  - Large, prominent health bar at the top of the screen
+  - Boss name display
+  - Smooth health updates with tweening
+  - Fade in/out transitions
+  - Dark souls inspired red theme
 
 ### Frost Guardian Boss
 - Ice-themed boss with unique frost abilities

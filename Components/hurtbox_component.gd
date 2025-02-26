@@ -23,11 +23,28 @@ func take_hit(hitbox: Node) -> void:
 
 	SignalBus.hit_taken.emit(hitbox, self)  # Use global signal only
 	
-	if hurtbox_owner and hurtbox_owner.has_method("take_damage"):
-		if hitbox.has_method("get_damage"):
-			hurtbox_owner.take_damage(hitbox.get_damage())
-		elif hitbox.has_property("damage"):
-			hurtbox_owner.take_damage(hitbox.damage)
+	if not hurtbox_owner or not hurtbox_owner.has_method("take_damage"):
+		Log.info("HurtboxComponent: Owner {0} cannot take damage".format([hurtbox_owner.name if hurtbox_owner else "null"]))
+		return
+	
+	var damage_amount: float = 0.0
+	
+	# Try to get damage value in order of priority
+	if hitbox.has_method("get_damage"):
+		damage_amount = hitbox.get_damage()
+		Log.info("HurtboxComponent: Got damage {0} from get_damage()".format([damage_amount]))
+	elif hitbox is HitboxComponent:
+		damage_amount = hitbox.damage
+		Log.info("HurtboxComponent: Got damage {0} from HitboxComponent.damage".format([damage_amount]))
+	elif "damage" in hitbox:
+		damage_amount = hitbox.damage
+		Log.info("HurtboxComponent: Got damage {0} from hitbox.damage property".format([damage_amount]))
+	else:
+		Log.info("HurtboxComponent: Could not get damage value from hitbox")
+		return
+	
+	Log.info("HurtboxComponent: Applying damage {0} to {1}".format([damage_amount, hurtbox_owner.name]))
+	hurtbox_owner.take_damage(damage_amount)
 
 func start_invincibility(duration: float = 0.5) -> void:
 	invincible = true

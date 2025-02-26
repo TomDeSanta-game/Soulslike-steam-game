@@ -422,6 +422,7 @@ height = 86.0
 script = ExtResource("2_4cdir")
 ice_damage_multiplier = 1.2
 frost_effect_duration = 3.0
+base_vigour = 1000.0
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_ionqr")
