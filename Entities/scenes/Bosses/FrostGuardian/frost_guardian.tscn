@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3 uid="uid://jlmfejnps25"]
+[gd_scene load_steps=64 format=3 uid="uid://jlmfejnps25"]
 
 [ext_resource type="PackedScene" uid="uid://cs1w3cq7krofg" path="res://Entities/scenes/Bosses/boss_base.tscn" id="1_fuut8"]
 [ext_resource type="Script" path="res://Entities/scripts/Bosses/FrostGuardian/frost_guardian.gd" id="2_4cdir"]
@@ -343,7 +343,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"Hurt",
-"speed": 8.0
+"speed": 14.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -406,7 +406,7 @@ animations = [{
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qidf"]
 radius = 39.0
-height = 86.0
+height = 84.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yaex7"]
 radius = 25.0
@@ -414,26 +414,30 @@ height = 96.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ceryl"]
 radius = 40.0
-height = 86.0
+height = 84.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1bl40"]
+size = Vector2(44, 20)
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_niin1"]
 
 [node name="FrostGuardian" instance=ExtResource("1_fuut8")]
 script = ExtResource("2_4cdir")
-ice_damage_multiplier = 1.2
+ice_damage_multiplier = 0.4
 frost_effect_duration = 3.0
 base_vigour = 1000.0
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = SubResource("SpriteFrames_ionqr")
-animation = &"Attack"
+animation = &"Hurt"
+frame = 6
+frame_progress = 1.0
 
 [node name="CollisionShape2D" parent="." index="1"]
 position = Vector2(0, 4)
 shape = SubResource("CapsuleShape2D_0qidf")
 
 [node name="VisibleOnScreenEnabler2D" parent="." index="2"]
-visible = false
 position = Vector2(-1.90735e-06, 1.5)
 scale = Vector2(3.9, 4.55)
 enable_node_path = NodePath("")
@@ -452,6 +456,14 @@ position = Vector2(0, 4)
 [node name="CollisionShape2D" parent="HurtBox" index="0"]
 shape = SubResource("CapsuleShape2D_ceryl")
 debug_color = Color(0.343118, 0.496231, 0, 0.419608)
+
+[node name="BackBox" parent="." index="6"]
+position = Vector2(-0.5, -33)
+
+[node name="CollisionShape2D" parent="BackBox" index="0"]
+position = Vector2(1.5, -2)
+shape = SubResource("RectangleShape2D_1bl40")
+debug_color = Color(0.7, 0, 0.0116665, 0.419608)
 
 [node name="BTPlayer" type="BTPlayer" parent="." index="7"]
 behavior_tree = ExtResource("4_bosnv")

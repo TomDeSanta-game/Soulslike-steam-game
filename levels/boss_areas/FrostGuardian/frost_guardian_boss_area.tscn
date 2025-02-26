@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://jlmfejnps25" path="res://Entities/scenes/Bosses/FrostGuardian/frost_guardian.tscn" id="9_oy0dg"]
 [ext_resource type="PackedScene" uid="uid://vpm32ogo31eu" path="res://Entities/scenes/Player/player.tscn" id="10_lfi45"]
 [ext_resource type="LabelSettings" uid="uid://dihms2mfxpk5d" path="res://assets/labelSettings/menu.tres" id="12_aea15"]
-[ext_resource type="Script" path="res://levels/boss_areas/FrostGuardian/doom_pit.gd" id="12_xkr3d"]
+[ext_resource type="Script" path="res://Singletons/Scripts/DoomPit/doom_pit.gd" id="12_xwb0j"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_18mvk"]
 texture = ExtResource("1_eafdk")
@@ -1060,12 +1060,12 @@ texture = ExtResource("8_84ibl")
 
 [node name="FrostGuardian" parent="." instance=ExtResource("9_oy0dg")]
 position = Vector2(301, -45)
-base_vigour = 1000.0
 
 [node name="player" parent="." instance=ExtResource("10_lfi45")]
 position = Vector2(0, -20)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+modulate = Color(0, 0, 0, 1)
 color = Color(0, 0, 0, 1)
 
 [node name="PointLights" type="Node" parent="."]
@@ -1079,7 +1079,7 @@ texture = SubResource("GradientTexture2D_yctgo")
 [node name="DoomPit" type="Area2D" parent="."]
 visible = false
 position = Vector2(0, 150)
-script = ExtResource("12_xkr3d")
+script = ExtResource("12_xwb0j")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DoomPit"]
 shape = SubResource("RectangleShape2D_doom")

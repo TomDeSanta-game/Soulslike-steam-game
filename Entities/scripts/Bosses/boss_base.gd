@@ -20,11 +20,22 @@ class_name BossBase
 @onready var boss_hurtbox: Node = %HurtBox
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var detection_area: Area2D = $DetectionArea
+@onready var back_box: Area2D = $BackBox
+
+# Add back damage properties
+@export_group("Back Damage Properties")
+@export var back_damage: float = 15.0  # Default back damage
+@export var back_damage_cooldown: float = 1.0  # Cooldown for back damage
+@export var continuous_damage_delay: float = 0.2  # Time needed for continuous collision damage
 
 var target: Node2D = null
 var can_attack: bool = true
 var attack_timer: float = 0.0
 var current_attack_pattern: Dictionary = {}
+var can_deal_back_damage: bool = true  # Track if back damage is available
+
+var _continuous_damage_timer: Timer
+var _is_player_in_back_box: bool = false
 
 const MOVEMENT_SPEEDS = {
 	"WALK": 200.0,
@@ -175,6 +186,9 @@ func _update_facing_direction(face_direction: int) -> void:
 			var current_scale = Vector2(-1 if face_left else 1, 1)
 			for box in hitboxes:
 				box.scale = current_scale
+			
+			# Update back box state when direction changes
+			_update_back_box_state()
 
 func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player"):
@@ -200,7 +214,7 @@ func _on_hit_taken(attacker_hitbox: Node, _defender_hitbox: Node) -> void:
 
 func take_damage(amount: float) -> void:
 	super.take_damage(amount)
-	if animated_sprite and animated_sprite.has_animation("Hurt"):
+	if animated_sprite:
 		animated_sprite.play("Hurt")
 
 func get_health() -> float:
@@ -256,3 +270,80 @@ func _on_animation_changed() -> void:
 	var _frame_data_component = get_node_or_null("FrameDataComponent")
 	if _frame_data_component:
 		_frame_data_component.update_frame_data()
+	
+	# Update back box state when animation changes
+	_update_back_box_state()
+
+func setup_back_box() -> void:
+	if not back_box:
+		push_error("BackBox node not found in boss!")
+		return
+		
+	# Configure back box collision properties
+	back_box.collision_layer = 0  # The box doesn't need a layer
+	back_box.collision_mask = C_Layers.LAYER_PLAYER  # Only detect player
+	back_box.monitorable = false
+	back_box.monitoring = true
+	
+	# Connect signals
+	if not back_box.body_entered.is_connected(_on_back_box_body_entered):
+		back_box.body_entered.connect(_on_back_box_body_entered)
+	if not back_box.body_exited.is_connected(_on_back_box_body_exited):
+		back_box.body_exited.connect(_on_back_box_body_exited)
+	
+	# Create cooldown timer for back damage
+	var back_damage_timer = Timer.new()
+	back_damage_timer.name = "BackDamageTimer"
+	back_damage_timer.one_shot = true
+	back_damage_timer.wait_time = back_damage_cooldown
+	back_damage_timer.timeout.connect(_on_back_damage_timer_timeout)
+	add_child(back_damage_timer)
+	
+	# Create continuous damage timer that repeats
+	_continuous_damage_timer = Timer.new()
+	_continuous_damage_timer.name = "ContinuousDamageTimer"
+	_continuous_damage_timer.one_shot = false  # Changed to false so it keeps checking
+	_continuous_damage_timer.wait_time = continuous_damage_delay
+	_continuous_damage_timer.timeout.connect(_on_continuous_damage_timer_timeout)
+	add_child(_continuous_damage_timer)
+	
+	# Initially enable the back box
+	_update_back_box_state()
+
+func _on_back_box_body_entered(body: Node2D) -> void:
+	if not back_box or not back_box.monitoring:
+		return
+		
+	if body.is_in_group("Player"):
+		_is_player_in_back_box = true
+		_continuous_damage_timer.start()  # Start checking continuously
+
+func _on_back_box_body_exited(body: Node2D) -> void:
+	if body.is_in_group("Player"):
+		_is_player_in_back_box = false
+		_continuous_damage_timer.stop()  # Stop checking when player exits
+
+func _on_back_damage_timer_timeout() -> void:
+	can_deal_back_damage = true
+
+func _on_continuous_damage_timer_timeout() -> void:
+	if _is_player_in_back_box:  # If player is still in the box
+		var player = get_tree().get_first_node_in_group("Player")
+		if player and player.has_method("take_damage") and can_deal_back_damage:
+			player.take_damage(back_damage)
+			can_deal_back_damage = false
+			if has_node("BackDamageTimer"):
+				get_node("BackDamageTimer").start()
+
+func _update_back_box_state() -> void:
+	if not back_box or not animated_sprite:
+		return
+		
+	# Disable back box during attack animation
+	var is_attacking = animated_sprite.animation == "Attack"
+	back_box.monitoring = not is_attacking
+	back_box.monitorable = not is_attacking
+	
+	# Keep the collision shape enabled
+	if back_box.get_node_or_null("CollisionShape2D"):
+		back_box.get_node("CollisionShape2D").disabled = is_attacking

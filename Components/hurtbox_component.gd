@@ -24,7 +24,6 @@ func take_hit(hitbox: Node) -> void:
 	SignalBus.hit_taken.emit(hitbox, self)  # Use global signal only
 	
 	if not hurtbox_owner or not hurtbox_owner.has_method("take_damage"):
-		Log.info("HurtboxComponent: Owner {0} cannot take damage".format([hurtbox_owner.name if hurtbox_owner else "null"]))
 		return
 	
 	var damage_amount: float = 0.0

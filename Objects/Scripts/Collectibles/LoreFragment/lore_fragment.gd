@@ -117,7 +117,7 @@ func collect_lore() -> void:
 	can_interact = false
 	hide_interaction_prompt()
 	
-	print("Collecting lore: ", lore_id)
+	Log.info("Collecting lore: {0}".format([lore_id]))
 	
 	# Add to inventory
 	var item_data = {
@@ -153,10 +153,10 @@ func collect_lore() -> void:
 	
 	# Handle teleportation if enabled
 	if enables_teleport:
-		print("Teleport is enabled, attempting teleport...")
+		Log.info("Teleport is enabled, attempting teleport...")
 		await _handle_teleport()
 	else:
-		print("Teleport is disabled")
+		Log.info("Teleport is disabled")
 	
 	# Queue free after collection and potential teleport
 	queue_free()
@@ -165,10 +165,10 @@ func _handle_teleport() -> void:
 	# Find the player
 	var player_node = get_tree().get_first_node_in_group("Player")
 	if not player_node:
-		print("Player not found!")
+		Log.info("Teleport failed: Player not found")
 		return
 		
-	print("Found player, applying teleport effect...")
+	Log.info("Found player, applying teleport effect...")
 	is_teleporting = true
 	
 	# Apply teleport shader to player
@@ -176,7 +176,7 @@ func _handle_teleport() -> void:
 		var teleport_shader_material = ShaderMaterial.new()
 		var shader = load("res://Shaders/Collectibles/teleport.gdshader")
 		if shader:
-			print("Shader loaded successfully")
+			Log.info("Shader loaded successfully")
 			teleport_shader_material.shader = shader
 			
 			# Store the original material to restore later
@@ -221,15 +221,15 @@ func _handle_teleport() -> void:
 			# Verify the scene exists before attempting to change to it
 			var target_scene = "res://levels/boss_areas/FrostGuardian/frost_guardian_boss_area.tscn"
 			if ResourceLoader.exists(target_scene):
-				print("Boss area scene found, changing scene...")
+				Log.info("Boss area scene found, changing scene...")
 				SceneManager.change_scene(target_scene, { "pattern_enter": "scribbles", "pattern_leave": "curtains"})
 			else:
-				push_error("Boss area scene not found at path: " + target_scene)
+				Log.error("Boss area scene not found at path: " + target_scene)
 				return
 			
-			print("Starting teleport animation...")
+			Log.info("Starting teleport animation...")
 			await tween.finished
-			print("Teleport animation finished")
+			Log.info("Teleport animation finished")
 			
 			# Cleanup
 			time_timer.queue_free()
@@ -238,9 +238,9 @@ func _handle_teleport() -> void:
 			if is_instance_valid(player_node) and is_instance_valid(player_node.animated_sprite):
 				player_node.animated_sprite.material = original_material
 		else:
-			print("Failed to load teleport shader!")
+			Log.error("Failed to load teleport shader!")
 	else:
-		print("Player's animated_sprite not found!")
+		Log.error("Player's animated_sprite not found!")
 
 func get_interaction_text() -> String:
 	return "Read Lore"

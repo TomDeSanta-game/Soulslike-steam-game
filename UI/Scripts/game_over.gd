@@ -11,5 +11,8 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("JUMP"):
 		# Change scene to main scene
-		SceneManager.change_scene("res://main/main.tscn")
-
+		SceneManager.change_scene("res://main/main.tscn", {
+			"pattern_enter": "radial",
+			"pattern_leave": "squares",
+			"wait_time": 0.1,
+		})

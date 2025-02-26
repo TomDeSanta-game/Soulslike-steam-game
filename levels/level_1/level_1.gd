@@ -19,9 +19,9 @@ func _on_detection_system_body_entered(_body: Node2D) -> void:
 		has_shown_label = true
 		LocationLabelManager.show_location_label("The Caves")
 
-func _on_doom_pit_body_entered(body: Node2D) -> void:
-	if body.is_in_group("Player"):
-		# Call die() on the player
-		if body.has_method("_die"):
-			body._die()
-		# The player's _die() function will handle the transition to game over scene
+# func _on_doom_pit_body_entered(body: Node2D) -> void:
+# 	if body.is_in_group("Player"):
+# 		# Call die() on the player
+# 		if body.has_method("_die"):
+# 			body._die()
+# 		# The player's _die() function will handle the transition to game over scene

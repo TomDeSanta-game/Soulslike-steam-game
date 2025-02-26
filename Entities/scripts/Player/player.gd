@@ -838,10 +838,9 @@ func _die() -> void:
 				SceneManager.change_scene(
 					"res://UI/Scenes/game_over.tscn",
 					{
-						"skip_fade_out": true,  # We have our own fade
-						"skip_fade_in": false,  # Allow fade in of new scene
-						"wait_time": 0.1,  # Quick transition
-						"skip_scene_change": false,
+						"pattern_enter": "circle",
+						"pattern_leave": "scribbles",
+						"wait_time": 0.2,  # Quick transition
 					}
 				)
 			

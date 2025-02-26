@@ -15,18 +15,20 @@ const DEBUG_COLORS = {
 # Predefined positions for different animations and their active frames
 const ANIMATION_DATA = {
 	"Attack": {
-		"frames": [6, 7, 8],
+		"frames": [2, 3, 4],  # Active attack frames
 		"positions": {
-			"hitbox": Vector2(-50, 5),
-			"hurtbox": Vector2(0, 4)
-		}
+			"hitbox": Vector2(50, 0),  # Position hitbox in front of player
+			"hurtbox": Vector2(0, 0)
+		},
+		"damage": 20.0  # Changed to 20 damage per hit
 	},
 	"Run_Attack": {
 		"frames": [2, 3, 4],
 		"positions": {
-			"hitbox": Vector2(6.5, 0),
-			"hurtbox": Vector2(0, 5)
-		}
+			"hitbox": Vector2(50, 0),
+			"hurtbox": Vector2(0, 0)
+		},
+		"damage": 20.0  # Changed to 20 damage per hit
 	}
 }
 
@@ -77,13 +79,34 @@ func update_frame_data() -> void:
 	# Update positions based on animation and frame
 	if ANIMATION_DATA.has(animation):
 		var data = ANIMATION_DATA[animation]
-		if data.frames.has(current_frame):
-			if hitbox and data.positions.has("hitbox"):
-				hitbox.position = data.positions.hitbox
-			if hurtbox and data.positions.has("hurtbox"):
-				hurtbox.position = data.positions.hurtbox
-		else:
-			clear_active_boxes()
+		
+		# Handle hitbox activation and positioning
+		if hitbox:
+			if data.frames.has(current_frame):
+				hitbox.active = true
+				hitbox.show()
+				
+				# Set hitbox position based on sprite direction
+				var hitbox_pos = data.positions.hitbox
+				if sprite.flip_h:
+					hitbox_pos.x = -hitbox_pos.x
+				hitbox.position = hitbox_pos
+				
+				# Set damage if specified
+				if data.has("damage"):
+					hitbox.damage = data.damage
+				
+				# Ensure hitbox is monitoring
+				hitbox.set_deferred("monitoring", true)
+				hitbox.set_deferred("monitorable", false)
+			else:
+				hitbox.active = false
+				hitbox.hide()
+				hitbox.set_deferred("monitoring", false)
+		
+		# Handle hurtbox positioning
+		if hurtbox and data.positions.has("hurtbox"):
+			hurtbox.position = data.positions.hurtbox
 	else:
 		clear_active_boxes()
 	

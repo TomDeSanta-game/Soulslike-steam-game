@@ -1,6 +1,7 @@
-[gd_scene load_steps=28 format=4 uid="uid://beai48cdctfy7"]
+[gd_scene load_steps=29 format=4 uid="uid://beai48cdctfy7"]
 
 [ext_resource type="Script" path="res://levels/level_1/level_1.gd" id="1_wb4y3"]
+[ext_resource type="Script" path="res://Singletons/Scripts/DoomPit/doom_pit.gd" id="2_3tg7i"]
 [ext_resource type="Texture2D" uid="uid://ceqmp4vsqbm1h" path="res://assets/dungeon-platformer-pixel-art-tileset/background3.png" id="3_g63hl"]
 [ext_resource type="PackedScene" uid="uid://m5ewagldf4er" path="res://Objects/Scenes/Collectibles/LoreFragment/lore_fragment.tscn" id="4_6w14d"]
 [ext_resource type="PackedScene" uid="uid://da7xh2hu5kb70" path="res://Objects/Scenes/Collectibles/CelestialTear/celestial_tear.tscn" id="4_a6vnj"]
@@ -3411,6 +3412,7 @@ sources/2 = SubResource("TileSetAtlasSource_gpp3k")
 sources/4 = SubResource("TileSetAtlasSource_hy82g")
 
 [node name="Level_1" type="Node2D"]
+position = Vector2(1, 0)
 script = ExtResource("1_wb4y3")
 
 [node name="DetectionSystem" type="Area2D" parent="."]
@@ -3420,6 +3422,7 @@ visible = false
 shape = SubResource("RectangleShape2D_a8ivm")
 
 [node name="DoomPit" type="Area2D" parent="."]
+script = ExtResource("2_3tg7i")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DoomPit"]
 position = Vector2(0, 200)
