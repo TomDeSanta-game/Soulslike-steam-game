@@ -29,6 +29,10 @@ func _ready() -> void:
 	else:
 		push_error("BossHealthBar node not found in GameUI!")
 
+func _process(delta: float) -> void:
+	SoundManager.play_music(Sound.music)
+	SoundManager.set_music_volume(0.5)
+
 func _on_detection_area_body_entered(body: Node2D) -> void:
 	print("Body entered detection area: ", body.name)
 	if body.is_in_group("Player"):
