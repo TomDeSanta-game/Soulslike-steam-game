@@ -21,23 +21,7 @@ const STATS: Dictionary = {
 	"WALL_GRAB_CHECK_DISTANCE": 5.0,  # How far to check for walls
 }
 
-const ANIMATIONS: Dictionary = {
-	"IDLE": "Idle",
-	"RUN": "Run",
-	"JUMP": "Jump",
-	"ATTACK": "Attack",
-	"CROUCH": "Crouch",
-	"CROUCH_RUN": "Crouch_Run",
-	"DASH": "Dash",
-	"DEATH": "Death",
-	"FALL": "Fall",
-	"HURT": "Hurt",
-	"ROLL": "Roll",
-	"RUN_ATTACK": "Run_Attack",
-	"SLIDE": "Slide",
-	"WALL_CLIMB": "Wall_Climb",
-	"WALL_HANG": "Wall_Hang"
-}
+const ANIMATIONS: Dictionary = {"IDLE": "Idle", "RUN": "Run", "JUMP": "Jump", "ATTACK": "Attack", "CROUCH": "Crouch", "CROUCH_RUN": "Crouch_Run", "DASH": "Dash", "DEATH": "Death", "FALL": "Fall", "HURT": "Hurt", "ROLL": "Roll", "RUN_ATTACK": "Run_Attack", "SLIDE": "Slide", "WALL_CLIMB": "Wall_Climb", "WALL_HANG": "Wall_Hang"}
 
 # Node references
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -476,12 +460,7 @@ func _physics_process(delta: float) -> void:
 	if !is_on_floor() and !is_grabbing and gravity_enabled:  # Only apply gravity if enabled
 		velocity.y += Types.GRAVITY_CONSTANT * delta
 		# Only play fall animation when moving downward and not in a jump state
-		if (
-			velocity.y > 0
-			and !is_jump_active
-			and !is_attacking
-			and animated_sprite.animation != ANIMATIONS.JUMP
-		):  # Check animation instead of state
+		if velocity.y > 0 and !is_jump_active and !is_attacking and animated_sprite.animation != ANIMATIONS.JUMP:  # Check animation instead of state
 			state_machine.dispatch(&"fall")
 	elif was_on_floor:
 		# Update last floor position when on floor
@@ -586,9 +565,7 @@ func _update_health_bar() -> void:
 			new_color = Color.from_string("#ff0000", Color.RED)  # Low health color
 
 		# Tween the color change
-		tween.parallel().tween_method(
-			func(c): health_style.bg_color = c, health_style.bg_color, new_color, 0.4
-		)
+		tween.parallel().tween_method(func(c): health_style.bg_color = c, health_style.bg_color, new_color, 0.4)
 
 	# Flash effect when taking damage
 	if health_bar.value > current_health:
@@ -816,9 +793,7 @@ func _die() -> void:
 	if is_on_floor():
 		spawn_position = global_position
 	else:
-		spawn_position = (
-			last_floor_position if last_floor_position != Vector2.ZERO else global_position
-		)
+		spawn_position = (last_floor_position if last_floor_position != Vector2.ZERO else global_position)
 
 	# Adjust X position based on player direction
 	if animated_sprite and is_instance_valid(animated_sprite):
@@ -942,19 +917,7 @@ func _check_health() -> void:
 
 # UI System
 func _update_ui() -> void:
-	label.text = (
-		"Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nStamina: %.1f/%s\nAnimation: %s"
-		% [
-			"None",
-			Engine.get_frames_per_second(),
-			current_health,
-			max_health,
-			health_percent,
-			stamina,
-			STATS.MAX_STAMINA,
-			animated_sprite.animation
-		]
-	)
+	label.text = ("Class: %s\nFPS: %s\nHealth: %s/%s (%.1f%%)\nStamina: %.1f/%s\nAnimation: %s" % ["None", Engine.get_frames_per_second(), current_health, max_health, health_percent, stamina, STATS.MAX_STAMINA, animated_sprite.animation])
 
 
 func _connect_signals() -> void:
@@ -1074,9 +1037,7 @@ func _on_frame_changed() -> void:
 # Lifesteal System
 func _apply_lifesteal(damage_dealt: float) -> void:
 	var lifesteal_amount = damage_dealt * STATS.LIFESTEAL_PERCENT / 100.0
-	lifesteal_amount = clamp(
-		lifesteal_amount, STATS.MIN_LIFESTEAL_AMOUNT, STATS.MAX_LIFESTEAL_AMOUNT
-	)
+	lifesteal_amount = clamp(lifesteal_amount, STATS.MIN_LIFESTEAL_AMOUNT, STATS.MAX_LIFESTEAL_AMOUNT)
 
 	if lifesteal_amount > 0:
 		# Visual feedback for lifesteal
@@ -1150,9 +1111,7 @@ func _update_stamina_bar() -> void:
 			new_color = Color.from_string("#ff6600", Color.ORANGE)  # Low stamina color
 
 		# Tween the color change
-		tween.parallel().tween_method(
-			func(c): stamina_style.bg_color = c, stamina_style.bg_color, new_color, 0.3
-		)
+		tween.parallel().tween_method(func(c): stamina_style.bg_color = c, stamina_style.bg_color, new_color, 0.3)
 
 	# Pulse effect when stamina is low
 	if stamina < STATS.MAX_STAMINA * 0.2:  # Less than 20% stamina
@@ -1307,11 +1266,7 @@ func _on_item_used(item_data: Dictionary) -> void:
 
 # Add these new methods
 func _start_grab() -> void:
-	if (
-		grab_collision_shape
-		and is_on_wall()
-		and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * 0.1)
-	):
+	if grab_collision_shape and is_on_wall() and _has_enough_stamina(STATS.WALL_CLIMB_STAMINA_DRAIN * 0.1):
 		grab_collision_shape.disabled = false
 		is_grabbing = true
 		# Apply upward movement while grabbing
@@ -1355,10 +1310,7 @@ func _can_climb_ledge() -> bool:
 	ledge_check.force_raycast_update()
 
 	# Check if we found a valid ledge
-	return (
-		ledge_check.is_colliding()
-		and not ledge_check.get_collision_point().is_equal_approx(global_position)
-	)
+	return ledge_check.is_colliding() and not ledge_check.get_collision_point().is_equal_approx(global_position)
 
 
 # Update the ledge climb function
@@ -1381,10 +1333,7 @@ func _start_ledge_climb() -> void:
 	var target_position = Vector2.ZERO
 	if ledge_check.is_colliding():
 		var collision_point = ledge_check.get_collision_point()
-		target_position = Vector2(
-			collision_point.x - (climb_offset.x / 2 * (-1 if animated_sprite.flip_h else 1)),
-			collision_point.y + climb_offset.y
-		)
+		target_position = Vector2(collision_point.x - (climb_offset.x / 2 * (-1 if animated_sprite.flip_h else 1)), collision_point.y + climb_offset.y)
 
 	# Create a tween for smooth movement
 	var tween = create_tween()
@@ -1421,19 +1370,14 @@ func _setup_ui_displays() -> void:
 			ui_layer.add_child(souls_display)
 
 			# Position souls display on the right side
-			souls_display.position = Vector2(
-				get_viewport_rect().size.x - souls_display.size.x - 20, 20  # 20 pixels from right edge  # 20 pixels from top
-			)
+			souls_display.position = Vector2(get_viewport_rect().size.x - souls_display.size.x - 20, 20)  # 20 pixels from right edge  # 20 pixels from top
 
 			# Add XP display
 			xp_display = xp_display_scene.instantiate()
 			ui_layer.add_child(xp_display)
 
 			# Position XP display below souls display
-			xp_display.position = Vector2(
-				get_viewport_rect().size.x - xp_display.size.x - 20,  # 20 pixels from right edge
-				souls_display.position.y + souls_display.size.y + 10  # 10 pixels below souls display
-			)
+			xp_display.position = Vector2(get_viewport_rect().size.x - xp_display.size.x - 20, souls_display.position.y + souls_display.size.y + 10)  # 20 pixels from right edge  # 10 pixels below souls display
 
 			# Add level up menu
 			level_up_menu = level_up_menu_scene.instantiate()
