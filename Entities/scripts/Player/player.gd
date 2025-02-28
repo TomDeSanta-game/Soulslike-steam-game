@@ -10,7 +10,7 @@ const STATS: Dictionary = {
 	"DASH_SPEED": 1200.0,  # Increased from 800 to 1200 for faster dash
 	"DASH_DURATION": 0.1,  # Reduced from 0.15 to 0.1 for faster dash
 	"DASH_COOLDOWN": 0.5,  # Time before can dash again
-	"MAX_STAMINA": 100.0,
+	"MAX_STAMINA": 200.0,  # Increased from 100 to 200
 	"STAMINA_REGEN_RATE": 20.0,  # Stamina points per second
 	"ATTACK_STAMINA_COST": 10.0,
 	"RUN_ATTACK_STAMINA_COST": 20.0,
@@ -175,6 +175,8 @@ var merchant_menu: MerchantMenu = null
 # Add a class variable to track if death transition is in progress
 var _is_death_transition_active: bool = false
 
+@onready var fell_label: Label = %FellLabel
+
 
 func _ready() -> void:
 	# Add only the player node to the Player group
@@ -184,6 +186,8 @@ func _ready() -> void:
 	types.player = self
 
 	place_label.add_to_group("PlaceLabel")
+
+	fell_label.add_to_group("FellLabel")
 
 	# Connect item used signal
 	SignalBus.item_used.connect(_on_item_used)
@@ -400,14 +404,14 @@ func _ready() -> void:
 		var collection_area = Area2D.new()
 		collection_area.name = "CollectionArea"
 		add_child(collection_area)
-		
+
 		# Add collision shape
 		var collection_shape = CollisionShape2D.new()
 		var shape = CircleShape2D.new()
 		shape.radius = 20.0  # Adjust radius as needed
 		collection_shape.shape = shape
 		collection_area.add_child(collection_shape)
-		
+
 		# Set proper collision layer and mask for collection
 		collection_area.collision_layer = C_Layers.LAYER_PLAYER
 		collection_area.collision_mask = C_Layers.LAYER_COLLECTIBLE
@@ -758,9 +762,9 @@ func _die() -> void:
 	# Prevent multiple calls to _die() from happening at once
 	if _is_death_transition_active:
 		return
-		
+
 	_is_death_transition_active = true
-	
+
 	# Disable physics processing first
 	state_machine.set_active(false)
 	set_physics_process(false)
@@ -812,7 +816,9 @@ func _die() -> void:
 	if is_on_floor():
 		spawn_position = global_position
 	else:
-		spawn_position = last_floor_position if last_floor_position != Vector2.ZERO else global_position
+		spawn_position = (
+			last_floor_position if last_floor_position != Vector2.ZERO else global_position
+		)
 
 	# Adjust X position based on player direction
 	if animated_sprite and is_instance_valid(animated_sprite):
@@ -835,15 +841,18 @@ func _die() -> void:
 			# Only proceed if we're not already transitioning
 			if not SceneManager.is_transitioning:
 				# Change to the game over scene
-				SceneManager.change_scene(
-					"res://UI/Scenes/game_over.tscn",
-					{
-						"pattern_enter": "circle",
-						"pattern_leave": "scribbles",
-						"wait_time": 0.2,  # Quick transition
-					}
+				(
+					SceneManager
+					. change_scene(
+						"res://UI/Scenes/game_over.tscn",
+						{
+							"pattern_enter": "circle",
+							"pattern_leave": "scribbles",
+							"wait_time": 0.2,  # Quick transition
+						}
+					)
 				)
-			
+
 			# Clean up timer
 			transition_timer.queue_free()
 	)
@@ -888,14 +897,17 @@ func take_damage(damage_amount: float) -> void:
 	else:
 		# Play hurt animation and sound
 		animated_sprite.play(ANIMATIONS.HURT)
-		SoundManager.play_sound(Sound.oof, "SFX")
+
+		SoundManager.set_sound_volume(0.4)
+
+		SoundManager.play_sound(Sound.hurt, "SFX")
 
 		# Enhanced screen shake with more impact
 		camera.shake(12, 0.3, 0.85)
 
 		# Damage pause effect
 		Engine.time_scale = 0.05
-		await get_tree().create_timer(0.3 * Engine.time_scale).timeout
+		await get_tree().create_timer(0.35 * Engine.time_scale).timeout
 		Engine.time_scale = 1.0
 
 		# Start invincibility
@@ -978,7 +990,7 @@ func _on_hit_landed(hitbox_node: Node, target_hurtbox: Node) -> void:
 	# Only process hits from our own hitbox
 	if hitbox_node.hitbox_owner != self:
 		return
-		
+
 	if target_hurtbox.hurtbox_owner and target_hurtbox.hurtbox_owner.is_in_group("Enemy"):
 		# Play hit effect or sound
 		SoundManager.play_sound(Sound.hit, "SFX")
@@ -990,7 +1002,7 @@ func _on_hit_taken(attacker_hitbox: Node, defender_hurtbox: Node) -> void:
 	# Only process hits to our own hurtbox
 	if defender_hurtbox.hurtbox_owner != self:
 		return
-		
+
 	if attacker_hitbox.hitbox_owner and attacker_hitbox.hitbox_owner.is_in_group("Enemy"):
 		take_damage(attacker_hitbox.damage)
 
@@ -1410,8 +1422,7 @@ func _setup_ui_displays() -> void:
 
 			# Position souls display on the right side
 			souls_display.position = Vector2(
-				get_viewport_rect().size.x - souls_display.size.x - 20,  # 20 pixels from right edge
-				20  # 20 pixels from top
+				get_viewport_rect().size.x - souls_display.size.x - 20, 20  # 20 pixels from right edge  # 20 pixels from top
 			)
 
 			# Add XP display

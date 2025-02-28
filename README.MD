@@ -127,7 +127,19 @@ A challenging 2D soulslike game built in Godot 4, featuring precise combat mecha
   - Frost-based attacks with slowing effects
   - Power-up system at 50% health
   - Enhanced damage and speed in powered state
-  - Properly positioned hitboxes that adjust based on facing direction
+  - Precise hitbox positioning system:
+    - When facing right (flip_h = true):
+      - Hitbox positioned at x = 75
+      - Attacks hit players to the left of hitbox
+    - When facing left (flip_h = false):
+      - Hitbox positioned at x = -75
+      - Attacks hit players to the right of hitbox
+    - Vertical range check within 30 units
+    - Attack frames active during frames 6-8 of attack animation
+  - Three-phase combat system:
+    - Phase 1 (100% - 70% health): Base attacks
+    - Phase 2 (70% - 30% health): 20% damage increase, 10% faster attacks
+    - Phase 3 (30% - 0% health): 30% damage increase, 20% faster attacks, 50% longer frost effects
 
 ## Technical Details
 

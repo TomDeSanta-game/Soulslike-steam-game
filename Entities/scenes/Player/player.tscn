@@ -1,4 +1,4 @@
-[gd_scene load_steps=90 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=92 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -66,7 +66,8 @@
 [ext_resource type="Texture2D" uid="uid://duefbqrf00nlm" path="res://assets/Player/Individual Sprites/adventurer-crnr-grb-03.png" id="57_w1nw7"]
 [ext_resource type="FontFile" uid="uid://2cet2eupuug3" path="res://assets/fonts/JetBrainsMonoNerdFont-Bold.ttf" id="64_tlvdk"]
 [ext_resource type="PackedScene" uid="uid://c2q8vxudrm6y2" path="res://UI/Scenes/inventory.tscn" id="65_8s1py"]
-[ext_resource type="FontFile" uid="uid://dkfmcs12ufeaf" path="res://assets/fonts/FiraSans-Medium.ttf" id="65_g3sok"]
+[ext_resource type="FontFile" uid="uid://dqsu4ub0voqp5" path="res://assets/fonts/OptimusPrincepsSemiBold.ttf" id="65_mbu0k"]
+[ext_resource type="FontFile" uid="uid://6x68i3w48eri" path="res://assets/fonts/Mantinia Regular.otf" id="65_ntark"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_r5sqx"]
 shader = ExtResource("2_0x5o6")
@@ -389,8 +390,17 @@ font_size = 24
 font_color = Color(1, 1, 1, 0.568627)
 
 [sub_resource type="LabelSettings" id="LabelSettings_lqeyv"]
-font = ExtResource("65_g3sok")
+font = ExtResource("65_ntark")
 font_size = 148
+font_color = Color(0.905882, 0.815686, 0.607843, 1)
+outline_size = 20
+outline_color = Color(0.0666667, 0.0156863, 0.00784314, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_lf43r"]
+font = ExtResource("65_mbu0k")
+font_size = 148
+outline_size = 20
+outline_color = Color(0, 0, 0, 1)
 
 [node name="player" type="CharacterBody2D"]
 position = Vector2(-1, 0)
@@ -532,13 +542,19 @@ label_settings = SubResource("LabelSettings_kpg22")
 unique_name_in_owner = true
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 1.0
-offset_right = 1.0
 offset_bottom = 468.0
 grow_horizontal = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 label_settings = SubResource("LabelSettings_lqeyv")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FellLabel" type="Label" parent="UILayer" groups=["FellLabel"]]
+unique_name_in_owner = true
+offset_right = 1920.0
+offset_bottom = 468.0
+label_settings = SubResource("LabelSettings_lf43r")
 horizontal_alignment = 1
 vertical_alignment = 1
 

@@ -444,6 +444,7 @@ enable_node_path = NodePath("")
 
 [node name="HitBox" parent="." index="3"]
 position = Vector2(-50, 5)
+monitoring = false
 
 [node name="CollisionShape2D" parent="HitBox" index="0"]
 rotation = 1.5708

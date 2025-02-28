@@ -1,6 +1,11 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3 uid="uid://ccad8iunio81i"]
 
 [ext_resource type="Script" path="res://UI/Scripts/boss_health_bar.gd" id="1_2k4p3"]
+[ext_resource type="FontFile" uid="uid://dqsu4ub0voqp5" path="res://assets/fonts/OptimusPrincepsSemiBold.ttf" id="2_wtrcq"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_i8bcs"]
+font = ExtResource("2_wtrcq")
+font_size = 28
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.15, 0.15, 0.15, 0.8)
@@ -8,19 +13,19 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.3, 0.3, 0.3, 1.0)
+border_color = Color(0.3, 0.3, 0.3, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health"]
-bg_color = Color(0.85, 0.2, 0.2, 1.0)
+bg_color = Color(0.85, 0.2, 0.2, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.7, 0.15, 0.15, 1.0)
+border_color = Color(0.7, 0.15, 0.15, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -53,7 +58,8 @@ theme_override_constants/separation = 8
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
-text = "Boss Name"
+text = "Boss"
+label_settings = SubResource("LabelSettings_i8bcs")
 horizontal_alignment = 1
 
 [node name="HealthBar" type="ProgressBar" parent="VBoxContainer"]
@@ -64,4 +70,4 @@ mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_health")
 value = 100.0
-show_percentage = false 
+show_percentage = false

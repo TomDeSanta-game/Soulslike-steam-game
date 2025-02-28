@@ -1,4 +1,3 @@
-# Version 1.0.0
 extends BossBase
 class_name FrostGuardian
 
@@ -33,19 +32,46 @@ var attack_delay_timer: float = 0.0
 
 # Add is_hurt state at the top with other state variables
 var is_hurt: bool = false
-var should_play_hurt: bool = false
 
+# Add chase speed
+var chase_speed: float = 250.0  # Faster speed when chasing
+var patrol_speed: float = 150.0  # Normal patrol speed
+
+# Patrol variables
+var patrol_enabled: bool = true
+var patrol_wait_time: float = 2.0
+var patrol_timer: float = 0.0
+var is_patrolling: bool = false
+var initial_position: Vector2
+var patrol_points: Array[Vector2] = [
+	Vector2(-400, 0),  # Left point (much wider patrol)
+	Vector2(400, 0),   # Right point
+	Vector2(0, 0),     # Center point
+]
 
 func _ready() -> void:
 	# Do not call super._ready() to avoid health manager initialization
+
+	LimboConsole.register_command(die, "boss_die")
+	
+	# Store initial position for patrol points
+	initial_position = global_position
+	
+	# Convert patrol points to global coordinates
+	var global_patrol_points: Array[Vector2] = []
+	for point in patrol_points:
+		global_patrol_points.append(initial_position + point)
+	
+	# Register patrol points with global coordinates
+	PatrolPoint.register_patrol_points("frost_guardian", global_patrol_points)
 	
 	# Set initial health values
-	max_health = 200.0  # Reduced boss health from 1000 to 200
+	max_health = 250.0  # Updated health value
 	current_health = max_health
 	
-	# Emit boss-specific signals with correct health values
-	SignalBus.boss_spawned.emit(self)
-	SignalBus.boss_damaged.emit(self, current_health, max_health)
+	# Emit initial signals
+	SignalBus.emit_signal("boss_spawned", self)
+	SignalBus.emit_signal("boss_damaged", self, current_health, max_health)
 
 	# Disable behavior tree
 	var bt_node = get_node_or_null("BTPlayer")
@@ -54,10 +80,11 @@ func _ready() -> void:
 		bt_node.set_physics_process(false)
 		bt_node.set_process_input(false)
 
-	# Set Frost Guardian specific properties
-	attack_damage = 10.0  # Base damage of 10
-	back_damage = 20.0  # Higher back damage for Frost Guardian
-	back_damage_cooldown = 1.5  # Custom cooldown for back damage
+	# Set Frost Guardian specific properties with FIXED damage values
+	attack_damage = 10.0  # Base attack damage
+	back_damage = 5.0    # Back damage
+	attack_cooldown = 1.5  # Attack cooldown
+	back_damage_cooldown = 1.5  # Back damage cooldown
 
 	# Setup back box for back damage
 	setup_back_box()
@@ -81,19 +108,23 @@ func _ready() -> void:
 	_setup_detection_area()
 
 	if boss_hitbox:
-		boss_hitbox.position = Vector2(50, 5)
+		print("Setting up boss hitbox")
+		# CRITICAL: Completely disable hitbox at start
 		boss_hitbox.active = false
-		boss_hitbox.damage = attack_damage
-		boss_hitbox.hitbox_owner = self
-		boss_hitbox.monitoring = true
+		boss_hitbox.monitoring = false
 		boss_hitbox.monitorable = false
-		boss_hitbox.show()
+		boss_hitbox.hide()
+		boss_hitbox.damage = attack_damage  # Set damage
+		boss_hitbox.hitbox_owner = self     # Set owner
+		boss_hitbox.position = Vector2(75, 5)
+		boss_hitbox.collision_layer = C_Layers.LAYER_HITBOX
+		boss_hitbox.collision_mask = C_Layers.LAYER_HURTBOX
+		
+		# CRITICAL: Disable collision shape
+		if boss_hitbox.get_node_or_null("CollisionShape2D"):
+			boss_hitbox.get_node("CollisionShape2D").set_deferred("disabled", true)
 
-		boss_hitbox.set_deferred("collision_layer", C_Layers.LAYER_HITBOX)
-		boss_hitbox.set_deferred("collision_mask", C_Layers.LAYER_HURTBOX)
-		boss_hitbox.set_deferred("monitoring", true)
-		boss_hitbox.set_deferred("monitorable", false)
-
+		# Ensure hitbox is properly connected
 		if boss_hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 			boss_hitbox.area_entered.disconnect(_on_hitbox_area_entered)
 		boss_hitbox.area_entered.connect(_on_hitbox_area_entered)
@@ -106,6 +137,9 @@ func _ready() -> void:
 		boss_hurtbox.collision_mask = C_Layers.LAYER_HITBOX
 		boss_hurtbox.monitoring = true
 		boss_hurtbox.monitorable = true
+		
+		# Add to boss hurtbox group to prevent self-collision
+		boss_hurtbox.add_to_group("Boss_Hurtbox")
 		
 		# Connect hurtbox signals - ensure proper type checking
 		if boss_hurtbox is HurtboxComponent:
@@ -171,55 +205,40 @@ func _setup_detection_area() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	super._physics_process(delta)
-
-	# Debug timer for periodic checks
-	debug_timer += delta
-	if debug_timer >= 5.0:
-		debug_timer = 0.0
-		_print_debug_info()
-
 	# Add gravity
 	if not is_on_floor():
 		velocity.y += 900 * delta
-
-	# Don't process AI if being hurt
-	if is_hurt:
+	
+	# Don't process AI if being hurt, dead, or attacking
+	if is_hurt or not is_instance_valid(self) or current_health <= 0:
+		# SAFETY: Ensure hitbox is disabled when not in normal state
+		if boss_hitbox:
+			_disable_hitbox()
+		move_and_slide()
 		return
-
-	# EXTREMELY SIMPLE APPROACH: Just basic AI without behavior tree
+	
+	# If attacking, only handle attack frames and movement stop
+	if is_attacking:
+		velocity.x = 0
+		_handle_attack_frames()
+		move_and_slide()
+		return
+	
+	# SAFETY: Ensure hitbox is disabled when not attacking
+	if boss_hitbox and not is_attacking:
+		_disable_hitbox()
+	
+	# Handle chase or patrol only when not attacking
 	if target and is_instance_valid(target):
 		var distance = global_position.distance_to(target.global_position)
-		var direction = (target.global_position - global_position).normalized()
-
-		# Only update facing direction if NOT attacking
-		if animated_sprite and not is_attacking:
-			animated_sprite.flip_h = direction.x > 0
-
-		if is_attacking:
-			velocity.x = 0
-
-			if animated_sprite and animated_sprite.animation != "Attack":
-				animated_sprite.play("Attack")
-
-			_handle_attack_frames()
-		else:
-			if distance <= attack_range and can_attack:
-				velocity.x = 0
-				_perform_frost_slash()
-			elif distance > attack_range:
-				velocity.x = direction.x * MOVEMENT_SPEEDS.RUN
-				if animated_sprite and animated_sprite.animation != "Run":
-					animated_sprite.play("Run")
-			else:
-				velocity.x = 0
-				if animated_sprite and animated_sprite.animation != "Idle":
-					animated_sprite.play("Idle")
-	else:
-		velocity.x = 0
-		if animated_sprite and animated_sprite.animation != "Idle" and not is_attacking:
-			animated_sprite.play("Idle")
-
+		if distance <= detection_range:
+			chase_player()
+		elif patrol_enabled:
+			handle_patrol(delta)
+	elif patrol_enabled:
+		handle_patrol(delta)
+	
+	# Always call move_and_slide at the end
 	move_and_slide()
 
 
@@ -228,30 +247,42 @@ func _handle_attack_frames() -> void:
 		return
 
 	if animated_sprite.animation != "Attack":
-		if is_attacking:
-			animated_sprite.play("Attack")
+		_disable_hitbox()
 		return
 
 	var current_frame = animated_sprite.frame
-
+	
+	# Only activate hitbox during specific attack frames
 	if current_frame in [6, 7, 8]:
-		if not boss_hitbox.active:
-			boss_hitbox.active = true
-			boss_hitbox.show()
-			boss_hitbox.damage = attack_damage
-			boss_hitbox.set_deferred("monitoring", true)
-			boss_hitbox.set_deferred("monitorable", false)
-
-			var hitbox_position = Vector2(50, 5)
-			if animated_sprite.flip_h:
-				hitbox_position.x = -hitbox_position.x
-			boss_hitbox.position = hitbox_position
+		boss_hitbox.damage = attack_damage  # Ensure damage is set before enabling
+		_enable_hitbox()
+		
+		# Position the hitbox based on facing direction
+		var hitbox_position = Vector2(75 if animated_sprite.flip_h else -75, 5)
+		boss_hitbox.position = hitbox_position
+		
+		# Check for player hit immediately
+		var player = get_tree().get_first_node_in_group("Player")
+		if player:
+			var hitbox_global_pos = boss_hitbox.global_position
+			var player_pos = player.global_position
+			var attack_reach = 75
+			
+			var x_distance = abs(player_pos.x - hitbox_global_pos.x)
+			var y_distance = abs(player_pos.y - hitbox_global_pos.y)
+			
+			var is_in_range = false
+			if animated_sprite.flip_h:  # If facing right
+				is_in_range = player_pos.x >= hitbox_global_pos.x and x_distance <= attack_reach
+			else:  # If facing left
+				is_in_range = player_pos.x <= hitbox_global_pos.x and x_distance <= attack_reach
+			
+			is_in_range = is_in_range and y_distance <= 30
+			
+			if is_in_range and player.has_method("take_damage"):
+				player.take_damage(attack_damage)  # Use consistent damage value
 	else:
-		if boss_hitbox.active:
-			boss_hitbox.active = false
-			boss_hitbox.hide()
-			boss_hitbox.set_deferred("monitoring", false)
-			boss_hitbox.set_deferred("monitorable", false)
+		_disable_hitbox()
 
 
 func _print_debug_info() -> void:
@@ -261,7 +292,7 @@ func _print_debug_info() -> void:
 
 
 func _handle_movement(delta: float) -> void:
-	# CRITICAL FIX: Don't handle movement if attacking
+	# Don't handle movement if attacking
 	if is_attacking:
 		velocity.x = 0
 		return
@@ -272,72 +303,66 @@ func _handle_movement(delta: float) -> void:
 			animated_sprite.play("Idle")
 		return
 
-	# Calculate direction and distance to target
 	var target_direction = (target.global_position - global_position).normalized()
 	var target_distance = global_position.distance_to(target.global_position)
 
-	# Always set facing direction regardless of movement
-	set_facing_direction(target_direction.x)
-
-	# Smooth distance transitions to prevent jittering
-	if abs(target_distance - last_target_distance) < movement_threshold:
-		target_distance = lerp(last_target_distance, target_distance, 0.2)
+	# More responsive distance tracking
 	last_target_distance = target_distance
 
-	# Attack logic - only if we're in range and can attack
-	if target_distance <= attack_range and can_attack:
-		# Stop completely before attacking
-		velocity.x = 0
+	# Update facing direction immediately only if not attacking
+	if abs(target_direction.x) > 0.1 and not is_attacking:
+		set_facing_direction(target_direction.x)
 
-		# Only start attack if we've been stopped for a moment
-		attack_delay_timer += delta
-		if attack_delay_timer >= 0.2:  # Small delay to ensure we're stopped
-			is_attacking = true
-			can_attack = false
-			velocity.x = 0
-			current_state = BossState.ATTACKING
+	# Attack logic with commitment
+	if target_distance <= attack_range and can_attack and not is_attacking:
+		velocity.x = lerp(velocity.x, 0.0, 0.5)  # Faster stop
+		
+		if abs(velocity.x) < 20:
+			attack_delay_timer += delta
+			if attack_delay_timer >= 0.1:
+				is_attacking = true
+				can_attack = false
+				velocity.x = 0
+				current_state = BossState.ATTACKING
 
-			if animated_sprite:
-				# Force animation to stop and restart
-				animated_sprite.stop()
-				animated_sprite.frame = 0
-				animated_sprite.play("Attack")
+				if animated_sprite:
+					animated_sprite.stop()
+					animated_sprite.frame = 0
+					animated_sprite.play("Attack")
 
-			frost_attack_timer.start(attack_cooldown)
-			attack_delay_timer = 0.0
-		return
+				frost_attack_timer.start(attack_cooldown)
+				attack_delay_timer = 0.0
 	else:
 		attack_delay_timer = 0.0
+		
+		# Movement only if not attacking
+		if not is_attacking:
+			if target_distance > attack_range * 1.2:
+				var speed_factor = clamp(target_distance / 200.0, 0.7, 1.0)
+				var target_velocity = target_direction.x * MOVEMENT_SPEEDS.RUN * speed_factor
+				velocity.x = lerp(velocity.x, target_velocity, 0.2)
+			else:
+				velocity.x = lerp(velocity.x, 0.0, 0.3)
 
-	# Movement logic with hysteresis to prevent jittering
-	if target_distance > attack_range * 1.2:  # Only move if clearly outside attack range
-		# Calculate speed based on distance for smoother approach
-		var speed_factor = clamp(target_distance / 200.0, 0.5, 1.0)
-
-		# Apply movement with smoothing
-		var target_velocity = target_direction.x * MOVEMENT_SPEEDS.RUN * speed_factor
-		velocity.x = lerp(velocity.x, target_velocity, 0.2)  # Smooth acceleration
-
-		# Only change animation if we're actually moving at a reasonable speed and not attacking
-		if abs(velocity.x) > 20 and animated_sprite and animated_sprite.animation != "Run" and not is_attacking:
-			animated_sprite.play("Run")
-	else:
-		# Gradually slow down rather than stopping instantly
-		velocity.x = lerp(velocity.x, 0.0, 0.3)
-
-		# Only switch to idle if we're almost stopped and not attacking
-		if abs(velocity.x) < 10 and animated_sprite and animated_sprite.animation != "Idle" and not is_attacking:
-			animated_sprite.play("Idle")
+	# Update animations only if not attacking
+	if not is_attacking:
+		if abs(velocity.x) > 5:
+			if animated_sprite and animated_sprite.animation != "Run":
+				animated_sprite.play("Run")
+		else:
+			if animated_sprite and animated_sprite.animation != "Idle":
+				animated_sprite.play("Idle")
 
 
 func _on_animation_changed() -> void:
 	if not animated_sprite:
 		return
 
-	# Don't override animations if we're being hurt
-	if is_hurt:
+	# Don't override animations if we're being hurt or attacking
+	if is_hurt or is_attacking:
 		return
 
+	# Only allow attack animation to play if we're actually attacking
 	if is_attacking and animated_sprite.animation != "Attack":
 		animated_sprite.play("Attack")
 
@@ -378,27 +403,27 @@ func _perform_frozen_ground() -> void:
 
 # CRITICAL FIX: Replace _on_hit_landed with _on_hitbox_area_entered
 func _on_hitbox_area_entered(area: Area2D) -> void:
-	if not boss_hitbox or not boss_hitbox.active:
+	if not boss_hitbox or not boss_hitbox.active or not boss_hitbox.monitoring:
+		return
+		
+	# Skip if hitting our own hurtbox or another boss's hurtbox
+	if area.is_in_group("Boss_Hurtbox"):
+		return
+	
+	var is_player_hurtbox = area.is_in_group("Player_Hurtbox") or (area.get_parent() and area.get_parent().is_in_group("Player"))
+	if not is_player_hurtbox:
 		return
 
-	if not area is HurtboxComponent:
-		return
-
-	var hurtbox = area as HurtboxComponent
-	if not hurtbox.hurtbox_owner or not hurtbox.hurtbox_owner.is_in_group("Player"):
-		return
-
-	boss_hitbox.damage = attack_damage
-	hurtbox.take_hit(boss_hitbox)
+	if area.get_parent().has_method("take_damage"):
+		area.get_parent().take_damage(attack_damage)  # Use base attack damage
 
 
 func _on_phase_transition() -> void:
+	# Remove damage multipliers in phase transitions
 	match current_phase:
 		1:  # Phase 2 transition (70% health)
-			attack_damage *= 1.2
 			attack_cooldown *= 0.9
 		2:  # Phase 3 transition (30% health)
-			attack_damage *= 1.3
 			attack_cooldown *= 0.8
 			frost_effect_duration *= 1.5
 
@@ -429,30 +454,11 @@ func _on_animation_finished() -> void:
 	match animated_sprite.animation:
 		"Attack":
 			is_attacking = false
-			if boss_hitbox:
-				boss_hitbox.active = false
+			_disable_hitbox()  # SAFETY: Ensure hitbox is disabled after attack
 			velocity.x = 0
-			
-			if should_play_hurt:
-				# Play queued hurt animation
-				should_play_hurt = false
-				is_hurt = true
-				animated_sprite.play("Hurt")
-				
-				# Create a timer to reset hurt state
-				var timer = get_tree().create_timer(0.5)  # Adjust time based on animation length
-				await timer.timeout
-				
-				is_hurt = false
-				animated_sprite.play("Idle")
-			else:
-				animated_sprite.play("Idle")
-				
+			animated_sprite.play("Idle")
 			frost_attack_timer.start(attack_cooldown)
 		"Death":
-			queue_free()
-		"Hurt":
-			# If we finish the hurt animation, go back to idle
 			is_hurt = false
 			animated_sprite.play("Idle")
 		_:
@@ -478,23 +484,21 @@ func _on_frost_attack_timer_timeout() -> void:
 
 # Add a helper method to set facing direction
 func set_facing_direction(direction_x: float) -> void:
-	if not animated_sprite or is_attacking:  # Don't change direction while attacking
+	if not animated_sprite or is_attacking:  # Never change direction while attacking
 		return
 		
 	var was_flipped = animated_sprite.flip_h
 	animated_sprite.flip_h = direction_x > 0
+	
+	if was_flipped != animated_sprite.flip_h:
+		update_hitbox_position()
 
-	# Only update hitbox position if the direction actually changed
-	if was_flipped != animated_sprite.flip_h and boss_hitbox:
-		if animated_sprite.flip_h:
-			# Facing left
-			boss_hitbox.position.x = -50
-		else:
-			# Facing right
-			boss_hitbox.position.x = 50
-
-		# Keep Y position consistent
-		boss_hitbox.position.y = 5
+func update_hitbox_position() -> void:
+	if not boss_hitbox:
+		return
+		
+	# Set hitbox position based on facing direction
+	boss_hitbox.position = Vector2(75 if animated_sprite.flip_h else -75, 5)
 
 
 # Helper method to check if currently attacking
@@ -507,6 +511,7 @@ func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player"):
 		target = body
 		SignalBus.player_detected.emit(self, body)
+		patrol_enabled = false  # Stop patrolling when player detected
 
 		if bt_player and bt_player.get_blackboard():
 			var blackboard = bt_player.get_blackboard()
@@ -518,6 +523,7 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 	if body.is_in_group("Player") and body == target:
 		SignalBus.player_lost.emit(self, body)
 		target = null
+		patrol_enabled = true  # Resume patrolling when player lost
 
 		if bt_player and bt_player.get_blackboard():
 			var blackboard = bt_player.get_blackboard()
@@ -542,10 +548,8 @@ func _perform_frost_slash() -> void:
 
 # Override the die method from BossBase
 func die() -> void:
-	if not animated_sprite:
-		queue_free()
-		return
-
+	print("FrostGuardian: Starting death sequence...")
+	
 	# Disable all combat and movement
 	is_attacking = false
 	can_attack = false
@@ -562,22 +566,43 @@ func die() -> void:
 		boss_hurtbox.set_deferred("monitoring", false)
 		boss_hurtbox.set_deferred("monitorable", false)
 
-	# Play death animation
-	animated_sprite.play("Death")
+	if animated_sprite:
+		print("FrostGuardian: Playing death animation...")
+		animated_sprite.play("Death")
+		await animated_sprite.animation_finished
 	
-	# Wait for death animation to finish
-	await animated_sprite.animation_finished
-	
-	# Create a timer to hide after 2.5 seconds
-	var timer = get_tree().create_timer(2.5)
-	await timer.timeout
-
-	# Hide the boss and queue for deletion
+	# Hide the boss
+	print("FrostGuardian: Hiding boss...")
 	hide()
-	queue_free()
-
-	# Emit death signal
+	
+	# Grant souls and XP to the player
+	var player = get_tree().get_first_node_in_group("Player")
+	if player:
+		if player.has_method("add_souls"):
+			player.add_souls(500)  # Grant 500 souls
+		if player.has_method("add_xp"):
+			player.add_xp(1000)  # Grant 1000 XP
+	
+	# Emit death signal first
+	print("FrostGuardian: Emitting boss_died signal...")
 	SignalBus.boss_died.emit(self)
+	
+	# Wait a short moment before showing the fell message
+	print("FrostGuardian: Waiting before showing fell message...")
+	await get_tree().create_timer(0.8).timeout
+	
+	# Show the "GREAT ENEMY FELLED" message
+	print("FrostGuardian: Attempting to show fell message...")
+	# Access FellLabelManager directly as an autoload singleton
+	FellLabelManager.show_fell_message()
+	
+	# Wait for fell message duration before cleanup
+	print("FrostGuardian: Waiting for cleanup...")
+	await get_tree().create_timer(4.0).timeout  # Increased to match new fell message duration
+	
+	# Clean up
+	print("FrostGuardian: Cleaning up...")
+	queue_free()
 
 
 # Handle character death
@@ -606,41 +631,34 @@ func _on_health_changed(new_health: float, max_health_value: float) -> void:
 
 # Phase transition handler
 func _enter_phase_two() -> void:
-	attack_damage *= 1.2
 	attack_cooldown *= 0.9
 	frost_effect_duration *= 1.2
 
 
 # Override parent's take_damage function to handle boss health
 func take_damage(amount: float) -> void:
-	print("Boss taking damage amount: ", amount)
-	current_health -= amount
-	current_health = max(0, current_health)  # Ensure health doesn't go below 0
+	if current_health <= 0:
+		return
 	
-	# Only emit boss_damaged signal
+	# Update health with the actual damage amount
+	current_health = max(0, current_health - amount)
+	
+	# Emit signal for health bar update
 	SignalBus.boss_damaged.emit(self, current_health, max_health)
+	
+	# Only play hurt animation if not attacking
+	if not is_attacking and animated_sprite and animated_sprite.animation != "Attack":
+		is_hurt = true
+		var prev_animation = animated_sprite.animation
+		animated_sprite.play("Hurt")
+		await animated_sprite.animation_finished
+		is_hurt = false
+		# Only return to previous animation if we're still alive and not attacking
+		if current_health > 0 and not is_attacking:
+			animated_sprite.play(prev_animation)
 	
 	if current_health <= 0:
 		die()
-	else:
-		if animated_sprite:
-			if is_attacking:
-				# Queue hurt animation to play after attack
-				should_play_hurt = true
-			else:
-				# Play hurt animation immediately if not attacking
-				print("Playing hurt animation...")
-				is_hurt = true
-				velocity.x = 0  # Stop movement
-				animated_sprite.stop()  # Stop current animation
-				animated_sprite.play("Hurt")  # Play hurt animation
-				
-				# Create a timer to reset hurt state
-				var timer = get_tree().create_timer(0.5)  # Adjust time based on animation length
-				await timer.timeout
-				
-				is_hurt = false
-				animated_sprite.play("Idle")
 
 
 func heal(amount: float) -> void:
@@ -665,5 +683,109 @@ func _on_hit_taken(attacker_hitbox: Node, _defender_hurtbox: Node) -> void:
 		return
 		
 	if attacker_hitbox.hitbox_owner.is_in_group("Player"):
-		print("Boss taking damage: ", attacker_hitbox.damage)
-		take_damage(attacker_hitbox.damage)  # Use our own take_damage method
+		# Use the actual damage from the hitbox
+		take_damage(attacker_hitbox.damage)
+		# Let the hit_landed signal propagate for lifesteal
+		SignalBus.hit_landed.emit(attacker_hitbox, _defender_hurtbox)
+
+func handle_patrol(delta: float) -> void:
+	if not is_on_floor():
+		return  # Don't patrol if not on floor
+		
+	if patrol_timer > 0:
+		patrol_timer -= delta
+		if patrol_timer <= 0:
+			is_patrolling = false  # Reset patrolling state when timer expires
+		return
+	
+	if not is_patrolling:
+		is_patrolling = true
+		var _target = PatrolPoint.get_next_patrol_point("frost_guardian")
+		move_to_point(_target)
+		patrol_timer = patrol_wait_time
+	else:
+		# Continue moving to current target
+		var _target = PatrolPoint.get_current_patrol_point("frost_guardian")
+		move_to_point(_target)
+
+func move_to_point(_target: Vector2) -> void:
+	if not is_instance_valid(animated_sprite):
+		return
+		
+	var direction = (_target - global_position).normalized()
+	var distance = global_position.distance_to(_target)
+	
+	# Update facing direction immediately
+	set_facing_direction(direction.x)
+	
+	if distance > 10.0:
+		var target_velocity = direction.x * patrol_speed
+		velocity.x = lerp(velocity.x, target_velocity, 0.2)  # Faster movement response
+		
+		if abs(velocity.x) > 5:  # Lower threshold for animation
+			if animated_sprite.animation != "Run":
+				animated_sprite.play("Run")
+		else:
+			if animated_sprite.animation != "Idle":
+				animated_sprite.play("Idle")
+	else:
+		velocity.x = lerp(velocity.x, 0.0, 0.3)  # Faster stop
+		if animated_sprite.animation != "Idle":
+			animated_sprite.play("Idle")
+		is_patrolling = false
+
+func chase_player() -> void:
+	if not target or not is_instance_valid(target) or is_attacking:
+		return
+	
+	var direction = (target.global_position - global_position).normalized()
+	var distance = global_position.distance_to(target.global_position)
+	
+	# Update facing direction immediately when not attacking
+	if animated_sprite:
+		set_facing_direction(direction.x)
+	
+	# Only start attack if we're not already attacking
+	if distance <= attack_range and can_attack and not is_attacking:
+		velocity.x = lerp(velocity.x, 0.0, 0.5)  # Faster stop
+		if abs(velocity.x) < 20:  # Increased threshold
+			is_attacking = true
+			animated_sprite.play("Attack")
+			_handle_attack_frames()
+	else:
+		# Chase only if not attacking
+		var target_velocity = direction.x * chase_speed
+		velocity.x = lerp(velocity.x, target_velocity, 0.2)
+		if animated_sprite and animated_sprite.animation != "Run":
+			animated_sprite.play("Run")
+
+func _on_continuous_damage_timer_timeout() -> void:
+	if _is_player_in_back_box and not is_attacking:  # Don't apply back damage during attacks
+		var player = get_tree().get_first_node_in_group("Player")
+		if player and player.has_method("take_damage") and can_deal_back_damage:
+			player.take_damage(back_damage)  # Use base back damage
+			can_deal_back_damage = false
+			if has_node("BackDamageTimer"):
+				get_node("BackDamageTimer").start()
+
+# Add helper functions to manage hitbox state
+func _disable_hitbox() -> void:
+	if not boss_hitbox:
+		return
+	boss_hitbox.active = false
+	boss_hitbox.monitoring = false
+	boss_hitbox.monitorable = false
+	boss_hitbox.hide()
+	if boss_hitbox.get_node_or_null("CollisionShape2D"):
+		boss_hitbox.get_node("CollisionShape2D").set_deferred("disabled", true)
+
+func _enable_hitbox() -> void:
+	if not boss_hitbox:
+		return
+	boss_hitbox.damage = attack_damage  # Ensure damage is set correctly when enabling
+	boss_hitbox.active = true
+	boss_hitbox.monitoring = true
+	boss_hitbox.monitorable = true
+	boss_hitbox.show()
+	if boss_hitbox.get_node_or_null("CollisionShape2D"):
+		boss_hitbox.get_node("CollisionShape2D").set_deferred("disabled", false)
