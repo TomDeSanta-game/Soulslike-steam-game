@@ -13,20 +13,15 @@ var death: AudioStream = preload("res://assets/Sounds/Player/Death/death.wav")
 var hit: AudioStream = preload("res://assets/Sounds/Player/Hit/hit.mp3")
 var hurt: AudioStream = preload("res://assets/Sounds/Player/Hurt/Hurt.mp3")
 var respawn: AudioStream = preload("res://assets/Sounds/Player/Respawn/respawn.wav")
-var run: AudioStream = preload("res://assets/Sounds/Player/Run/run.wav")
 var run_attack: AudioStream = preload(
 	"res://assets/Sounds/Player/_Sword_Attacks/Run_Attack/run_attack.wav"
 )
 
-var landing: AudioStream = preload("res://assets/Sounds/Player/Landing/landing.mp3")
 
 # Monster Sounds
 var monster_hurt: AudioStream = preload("res://assets/Sounds/Monster/Hurt/hurt.mp3")
 var monster_attack: AudioStream = preload("res://assets/Sounds/Monster/Attack/monster-attack.mp3")
 
-# Projectile Sounds
-var explosion: AudioStream = preload("res://assets/Sounds/Projectile/Explosion/explosion.mp3")
-var projectile_hit: AudioStream = preload("res://assets/Sounds/Projectile/Hit/proj_hit.wav")
 
 # Collectible Sounds
 var collect: AudioStream = preload("res://assets/Sounds/Collectible/Collect/collect.mp3")
