@@ -26,7 +26,6 @@ const ANIMATIONS: Dictionary = {"IDLE": "Idle", "RUN": "Run", "JUMP": "Jump", "A
 # Node references
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var label: Label = $UILayer/Label
-@onready var shooter: Shooter = $Shooter
 @onready var health_bar: ProgressBar = $UILayer/ProgressBar
 @onready var stamina_bar: ProgressBar = $UILayer/StaminaBar
 @onready var camera: Camera2D = $Camera2D
@@ -690,8 +689,6 @@ func _handle_input(event: InputEvent) -> void:
 					state_machine.dispatch(&"attack")
 	elif event.is_action_released("CROUCH"):
 		state_machine.dispatch(&"crouch")
-	elif event.is_action_released("SHOOT"):
-		_shoot()
 
 	# Wall interactions
 	if event.is_action_pressed("GRAB") and is_on_wall():
@@ -728,10 +725,9 @@ func _handle_jump() -> void:
 		InputBuffer.consume_jump_buffer()  # Consume any buffered jump
 
 
-# Combat System
-func _shoot() -> void:
-	var dir = Vector2.LEFT if animated_sprite.flip_h else Vector2.RIGHT
-	shooter.shoot(dir)
+# Override parent's die function
+func _die() -> void:
+	# ... rest of the code ...
 
 
 # Override parent's die function
