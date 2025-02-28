@@ -1,4 +1,4 @@
-[gd_scene load_steps=92 format=3 uid="uid://vpm32ogo31eu"]
+[gd_scene load_steps=91 format=3 uid="uid://vpm32ogo31eu"]
 
 [ext_resource type="Script" path="res://Entities/scripts/Player/player.gd" id="1_lfhy7"]
 [ext_resource type="Shader" path="res://Shaders/Player/player_damage.gdshader" id="2_0x5o6"]
@@ -22,7 +22,6 @@
 [ext_resource type="Script" path="res://Components/frame_data_component.gd" id="16_qqvvs"]
 [ext_resource type="Script" path="res://camera/camera.gd" id="17_kn0ag"]
 [ext_resource type="Texture2D" uid="uid://bj8tw1lfi1x33" path="res://assets/Player/Individual Sprites/adventurer-die-02.png" id="17_y3g2y"]
-[ext_resource type="Script" path="res://Singletons/Scripts/Shooter/shooter.gd" id="18_58vw6"]
 [ext_resource type="Texture2D" uid="uid://c4yxd5cov64j3" path="res://assets/Player/Individual Sprites/adventurer-die-03.png" id="18_y5qsl"]
 [ext_resource type="Texture2D" uid="uid://bl1e52vab2rpx" path="res://assets/Player/Individual Sprites/adventurer-die-04.png" id="19_7rhh7"]
 [ext_resource type="Script" path="res://Components/box_flip.gd" id="19_box_flip"]
@@ -508,9 +507,6 @@ script = ExtResource("16_qqvvs")
 sprite = NodePath("../AnimatedSprite2D")
 hitbox = NodePath("../Hitbox")
 hurtbox = NodePath("../Hurtbox")
-
-[node name="Shooter" type="Node2D" parent="."]
-script = ExtResource("18_58vw6")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 

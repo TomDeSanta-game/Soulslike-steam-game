@@ -727,11 +727,6 @@ func _handle_jump() -> void:
 
 # Override parent's die function
 func _die() -> void:
-	# ... rest of the code ...
-
-
-# Override parent's die function
-func _die() -> void:
 	# Prevent multiple calls to _die() from happening at once
 	if _is_death_transition_active:
 		return
