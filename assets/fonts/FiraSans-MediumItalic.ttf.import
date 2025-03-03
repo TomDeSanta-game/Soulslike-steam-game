@@ -1,34 +1,3 @@
-[remap]
-
-importer="font_data_dynamic"
-type="FontFile"
-uid="uid://l4axxcywvd6u"
-path="res://.godot/imported/FiraSans-MediumItalic.ttf-f8e2711748c24844151c3a5abb9956bc.fontdata"
-
-[deps]
-
-source_file="res://assets/fonts/FiraSans-MediumItalic.ttf"
-dest_files=["res://.godot/imported/FiraSans-MediumItalic.ttf-f8e2711748c24844151c3a5abb9956bc.fontdata"]
-
-[params]
-
-Rendering=null
-antialiasing=1
-generate_mipmaps=false
-disable_embedded_bitmaps=true
-multichannel_signed_distance_field=false
-msdf_pixel_range=8
-msdf_size=48
-allow_system_fallback=true
-force_autohinter=false
-hinting=1
-subpixel_positioning=1
-oversampling=0.0
-Fallbacks=null
-fallbacks=[]
-Compress=null
-compress=true
-preload=[]
-language_support={}
-script_support={}
-opentype_features={}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e942c1232a09708d1401b4f784f67fcee392e158a7213fb30f50989fbedb614c
+size 742

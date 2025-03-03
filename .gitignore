@@ -16,3 +16,5 @@ data_*/
 # OS-specific
 .DS_Store
 Thumbs.db
+export_presets.cfg
+OUTLINE_1

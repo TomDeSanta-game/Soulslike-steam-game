@@ -1,34 +1,3 @@
-[remap]
-
-importer="font_data_dynamic"
-type="FontFile"
-uid="uid://dqsu4ub0voqp5"
-path="res://.godot/imported/OptimusPrincepsSemiBold.ttf-21bec12e0b5212927712417e242b2ea2.fontdata"
-
-[deps]
-
-source_file="res://assets/fonts/OptimusPrincepsSemiBold.ttf"
-dest_files=["res://.godot/imported/OptimusPrincepsSemiBold.ttf-21bec12e0b5212927712417e242b2ea2.fontdata"]
-
-[params]
-
-Rendering=null
-antialiasing=1
-generate_mipmaps=false
-disable_embedded_bitmaps=true
-multichannel_signed_distance_field=false
-msdf_pixel_range=8
-msdf_size=48
-allow_system_fallback=true
-force_autohinter=false
-hinting=1
-subpixel_positioning=1
-oversampling=0.0
-Fallbacks=null
-fallbacks=[]
-Compress=null
-compress=true
-preload=[]
-language_support={}
-script_support={}
-opentype_features={}
+version https://git-lfs.github.com/spec/v1
+oid sha256:05b022937835f838f202cc9b89f241d1b0684609bacd6b529f8f65d72b1e5343
+size 749

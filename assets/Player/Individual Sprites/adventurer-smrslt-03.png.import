@@ -1,34 +1,3 @@
-[remap]
-
-importer="texture"
-type="CompressedTexture2D"
-uid="uid://ck3hbbrjlkj8a"
-path="res://.godot/imported/adventurer-smrslt-03.png-264ac8e423b211976c573945268ba08d.ctex"
-metadata={
-"vram_texture": false
-}
-
-[deps]
-
-source_file="res://assets/Player/Individual Sprites/adventurer-smrslt-03.png"
-dest_files=["res://.godot/imported/adventurer-smrslt-03.png-264ac8e423b211976c573945268ba08d.ctex"]
-
-[params]
-
-compress/mode=0
-compress/high_quality=false
-compress/lossy_quality=0.7
-compress/hdr_compression=1
-compress/normal_map=0
-compress/channel_pack=0
-mipmaps/generate=false
-mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
-process/fix_alpha_border=true
-process/premult_alpha=false
-process/normal_map_invert_y=false
-process/hdr_as_srgb=false
-process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=1
+version https://git-lfs.github.com/spec/v1
+oid sha256:8dd8c48ac0f536b0efcf7a92fcf5ce5ef95676419ed765e785d6f299106e5e98
+size 827

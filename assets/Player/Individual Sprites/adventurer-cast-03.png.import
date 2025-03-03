@@ -1,34 +1,3 @@
-[remap]
-
-importer="texture"
-type="CompressedTexture2D"
-uid="uid://dw7k17wy5nmi1"
-path="res://.godot/imported/adventurer-cast-03.png-cfd696aba790e5c642e1126abff4bb74.ctex"
-metadata={
-"vram_texture": false
-}
-
-[deps]
-
-source_file="res://assets/Player/Individual Sprites/adventurer-cast-03.png"
-dest_files=["res://.godot/imported/adventurer-cast-03.png-cfd696aba790e5c642e1126abff4bb74.ctex"]
-
-[params]
-
-compress/mode=0
-compress/high_quality=false
-compress/lossy_quality=0.7
-compress/hdr_compression=1
-compress/normal_map=0
-compress/channel_pack=0
-mipmaps/generate=false
-mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
-process/fix_alpha_border=true
-process/premult_alpha=false
-process/normal_map_invert_y=false
-process/hdr_as_srgb=false
-process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=1
+version https://git-lfs.github.com/spec/v1
+oid sha256:a32dfc652abf489c21947612c28c8132ba04a5eb5ad90af8cf6e5932fc280eb1
+size 821

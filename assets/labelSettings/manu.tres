@@ -1,9 +1,3 @@
-[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://dn1t2csf3jc2t"]
-
-[ext_resource type="FontFile" uid="uid://b4kckk08q1xc6" path="res://assets/fonts/GrapeSoda.ttf" id="1_pexsg"]
-
-[resource]
-font = ExtResource("1_pexsg")
-font_size = 105
-outline_size = 35
-outline_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
+version https://git-lfs.github.com/spec/v1
+oid sha256:bbeb218c7fbf38a238601d38710a12568b33f54c7645bae5861d90d829b99520
+size 328

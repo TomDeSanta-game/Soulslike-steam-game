@@ -1,34 +1,3 @@
-[remap]
-
-importer="font_data_dynamic"
-type="FontFile"
-uid="uid://ck2b6aq1lk44q"
-path="res://.godot/imported/Oswald-Regular.ttf-49257bb5a357ee39292d3772ed97b380.fontdata"
-
-[deps]
-
-source_file="res://assets/fonts/static/Oswald-Regular.ttf"
-dest_files=["res://.godot/imported/Oswald-Regular.ttf-49257bb5a357ee39292d3772ed97b380.fontdata"]
-
-[params]
-
-Rendering=null
-antialiasing=1
-generate_mipmaps=false
-disable_embedded_bitmaps=true
-multichannel_signed_distance_field=false
-msdf_pixel_range=8
-msdf_size=48
-allow_system_fallback=true
-force_autohinter=false
-hinting=1
-subpixel_positioning=1
-oversampling=0.0
-Fallbacks=null
-fallbacks=[]
-Compress=null
-compress=true
-preload=[]
-language_support={}
-script_support={}
-opentype_features={}
+version https://git-lfs.github.com/spec/v1
+oid sha256:fc1f1a1d080fa0302d4aebbb2049566811d3e91b8b793c497109b84a05fac1cf
+size 729

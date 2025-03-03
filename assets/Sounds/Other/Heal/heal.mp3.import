@@ -1,19 +1,3 @@
-[remap]
-
-importer="mp3"
-type="AudioStreamMP3"
-uid="uid://bxwgxsvf07ogu"
-path="res://.godot/imported/heal.mp3-2244e7d6b24ce14c9e0a0d492c5a3703.mp3str"
-
-[deps]
-
-source_file="res://assets/Sounds/Other/Heal/heal.mp3"
-dest_files=["res://.godot/imported/heal.mp3-2244e7d6b24ce14c9e0a0d492c5a3703.mp3str"]
-
-[params]
-
-loop=false
-loop_offset=0
-bpm=0
-beat_count=0
-bar_beats=4
+version https://git-lfs.github.com/spec/v1
+oid sha256:f24a7d03e4977cd8ede33622babd93a6d2143bf2b0ffe136fe4823a133b0fe36
+size 366

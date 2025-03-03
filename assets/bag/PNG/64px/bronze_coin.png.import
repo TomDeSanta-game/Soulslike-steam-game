@@ -1,34 +1,3 @@
-[remap]
-
-importer="texture"
-type="CompressedTexture2D"
-uid="uid://6npc5s85insq"
-path="res://.godot/imported/bronze_coin.png-4f338fb4924152cfd6178e3f8e36d886.ctex"
-metadata={
-"vram_texture": false
-}
-
-[deps]
-
-source_file="res://assets/bag/PNG/64px/bronze_coin.png"
-dest_files=["res://.godot/imported/bronze_coin.png-4f338fb4924152cfd6178e3f8e36d886.ctex"]
-
-[params]
-
-compress/mode=0
-compress/high_quality=false
-compress/lossy_quality=0.7
-compress/hdr_compression=1
-compress/normal_map=0
-compress/channel_pack=0
-mipmaps/generate=false
-mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
-process/fix_alpha_border=true
-process/premult_alpha=false
-process/normal_map_invert_y=false
-process/hdr_as_srgb=false
-process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=1
+version https://git-lfs.github.com/spec/v1
+oid sha256:e51acfe0c07e1259f8368b279a84da4993e944c647050a029f1db528a3e19b2b
+size 786

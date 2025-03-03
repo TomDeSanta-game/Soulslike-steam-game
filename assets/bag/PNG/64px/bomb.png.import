@@ -1,34 +1,3 @@
-[remap]
-
-importer="texture"
-type="CompressedTexture2D"
-uid="uid://m1emda37nnci"
-path="res://.godot/imported/bomb.png-b5e02d5c6c942804d3696f21a309ea7c.ctex"
-metadata={
-"vram_texture": false
-}
-
-[deps]
-
-source_file="res://assets/bag/PNG/64px/bomb.png"
-dest_files=["res://.godot/imported/bomb.png-b5e02d5c6c942804d3696f21a309ea7c.ctex"]
-
-[params]
-
-compress/mode=0
-compress/high_quality=false
-compress/lossy_quality=0.7
-compress/hdr_compression=1
-compress/normal_map=0
-compress/channel_pack=0
-mipmaps/generate=false
-mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
-process/fix_alpha_border=true
-process/premult_alpha=false
-process/normal_map_invert_y=false
-process/hdr_as_srgb=false
-process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=1
+version https://git-lfs.github.com/spec/v1
+oid sha256:17ec88f4a49f602929c30c4ebc6d50dd12c57c034a9fbccb130eab31874f61e2
+size 765

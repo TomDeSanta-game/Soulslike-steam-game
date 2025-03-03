@@ -1,24 +1,3 @@
-[remap]
-
-importer="wav"
-type="AudioStreamWAV"
-uid="uid://ug2leigp6q1i"
-path="res://.godot/imported/death.wav-51f49236dc91b57d96292b3b9ceef4cf.sample"
-
-[deps]
-
-source_file="res://assets/Sounds/Player/Death/death.wav"
-dest_files=["res://.godot/imported/death.wav-51f49236dc91b57d96292b3b9ceef4cf.sample"]
-
-[params]
-
-force/8_bit=false
-force/mono=false
-force/max_rate=false
-force/max_rate_hz=44100
-edit/trim=false
-edit/normalize=false
-edit/loop_mode=0
-edit/loop_begin=0
-edit/loop_end=-1
-compress/mode=0
+version https://git-lfs.github.com/spec/v1
+oid sha256:a2e1b59dc2f6eaee1670df5d346ebf782542da6615d0fc50bbec2c26bce31346
+size 499

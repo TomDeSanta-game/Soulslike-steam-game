@@ -1,34 +1,3 @@
-[remap]
-
-importer="texture"
-type="CompressedTexture2D"
-uid="uid://b7awspk1q41it"
-path="res://.godot/imported/adventurer-air-attack3-loop-00.png-32316b4e49c81c72867477e46f344f52.ctex"
-metadata={
-"vram_texture": false
-}
-
-[deps]
-
-source_file="res://assets/Player/Individual Sprites/adventurer-air-attack3-loop-00.png"
-dest_files=["res://.godot/imported/adventurer-air-attack3-loop-00.png-32316b4e49c81c72867477e46f344f52.ctex"]
-
-[params]
-
-compress/mode=0
-compress/high_quality=false
-compress/lossy_quality=0.7
-compress/hdr_compression=1
-compress/normal_map=0
-compress/channel_pack=0
-mipmaps/generate=false
-mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
-process/fix_alpha_border=true
-process/premult_alpha=false
-process/normal_map_invert_y=false
-process/hdr_as_srgb=false
-process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=1
+version https://git-lfs.github.com/spec/v1
+oid sha256:18ee1010215e58077c1cdf140926af73c73dab2aafc5aeecc3e5d6206088bd54
+size 857
