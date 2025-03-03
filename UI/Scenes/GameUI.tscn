@@ -1,8 +1,3 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="PackedScene" uid="uid://boss_health_bar" path="res://UI/Scenes/BossHealthBar.tscn" id="1_health_bar"]
-
-[node name="GameUI" type="CanvasLayer"]
-layer = 5
-
-[node name="BossHealthBar" parent="." instance=ExtResource("1_health_bar")] 
+version https://git-lfs.github.com/spec/v1
+oid sha256:d16ef482237cb2b08c6646f76a4ae75f0c01b1d653d8ed5483bfcb1a6b86524a
+size 284

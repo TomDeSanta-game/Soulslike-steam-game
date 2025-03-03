@@ -194,11 +194,8 @@ func crouch_update(_delta: float) -> void:
 		player.is_crouching = false
 		dispatch(&"state_ended")
 	else:
-		# Handle crouch movement
-		if abs(player.velocity.x) > 0:
-			player.animated_sprite.play(player.ANIMATIONS.CROUCH_RUN)
-		else:
-			player.animated_sprite.play(player.ANIMATIONS.CROUCH)
+		# Always use the crouch animation, regardless of movement
+		player.animated_sprite.play(player.ANIMATIONS.CROUCH)
 
 
 func hurt_start() -> void:
