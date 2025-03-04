@@ -1,4 +1,5 @@
-extends NpcBase
+@tool
+extends "res://Entities/scripts/Npcs/npc_base.gd"
 
 @onready var interact_button: Button = $InteractButton
 @onready var merchant_menu_scene_resource: PackedScene = preload("res://UI/Scenes/MerchantMenu.tscn")

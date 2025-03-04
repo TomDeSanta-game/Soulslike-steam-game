@@ -81,7 +81,7 @@ func _ready() -> void:
 		bt_node.set_process_input(false)
 
 	# Set Frost Guardian specific properties with FIXED damage values
-	attack_damage = 5.0  # Reduced from 10.0
+	attack_damage = 3.0  # Reduced from 10.0
 	back_damage = 2.5    # Reduced from 5.0
 	attack_cooldown = 1.5  # Attack cooldown
 	back_damage_cooldown = 1.5  # Back damage cooldown
@@ -280,6 +280,20 @@ func _handle_attack_frames() -> void:
 			is_in_range = is_in_range and y_distance <= 30
 			
 			if is_in_range and player.has_method("take_damage"):
+				# Check if player is invincible
+				if player.has_method("is_player_invincible") and player.is_player_invincible():
+					return
+					
+				# Check if player was recently hit by a hitbox
+				var player_path = player.get_path()
+				if HitboxComponent._global_hit_cooldown.has(player_path):
+					var time_since_last_hit = Time.get_ticks_msec() - HitboxComponent._global_hit_cooldown[player_path]
+					if time_since_last_hit < HitboxComponent.GLOBAL_HIT_COOLDOWN_TIME * 1000:
+						return
+				
+				# Set global hit cooldown to prevent multiple damage sources
+				HitboxComponent._global_hit_cooldown[player_path] = Time.get_ticks_msec()
+				
 				player.take_damage(attack_damage)  # Use consistent damage value
 	else:
 		_disable_hitbox()
@@ -415,7 +429,23 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		return
 
 	if area.get_parent().has_method("take_damage"):
-		area.get_parent().take_damage(attack_damage)  # Use base attack damage
+		var player = area.get_parent()
+		
+		# Check if player is invincible
+		if player.has_method("is_player_invincible") and player.is_player_invincible():
+			return
+			
+		# Check if player was recently hit by a hitbox
+		var player_path = player.get_path()
+		if HitboxComponent._global_hit_cooldown.has(player_path):
+			var time_since_last_hit = Time.get_ticks_msec() - HitboxComponent._global_hit_cooldown[player_path]
+			if time_since_last_hit < HitboxComponent.GLOBAL_HIT_COOLDOWN_TIME * 1000:
+				return
+		
+		# Set global hit cooldown to prevent multiple damage sources
+		HitboxComponent._global_hit_cooldown[player_path] = Time.get_ticks_msec()
+		
+		player.take_damage(attack_damage)  # Use base attack damage
 
 
 func _on_phase_transition() -> void:
@@ -763,6 +793,20 @@ func _on_continuous_damage_timer_timeout() -> void:
 	if _is_player_in_back_box and not is_attacking:  # Don't apply back damage during attacks
 		var player = get_tree().get_first_node_in_group("Player")
 		if player and player.has_method("take_damage") and can_deal_back_damage:
+			# Check if player is invincible
+			if player.has_method("is_player_invincible") and player.is_player_invincible():
+				return
+				
+			# Check if player was recently hit by a hitbox
+			var player_path = player.get_path()
+			if HitboxComponent._global_hit_cooldown.has(player_path):
+				var time_since_last_hit = Time.get_ticks_msec() - HitboxComponent._global_hit_cooldown[player_path]
+				if time_since_last_hit < HitboxComponent.GLOBAL_HIT_COOLDOWN_TIME * 1000:
+					return
+			
+			# Set global hit cooldown to prevent multiple damage sources
+			HitboxComponent._global_hit_cooldown[player_path] = Time.get_ticks_msec()
+			
 			player.take_damage(back_damage)  # Use base back damage
 			can_deal_back_damage = false
 			if has_node("BackDamageTimer"):

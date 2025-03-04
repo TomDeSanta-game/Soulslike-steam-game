@@ -1,4 +1,6 @@
-class_name DateTime extends Resource
+@tool
+class_name GameDateTime
+extends Resource
 
 @export_range(0, 59) var seconds: int = 0
 @export_range(0, 59) var minutes: int = 0
@@ -6,8 +8,6 @@ class_name DateTime extends Resource
 @export var days: int = 0
 
 var delta_time: float = 0
-
-var types: Types = Types.new()
 
 
 func increase_by_sec(delta_seconds: float):
@@ -28,8 +28,3 @@ func increase_by_sec(delta_seconds: float):
 	seconds = seconds % 60
 	minutes = minutes % 60
 	hours = hours % 24
-
-	types.days = days
-	types.hours = hours
-	types.minutes = minutes
-	types.seconds = seconds

@@ -32,10 +32,7 @@ config/icon="res://icon.png"
 
 LimboConsole="*res://addons/limbo_console/limbo_console.gd"
 SoundManager="*res://addons/sound_manager/sound_manager.gd"
-PauseManager="*res://Singletons/Scripts/PauseManager/pause_manager.gd"
-Sound="*res://Globals/sound.gd"
 SceneManager="*res://addons/scene_manager/SceneManager.tscn"
-SaveEngine="*res://Singletons/Scripts/SaveManager/save_manager.gd"
 InputBuffer="*res://Singletons/Scripts/InputBuffer/input_buffer.gd"
 Log="*res://addons/logger/logger.gd"
 SignalBus="*res://Singletons/Scripts/SignalBus/signal_bus.gd"
@@ -45,11 +42,14 @@ Inventory="*res://Singletons/Scripts/Inventory/inventory.gd"
 BagSpawner="*res://Singletons/Scripts/BagSpawner/bag_spawner.gd"
 SoulsSystem="*res://Singletons/Scripts/SoulsSystem/souls_system.gd"
 XPSystem="*res://Singletons/Scripts/XPSystem/xp_system.gd"
-InventoryStateManager="*res://Singletons/Scripts/InventoryStateManager.gd"
 Sales="*res://Singletons/Scripts/Sales/sales.gd"
 LocationLabelManager="*res://Singletons/Scripts/LabelLocationManager/location_label_manager.gd"
 PatrolPoint="*res://Singletons/Scripts/PatrolPoint/patrol_point.gd"
 FellLabelManager="*res://Singletons/Scripts/FellLabelManager/fell_label_manager.gd"
+LokGlobalStorageManager="*res://addons/locker/scripts/storage_manager/global_storage_manager.gd"
+Global="*res://Singletons/Scripts/Global/global.gd"
+InventoryStateManager="*res://Singletons/Scripts/InventoryStateManager/InventoryStateManager.gd"
+Sound="*res://Singletons/Scripts/Sound/sound.gd"
 
 [display]
 
@@ -63,7 +63,7 @@ window/vsync/vsync_mode=0
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/limbo_console/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/script-ide/plugin.cfg", "res://addons/sound_manager/plugin.cfg")
+enabled=PackedStringArray("res://addons/limbo_console/plugin.cfg", "res://addons/locker/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/script-ide/plugin.cfg", "res://addons/sound_manager/plugin.cfg")
 
 [file_customization]
 

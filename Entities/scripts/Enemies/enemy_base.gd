@@ -19,11 +19,21 @@ class_name EnemyBase
 @export var patrol_range: float = 100.0
 @export var patrol_wait_time: float = 2.0
 
-@onready var enemy_hitbox: Node = %HitBox
-@onready var enemy_hurtbox: Node = %HurtBox
+@export_group("AI Settings")
+@export var check_floor_ahead: bool = true
+@export var check_walls: bool = true
+@export var edge_detection_distance: float = 30.0
+@export var wall_detection_distance: float = 20.0
+
+@onready var enemy_hitbox: HitboxComponent = %HitBox
+@onready var enemy_hurtbox: HurtboxComponent = %HurtBox
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var detection_area: Area2D = $DetectionArea
 @onready var shader_material: ShaderMaterial = null
+
+# Raycasts for environment detection
+var floor_raycast_left: RayCast2D
+var floor_raycast_right: RayCast2D
+var wall_raycast: RayCast2D
 
 # State variables
 var target: Node2D = null
@@ -39,6 +49,16 @@ var is_patrolling: bool = false
 var initial_position: Vector2
 var patrol_points: Array[Vector2] = []
 var current_patrol_point: int = 0
+var current_direction: float = 1.0
+
+# Animation variables
+var has_idle_animation: bool = false
+var has_run_animation: bool = false
+var has_idle_run_animation: bool = false
+var has_attack_animation: bool = false
+var has_hurt_animation: bool = false
+var has_death_animation: bool = false
+var default_animation: String = ""
 
 # Movement variables
 const MOVEMENT_SPEEDS = {
@@ -62,17 +82,7 @@ func _ready() -> void:
 	collision_mask = C_Layers.MASK_ENEMY
 	
 	# Setup hitbox and hurtbox
-	if enemy_hitbox:
-		enemy_hitbox.hitbox_owner = self
-		enemy_hitbox.damage = attack_damage
-		enemy_hitbox.collision_layer = C_Layers.LAYER_HITBOX
-		enemy_hitbox.collision_mask = C_Layers.MASK_HITBOX
-		enemy_hitbox.active = false
-	
-	if enemy_hurtbox:
-		enemy_hurtbox.hurtbox_owner = self
-		enemy_hurtbox.collision_layer = C_Layers.LAYER_HURTBOX
-		enemy_hurtbox.collision_mask = C_Layers.MASK_HURTBOX
+	_setup_hitbox_hurtbox()
 	
 	# Initialize patrol points
 	initial_position = global_position
@@ -86,53 +96,86 @@ func _ready() -> void:
 	
 	# Setup collision detection
 	_setup_collision_detection()
+	
+	# Setup raycasts for environment detection
+	_setup_raycasts()
+	
+	# Check available animations
+	_check_available_animations()
 
 func _setup_enemy() -> void:
-	if detection_area:
-		detection_area.body_entered.connect(_on_detection_area_body_entered)
-		detection_area.body_exited.connect(_on_detection_area_body_exited)
-	else:
-		# Create detection area if it doesn't exist
-		_setup_detection_area()
+	# Add hitbox and hurtbox to arrays for CharacterBase to manage
+	if enemy_hitbox and not hitboxes.has(enemy_hitbox):
+		hitboxes.append(enemy_hitbox)
 	
-	if enemy_hitbox:
-		enemy_hitbox.hitbox_owner = self
-		enemy_hitbox.damage = attack_damage
-		if enemy_hitbox.has_signal("hit_landed"):
-			enemy_hitbox.hit_landed.connect(_on_hit_landed)
-	
-	if enemy_hurtbox:
-		enemy_hurtbox.hurtbox_owner = self
-		if enemy_hurtbox.has_signal("hit_taken"):
-			enemy_hurtbox.hit_taken.connect(_on_hit_taken)
+	if enemy_hurtbox and not hurtboxes.has(enemy_hurtbox):
+		hurtboxes.append(enemy_hurtbox)
 	
 	if animated_sprite:
 		if animated_sprite.animation_finished.is_connected(_on_animation_finished):
 			animated_sprite.animation_finished.disconnect(_on_animation_finished)
 		animated_sprite.animation_finished.connect(_on_animation_finished)
 
-func _setup_detection_area() -> void:
-	# Create new detection area
-	detection_area = Area2D.new()
-	detection_area.name = "DetectionArea"
-	add_child(detection_area)
+func _check_available_animations() -> void:
+	if not animated_sprite:
+		return
+		
+	var animation_names = animated_sprite.sprite_frames.get_animation_names()
+	
+	has_idle_animation = animation_names.has("Idle")
+	has_run_animation = animation_names.has("Run")
+	has_idle_run_animation = animation_names.has("Idle-Run")
+	has_attack_animation = animation_names.has("Attack")
+	has_hurt_animation = animation_names.has("Hurt")
+	has_death_animation = animation_names.has("Death")
+	
+	# Set default animation
+	if has_idle_animation:
+		default_animation = "Idle"
+	elif has_idle_run_animation:
+		default_animation = "Idle-Run"
+	elif animation_names.size() > 0:
+		default_animation = animation_names[0]
+	
+	# Play default animation
+	if default_animation != "":
+		animated_sprite.play(default_animation)
 
-	# Create collision shape for detection area
-	var detection_collision_shape = CollisionShape2D.new()
-	var detection_circle_shape = CircleShape2D.new()
-	detection_circle_shape.radius = detection_range
-	detection_collision_shape.shape = detection_circle_shape
-	detection_area.add_child(detection_collision_shape)
+func _setup_hitbox_hurtbox() -> void:
+	if enemy_hitbox:
+		enemy_hitbox.hitbox_owner = self
+		enemy_hitbox.damage = attack_damage
+		enemy_hitbox.collision_layer = C_Layers.LAYER_HITBOX
+		enemy_hitbox.collision_mask = C_Layers.MASK_HITBOX
+		enemy_hitbox.active = false
+		enemy_hitbox.hide()
+	
+	if enemy_hurtbox:
+		enemy_hurtbox.hurtbox_owner = self
+		enemy_hurtbox.collision_layer = C_Layers.LAYER_HURTBOX
+		enemy_hurtbox.collision_mask = C_Layers.MASK_HURTBOX
+		enemy_hurtbox.active = true
 
-	# Configure detection area
-	detection_area.collision_layer = 0
-	detection_area.collision_mask = C_Layers.LAYER_PLAYER
-	detection_area.monitorable = false
-	detection_area.monitoring = true
-
-	# Connect detection area signals
-	detection_area.body_entered.connect(_on_detection_area_body_entered)
-	detection_area.body_exited.connect(_on_detection_area_body_exited)
+func _setup_raycasts() -> void:
+	# Create floor detection raycasts
+	floor_raycast_left = RayCast2D.new()
+	floor_raycast_left.target_position = Vector2(-edge_detection_distance, 50)
+	floor_raycast_left.collision_mask = C_Layers.LAYER_WORLD
+	floor_raycast_left.enabled = check_floor_ahead
+	add_child(floor_raycast_left)
+	
+	floor_raycast_right = RayCast2D.new()
+	floor_raycast_right.target_position = Vector2(edge_detection_distance, 50)
+	floor_raycast_right.collision_mask = C_Layers.LAYER_WORLD
+	floor_raycast_right.enabled = check_floor_ahead
+	add_child(floor_raycast_right)
+	
+	# Create wall detection raycast
+	wall_raycast = RayCast2D.new()
+	wall_raycast.target_position = Vector2(wall_detection_distance, 0)
+	wall_raycast.collision_mask = C_Layers.LAYER_WORLD
+	wall_raycast.enabled = check_walls
+	add_child(wall_raycast)
 
 func _setup_patrol_points() -> void:
 	# Create default patrol points if none are set
@@ -179,6 +222,9 @@ func _physics_process(delta: float) -> void:
 		if attack_timer <= 0:
 			can_attack = true
 	
+	# Update raycast directions based on facing
+	_update_raycast_directions()
+	
 	# Handle AI behavior
 	_update_enemy_behavior(delta)
 	
@@ -187,6 +233,15 @@ func _physics_process(delta: float) -> void:
 	
 	# Check for collisions with player after moving
 	_check_player_collision()
+
+func _update_raycast_directions() -> void:
+	# Update wall raycast direction based on current movement direction
+	if wall_raycast:
+		var facing_direction = 1.0
+		if animated_sprite:
+			facing_direction = -1.0 if animated_sprite.flip_h else 1.0
+		
+		wall_raycast.target_position.x = wall_detection_distance * facing_direction
 
 func _check_player_collision() -> void:
 	# This is a base implementation that emits the body_entered signal
@@ -211,8 +266,7 @@ func _update_enemy_behavior(delta: float) -> void:
 		else:
 			# Idle behavior
 			velocity.x = lerp(velocity.x, 0.0, 0.3)
-			if animated_sprite and animated_sprite.animation != "Idle":
-				animated_sprite.play("Idle")
+			_play_animation(default_animation)
 
 func _chase_target(_delta: float) -> void:
 	var direction = (target.global_position - global_position).normalized()
@@ -225,10 +279,17 @@ func _chase_target(_delta: float) -> void:
 	if distance <= attack_range and can_attack:
 		_perform_attack()
 	else:
-		# Move towards target
-		velocity.x = direction.x * MOVEMENT_SPEEDS.CHASE
-		if animated_sprite and animated_sprite.animation != "Run":
-			animated_sprite.play("Run")
+		# Check if it's safe to move in this direction
+		var can_move = _can_move_safely(direction.x)
+		
+		if can_move:
+			# Move towards target
+			velocity.x = direction.x * MOVEMENT_SPEEDS.CHASE
+			_play_movement_animation()
+		else:
+			# Stop if movement is unsafe
+			velocity.x = 0
+			_play_animation(default_animation)
 
 func _flee_from_target(_delta: float) -> void:
 	var direction = (global_position - target.global_position).normalized()
@@ -236,10 +297,17 @@ func _flee_from_target(_delta: float) -> void:
 	# Update facing direction
 	_update_facing_direction(sign(direction.x))
 	
-	# Move away from target
-	velocity.x = direction.x * MOVEMENT_SPEEDS.RUN
-	if animated_sprite and animated_sprite.animation != "Run":
-		animated_sprite.play("Run")
+	# Check if it's safe to move in this direction
+	var can_move = _can_move_safely(direction.x)
+	
+	if can_move:
+		# Move away from target
+		velocity.x = direction.x * MOVEMENT_SPEEDS.RUN
+		_play_movement_animation()
+	else:
+		# Stop if movement is unsafe
+		velocity.x = 0
+		_play_animation(default_animation)
 
 func _handle_patrol(delta: float) -> void:
 	if not is_on_floor():
@@ -252,8 +320,7 @@ func _handle_patrol(delta: float) -> void:
 		else:
 			# Wait at current position
 			velocity.x = lerp(velocity.x, 0.0, 0.3)
-			if animated_sprite and animated_sprite.animation != "Idle":
-				animated_sprite.play("Idle")
+			_play_animation(default_animation)
 		return
 	
 	if is_patrolling:
@@ -263,19 +330,41 @@ func _handle_patrol(delta: float) -> void:
 		
 		# Update facing direction
 		_update_facing_direction(sign(direction.x))
+		current_direction = sign(direction.x)
 		
-		if distance > 10.0:
+		# Check if it's safe to move in this direction
+		var can_move = _can_move_safely(direction.x)
+		
+		if can_move and distance > 10.0:
 			velocity.x = direction.x * MOVEMENT_SPEEDS.WALK
-			if animated_sprite and animated_sprite.animation != "Run":
-				animated_sprite.play("Run")
+			_play_movement_animation()
 		else:
-			# Reached patrol point, move to next one
-			current_patrol_point = (current_patrol_point + 1) % patrol_points.size()
+			# If we can't move safely or we've reached the point
+			if distance <= 10.0:
+				# Reached patrol point, move to next one
+				current_patrol_point = (current_patrol_point + 1) % patrol_points.size()
+			else:
+				# Can't move safely, reverse direction
+				current_patrol_point = (current_patrol_point + 1) % patrol_points.size()
+			
 			is_patrolling = false
 			patrol_timer = patrol_wait_time
 			velocity.x = 0
-			if animated_sprite and animated_sprite.animation != "Idle":
-				animated_sprite.play("Idle")
+			_play_animation(default_animation)
+
+func _can_move_safely(direction: float) -> bool:
+	# Check for walls
+	if check_walls and wall_raycast and wall_raycast.is_colliding():
+		return false
+	
+	# Check for floor edges
+	if check_floor_ahead:
+		if direction < 0 and floor_raycast_left and not floor_raycast_left.is_colliding():
+			return false
+		elif direction > 0 and floor_raycast_right and not floor_raycast_right.is_colliding():
+			return false
+	
+	return true
 
 func _perform_attack() -> void:
 	if is_attacking:
@@ -286,8 +375,8 @@ func _perform_attack() -> void:
 	attack_timer = attack_cooldown
 	velocity.x = 0
 	
-	if animated_sprite:
-		animated_sprite.play("Attack")
+	if has_attack_animation:
+		_play_animation("Attack")
 	
 	# Enable hitbox during attack
 	if enemy_hitbox:
@@ -312,24 +401,41 @@ func _update_facing_direction(face_direction: int) -> void:
 				var hitbox_position = Vector2(20 if face_left else -20, 0)
 				enemy_hitbox.position = hitbox_position
 
-func _on_detection_area_body_entered(body: Node2D) -> void:
-	if body.is_in_group("Player"):
-		target = body
-		SignalBus.player_detected.emit(self, body)
+# Helper function to play animation safely
+func _play_animation(anim_name: String) -> void:
+	if not animated_sprite or animated_sprite.animation == anim_name:
+		return
+		
+	if animated_sprite.sprite_frames.has_animation(anim_name):
+		animated_sprite.play(anim_name)
+	elif default_animation != "":
+		animated_sprite.play(default_animation)
 
-func _on_detection_area_body_exited(body: Node2D) -> void:
-	if body.is_in_group("Player") and body == target:
-		SignalBus.player_lost.emit(self, body)
-		target = null
+# Helper function to play movement animation
+func _play_movement_animation() -> void:
+	if has_idle_run_animation:
+		_play_animation("Idle-Run")
+	elif has_run_animation:
+		_play_animation("Run")
+	else:
+		_play_animation(default_animation)
 
-func _on_hit_landed(_hitbox_node: Node, _target_hurtbox: Node) -> void:
-	if _target_hurtbox.hurtbox_owner.has_method("take_damage"):
-		_target_hurtbox.hurtbox_owner.take_damage(attack_damage)
-	if _target_hurtbox.hurtbox_owner.is_in_group("Player"):
+# Override from CharacterBase
+func _on_hit_landed(hitbox_node: Node, target_hurtbox: Node) -> void:
+	# Only process hits from our own hitbox
+	if hitbox_node != enemy_hitbox:
+		return
+		
+	if target_hurtbox.hurtbox_owner and target_hurtbox.hurtbox_owner.has_method("take_damage"):
 		# Play hit sound if needed
 		pass
 
-func _on_hit_taken(attacker_hitbox: Node, _defender_hurtbox: Node) -> void:
+# Override from CharacterBase
+func _on_hit_taken(attacker_hitbox: Node, defender_hurtbox: Node) -> void:
+	# Only process hits to our own hurtbox
+	if defender_hurtbox != enemy_hurtbox:
+		return
+		
 	if attacker_hitbox.hitbox_owner and attacker_hitbox.hitbox_owner.is_in_group("Player"):
 		take_damage(attacker_hitbox.damage)
 		
@@ -351,10 +457,10 @@ func _on_animation_finished() -> void:
 				enemy_hitbox.monitoring = false
 				enemy_hitbox.monitorable = false
 				enemy_hitbox.hide()
-			animated_sprite.play("Idle")
+			_play_animation(default_animation)
 		"Hurt":
 			is_hurt = false
-			animated_sprite.play("Idle")
+			_play_animation(default_animation)
 		"Death":
 			die()
 		_:
@@ -364,8 +470,8 @@ func take_damage(amount: float) -> void:
 	super.take_damage(amount)
 	
 	is_hurt = true
-	if animated_sprite and animated_sprite.animation != "Death":
-		animated_sprite.play("Hurt")
+	if has_hurt_animation:
+		_play_animation("Hurt")
 	
 	# Flash effect when taking damage
 	if shader_material:
@@ -394,8 +500,8 @@ func _on_character_died() -> void:
 		enemy_hurtbox.monitorable = false
 	
 	# Play death animation
-	if animated_sprite:
-		animated_sprite.play("Death")
+	if has_death_animation:
+		_play_animation("Death")
 	else:
 		die()
 
@@ -422,3 +528,31 @@ func get_max_health() -> float:
 
 func get_health_percentage() -> float:
 	return health_manager.get_health_percentage()
+
+# Required move function for AI integration
+func move(direction: float, speed: float) -> void:
+	if is_attacking or is_hurt or is_dead:
+		return
+	
+	# Check if it's safe to move in this direction
+	if _can_move_safely(direction):
+		velocity.x = direction * speed
+		
+		# Update facing direction
+		if animated_sprite:
+			animated_sprite.flip_h = direction < 0
+			
+			# Update hitbox positions if needed
+			if enemy_hitbox:
+				var hitbox_position = Vector2(20 if animated_sprite.flip_h else -20, 0)
+				enemy_hitbox.position = hitbox_position
+		
+		# Play run animation
+		if abs(velocity.x) > 0:
+			_play_movement_animation()
+		else:
+			_play_animation(default_animation)
+	else:
+		# Stop if movement is unsafe
+		velocity.x = 0
+		_play_animation(default_animation)

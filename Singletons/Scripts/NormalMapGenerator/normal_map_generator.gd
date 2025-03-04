@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 const SOBEL_X = [
@@ -12,6 +13,8 @@ const SOBEL_Y = [
 	1, 2, 1
 ]
 
+## Generates a normal map from a texture using Sobel operators for height detection
+## strength: Controls how pronounced the normal map effect is
 static func generate_normal_map(texture: Texture2D, strength: float = 2.0) -> ImageTexture:
 	var image = texture.get_image()
 	var width = image.get_width()
@@ -20,18 +23,35 @@ static func generate_normal_map(texture: Texture2D, strength: float = 2.0) -> Im
 	# Create a new image for the normal map
 	var normal_map = Image.create(width, height, false, Image.FORMAT_RGBA8)
 	
-	# Convert to grayscale and calculate height map
-	image.convert(Image.FORMAT_L8)
+	# Convert to grayscale for height map calculation
+	var height_map = image.duplicate()
+	height_map.convert(Image.FORMAT_L8)
 	
+	# Fill with default normal (facing forward) for transparent pixels
+	for x in range(width):
+		for y in range(height):
+			var color = image.get_pixel(x, y)
+			# If pixel is transparent, make normal map transparent too
+			if color.a < 0.5:
+				normal_map.set_pixel(x, y, Color(0.5, 0.5, 1.0, 0.0))
+			else:
+				# Default normal (will be overwritten for non-edge pixels)
+				normal_map.set_pixel(x, y, Color(0.5, 0.5, 1.0, 1.0))
+	
+	# Apply Sobel operator to calculate normals for non-edge pixels
 	for x in range(1, width - 1):
 		for y in range(1, height - 1):
 			var dx = 0.0
 			var dy = 0.0
 			
+			# Skip fully transparent pixels
+			if image.get_pixel(x, y).a < 0.5:
+				continue
+				
 			# Apply Sobel operators
 			for i in range(-1, 2):
 				for j in range(-1, 2):
-					var pixel = image.get_pixel(x + i, y + j).r
+					var pixel = height_map.get_pixel(x + i, y + j).r
 					var sobel_idx = (i + 1) + (j + 1) * 3
 					
 					dx += pixel * SOBEL_X[sobel_idx]
@@ -61,29 +81,35 @@ static func generate_normal_map(texture: Texture2D, strength: float = 2.0) -> Im
 	
 	return ImageTexture.create_from_image(normal_map)
 
-static func apply_normal_maps_to_animated_sprite(_sprite: AnimatedSprite2D, _strength: float = 2.0) -> void:
-	# This function is now deprecated - normal maps are applied directly in the player script
-	# This is just a stub to avoid errors when called
-	pass
-
-# The following signal handlers are no longer used but kept for reference
-# They can be safely removed if needed
-#static func _on_frame_changed(sprite: AnimatedSprite2D, strength: float) -> void:
-#	_update_sprite_normal_map(sprite, strength)
-#
-#static func _on_animation_changed(sprite: AnimatedSprite2D, strength: float) -> void:
-#	_update_sprite_normal_map(sprite, strength)
-#
-#static func _update_sprite_normal_map(sprite: AnimatedSprite2D, strength: float) -> void:
-#	var sprite_frames = sprite.sprite_frames
-#	if not sprite_frames:
-#		return
-#		
-#	var current_animation = sprite.animation
-#	var current_frame = sprite.frame
-#	
-#	if current_animation and current_frame >= 0:
-#		var texture = sprite_frames.get_frame_texture(current_animation, current_frame)
-#		if texture:
-#			var normal_map = generate_normal_map(texture, strength)
-#			sprite.normal_map = normal_map 
+## Applies normal maps to all frames of an AnimatedSprite2D
+## This creates reflection-ready sprites with normal maps
+static func apply_normal_maps_to_animated_sprite(sprite: AnimatedSprite2D, strength: float = 2.0) -> void:
+	# Basic visibility setup
+	sprite.visible = true
+	sprite.modulate = Color(1, 1, 1, 1)
+	sprite.self_modulate = Color(1, 1, 1, 1)
+	sprite.use_parent_material = false
+	
+	# Light receiving setup for clean reflections
+	sprite.light_mask = 1  # Receive light
+	
+	# Create a canvas material optimized for reflections
+	var canvas_material = CanvasItemMaterial.new()
+	canvas_material.light_mode = CanvasItemMaterial.LIGHT_MODE_NORMAL
+	canvas_material.blend_mode = CanvasItemMaterial.BLEND_MODE_MIX
+	sprite.material = canvas_material
+	
+	# Apply normal maps to all frames
+	var sprite_frames = sprite.sprite_frames
+	if sprite_frames:
+		for anim_name in sprite_frames.get_animation_names():
+			var frame_count = sprite_frames.get_frame_count(anim_name)
+			for frame in range(frame_count):
+				var texture = sprite_frames.get_frame_texture(anim_name, frame)
+				if texture:
+					# Generate and apply normal map
+					var normal_map = generate_normal_map(texture, strength)
+					var canvas_texture = CanvasTexture.new()
+					canvas_texture.diffuse_texture = texture
+					canvas_texture.normal_texture = normal_map
+					sprite_frames.set_frame(anim_name, frame, canvas_texture) 

@@ -17,6 +17,10 @@ var active: bool = true
 var _has_hit: bool = false
 var _hit_targets: Array[NodePath] = []
 
+# Global cooldown system to prevent multiple damage sources hitting at once
+static var _global_hit_cooldown: Dictionary = {}
+const GLOBAL_HIT_COOLDOWN_TIME: float = 0.8  # 800ms cooldown between any damage
+
 func _ready() -> void:
 	# Connect area entered signal
 	area_entered.connect(_on_area_entered)
@@ -51,9 +55,18 @@ func _on_area_entered(area: Area2D) -> void:
 	if one_shot and _hit_targets.has(hurtbox.get_path()):
 		return
 	
+	# Check global hit cooldown to prevent multiple damage sources hitting at once
+	var target_path = hurtbox.hurtbox_owner.get_path() if hurtbox.hurtbox_owner else hurtbox.get_path()
+	if _global_hit_cooldown.has(target_path) and Time.get_ticks_msec() - _global_hit_cooldown[target_path] < GLOBAL_HIT_COOLDOWN_TIME * 1000:
+		return
+	
 	# Apply damage and effects
 	if hurtbox.active:
 		_hit_targets.append(hurtbox.get_path())
+		
+		# Set global hit cooldown
+		_global_hit_cooldown[target_path] = Time.get_ticks_msec()
+		
 		SignalBus.hit_landed.emit(self, hurtbox)  # Use global signal only
 		hurtbox.take_hit(self)
 		

@@ -24,7 +24,7 @@ class_name BossBase
 
 # Add back damage properties
 @export_group("Back Damage Properties")
-@export var back_damage: float = 15.0  # Default back damage
+@export var back_damage: float = 5.0  # Default back damage
 @export var back_damage_cooldown: float = 1.0  # Cooldown for back damage
 @export var continuous_damage_delay: float = 0.2  # Time needed for continuous collision damage
 
@@ -329,7 +329,23 @@ func _on_back_damage_timer_timeout() -> void:
 func _on_continuous_damage_timer_timeout() -> void:
 	if _is_player_in_back_box:  # If player is still in the box
 		var player = get_tree().get_first_node_in_group("Player")
-		if player and player.has_method("take_damage") and can_deal_back_damage:
+		if not player:
+			return
+			
+		# Check if player is invincible
+		if player.has_method("is_player_invincible") and player.is_player_invincible():
+			return
+			
+		# Check if player was recently hit by a hitbox
+		var player_path = player.get_path()
+		if HitboxComponent._global_hit_cooldown.has(player_path):
+			var time_since_last_hit = Time.get_ticks_msec() - HitboxComponent._global_hit_cooldown[player_path]
+			if time_since_last_hit < HitboxComponent.GLOBAL_HIT_COOLDOWN_TIME * 1000:
+				return
+		
+		if player.has_method("take_damage") and can_deal_back_damage:
+			# Set global hit cooldown to prevent multiple damage sources
+			HitboxComponent._global_hit_cooldown[player_path] = Time.get_ticks_msec()
 			player.take_damage(back_damage)
 			can_deal_back_damage = false
 			if has_node("BackDamageTimer"):

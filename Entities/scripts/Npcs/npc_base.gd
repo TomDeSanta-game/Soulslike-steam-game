@@ -1,11 +1,12 @@
-class_name NpcBase extends CharacterBase
+@tool
+extends CharacterBase
 
 @export_group("NPC Behavior")
 @export var is_roaming: bool = true
 @export var chat_enabled: bool = true
 @export var roam_distance: float = 100.0
 
-var current_state: Types.CharacterState = Types.CharacterState.IDLE
+var current_state: Global.CharacterState = Global.CharacterState.IDLE
 var movement_direction: Vector2 = Vector2.RIGHT
 var start_position: Vector2
 var is_chatting: bool = false
@@ -32,11 +33,11 @@ func _physics_process(delta: float) -> void:
 
 func _handle_roaming_behavior(delta: float) -> void:
 	match current_state:
-		Types.CharacterState.IDLE:
+		Global.CharacterState.IDLE:
 			velocity.x = 0
-		Types.CharacterState.NEW_DIRECTION:
+		Global.CharacterState.NEW_DIRECTION:
 			_choose_new_direction()
-		Types.CharacterState.MOVE:
+		Global.CharacterState.MOVE:
 			_move(delta)
 
 	if abs(global_position.x - start_position.x) > roam_distance:
@@ -61,4 +62,4 @@ func _setup_state_timer() -> void:
 
 func _on_state_timer_timeout() -> void:
 	timer.wait_time = randf_range(0.5, 1.5)
-	current_state = Types.CharacterState.values().pick_random()
+	current_state = Global.CharacterState.values().pick_random()

@@ -1,12 +1,12 @@
 class_name CharacterBase
 extends CharacterBody2D
 
-const CharacterHealthManager = preload("res://Globals/character_health_manager.gd")
+const CharacterHealthManagerClass = preload("res://Singletons/Scripts/CharacterHealthManager/character_health_manager.gd")
 
 @export_group("Character Properties")
 @warning_ignore("unused_private_class_variable")
 @export var initial_health: float = 100.0
-@export var initial_vigour: int = 10
+@export var initial_vigour: int = 30
 
 @export_group("Movement Properties")
 @export var base_run_speed: float = 100.0
@@ -21,7 +21,7 @@ const CharacterHealthManager = preload("res://Globals/character_health_manager.g
 @warning_ignore("unused_private_class_variable")
 @export var hurtboxes: Array[Node] = []
 
-var health_manager: Node
+var health_manager: CharacterHealthManagerClass = CharacterHealthManagerClass.new()
 @warning_ignore("unused_private_class_variable")
 var current_speed: float = base_run_speed
 @warning_ignore("unused_private_class_variable")
@@ -36,7 +36,6 @@ func _ready() -> void:
 
 
 func _setup_character() -> void:
-	health_manager = CharacterHealthManager.new()
 	add_child(health_manager)
 	SignalBus.health_changed.connect(_on_health_changed)
 	SignalBus.character_died.connect(_on_character_died)

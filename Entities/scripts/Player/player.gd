@@ -1,5 +1,7 @@
 extends CharacterBase
 
+# Preload utilities
+const NormalMapGenerator = preload("res://Singletons/Scripts/normal_map_generator.gd")
 
 # Constants and Configuration
 const STATS: Dictionary = {
@@ -33,9 +35,6 @@ const ANIMATIONS: Dictionary = {"IDLE": "Idle", "RUN": "Run", "JUMP": "Jump", "A
 @onready var grab_collision_shape: CollisionShape2D = $GrabCollisionShape
 @onready var place_label: Label = $UILayer/PlaceLabel
 
-# Types Global
-@onready var types: Types = Types.new()
-
 # Timers
 @onready var time_taken_damage_timer: Timer = $Timers/TimeTakenDamageTimer
 @onready var hurt_timer: Timer = $Timers/HurtTimer
@@ -57,7 +56,7 @@ var stamina: float = STATS.MAX_STAMINA
 var direction: float = 0.0
 var is_attacking: bool = false
 var is_crouching: bool = false
-var current_state: Types.CharacterState = Types.CharacterState.IDLE
+var current_state: int = Global.CharacterState.IDLE
 
 # Fade Variables
 var fade_duration: float = 2.0  # Duration of the fade effect
@@ -117,8 +116,8 @@ var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 var dash_direction: float = 1.0
 
-# Save Engine
-@onready var save_engine: Node = get_node("/root/SaveEngine")
+# Save System
+@onready var storage_accessor = preload("res://Entities/scripts/Player/player_storage_accessor.gd").new()
 
 # Coyote Time Variables
 var coyote_timer: float = 0.0
@@ -168,7 +167,7 @@ func _ready() -> void:
 	add_to_group("Player")
 
 	super._ready()  # Call parent _ready to initialize health manager
-	types.player = self
+	Global.player = self
 
 	place_label.add_to_group("PlaceLabel")
 
@@ -184,7 +183,7 @@ func _ready() -> void:
 	# Also set the hitbox and hurtbox layers/masks
 	if hitbox:
 		hitbox.hitbox_owner = self
-		hitbox.damage = 15.0  # Make sure damage is set correctly
+		hitbox.damage = 10.0  # Updated damage from 15.0 to 10.0
 		hitbox.knockback_force = 200.0
 		hitbox.hit_stun_duration = 0.2
 		hitbox.collision_layer = C_Layers.LAYER_HITBOX
@@ -205,6 +204,12 @@ func _ready() -> void:
 	current_health = health_manager.get_health()
 	max_health = health_manager.get_max_health()
 	health_percent = health_manager.get_health_percentage()
+
+	# Initialize storage accessor
+	add_child(storage_accessor)
+
+	# Load saved game data if it exists
+	await storage_accessor.load_data()
 
 	# Setup health bar style
 	var health_bar_style = StyleBoxFlat.new()
@@ -371,10 +376,6 @@ func _ready() -> void:
 	_frame_data_init()
 	frame_data_component.update_frame_data()  # Initial frame data update
 
-	# Load saved game data if it exists
-	if save_engine.load_game():
-		_load_player_state(save_engine.get_save_data())
-
 	# Disable grab collision shape by default
 	if grab_collision_shape:
 		grab_collision_shape.disabled = true
@@ -468,7 +469,7 @@ func _physics_process(delta: float) -> void:
 			_end_grab()  # Let go if not on wall or out of stamina
 
 	if !is_on_floor() and !is_grabbing and gravity_enabled:  # Only apply gravity if enabled
-		velocity.y += Types.GRAVITY_CONSTANT * delta
+		velocity.y += Global.GRAVITY_CONSTANT * delta
 		# Only play fall animation when moving downward and not in a jump state
 		if velocity.y > 0 and !is_jump_active and !is_attacking and animated_sprite.animation != ANIMATIONS.JUMP:  # Check animation instead of state
 			state_machine.dispatch(&"fall")
@@ -484,10 +485,6 @@ func _physics_process(delta: float) -> void:
 		has_coyote_time = false
 		coyote_timer = 0.0
 		is_jump_active = false  # Reset jump active when landing
-	elif coyote_timer > 0:
-		coyote_timer -= delta
-		if coyote_timer <= 0:
-			has_coyote_time = false
 
 	# Jump cutting logic
 	if is_jump_active and not is_jump_held and velocity.y < 0:
@@ -600,7 +597,7 @@ func _handle_movement() -> void:
 	if !is_on_floor():
 		speed *= 0.6  # Reduce speed to 60% while in air
 
-	if current_state == Types.CharacterState.IDLE or current_state == Types.CharacterState.MOVE:
+	if current_state == Global.CharacterState.IDLE or current_state == Global.CharacterState.MOVE:
 		if direction != 0:
 			deceleration_counter = 0  # Reset deceleration counter when moving
 			target_speed = speed * sign(direction)
@@ -632,10 +629,12 @@ func _update_movement_state() -> void:
 	if abs(velocity.x) > 5.0:  # Small threshold to avoid floating point issues
 		if !is_attacking and !is_jump_active and is_on_floor():
 			animated_sprite.play(ANIMATIONS.RUN)
+			current_state = Global.CharacterState.MOVE
 	else:
 		velocity.x = 0  # Snap to zero when very slow
 		if !is_attacking and !is_jump_active and is_on_floor():
 			animated_sprite.play(ANIMATIONS.IDLE)
+			current_state = Global.CharacterState.IDLE
 
 
 func _reset_acceleration() -> void:
@@ -983,15 +982,15 @@ func _on_animation_changed() -> void:
 	# Original animation logic - simplified to avoid enum errors
 	var animation_name = animated_sprite.animation
 	if animation_name == ANIMATIONS.IDLE:
-		current_state = Types.CharacterState.IDLE
+		current_state = Global.CharacterState.IDLE
 	elif animation_name == ANIMATIONS.RUN:
-		current_state = Types.CharacterState.MOVE
+		current_state = Global.CharacterState.MOVE
 	else:
 		# For other animations, just use MOVE or IDLE as appropriate
 		if is_on_floor() and velocity.x == 0:
-			current_state = Types.CharacterState.IDLE
+			current_state = Global.CharacterState.IDLE
 		else:
-			current_state = Types.CharacterState.MOVE
+			current_state = Global.CharacterState.MOVE
 
 	# Update frame data for hitbox/hurtbox positioning
 	frame_data_component.update_frame_data()
@@ -1134,35 +1133,15 @@ func _use_stamina(amount: float) -> void:
 
 
 # Save System
-func _load_player_state(save_data: SaveData) -> void:
-	# Only load position if we don't have a last bonfire position
-	if save_data.last_bonfire_position == Vector2.ZERO:
-		position = save_data.player_position
-	else:
-		position = save_data.last_bonfire_position
-
-	current_health = save_data.current_health
-	stamina = save_data.current_stamina
-	magic = save_data.current_magic
-
-	# Update UI
-	_update_health_bar()
-	_update_stamina_bar()
-	_update_ui()
-
-
 func save_player_state() -> void:
-	save_engine.update_save_data(self)
-	save_engine.save_game()
+	await storage_accessor.save_data()
 
 
 func respawn_at_bonfire() -> void:
-	var bonfire_pos = save_engine.get_last_bonfire_position()
-	if bonfire_pos != Vector2.ZERO:
-		position = bonfire_pos
-		_heal(max_health)  # Full heal on respawn
-		stamina = STATS.MAX_STAMINA  # Full stamina on respawn
-		magic = STATS.MAX_MAGIC  # Full magic on respawn
+	position = Vector2.ZERO  # Respawn at origin
+	_heal(max_health)  # Full heal on respawn
+	stamina = STATS.MAX_STAMINA  # Full stamina on respawn
+	magic = STATS.MAX_MAGIC  # Full magic on respawn
 
 
 func _start_dash() -> void:
@@ -1540,3 +1519,6 @@ func _update_normal_map() -> void:
 			var normal_texture = NormalMapGenerator.generate_normal_map(texture, normal_map_strength)
 			# Update the shader parameter
 			animated_sprite.material.set_shader_parameter("normal_texture", normal_texture)
+
+func is_player_invincible() -> bool:
+	return is_invincible
