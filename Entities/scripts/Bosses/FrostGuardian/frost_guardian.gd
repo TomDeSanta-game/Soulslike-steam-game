@@ -81,8 +81,8 @@ func _ready() -> void:
 		bt_node.set_process_input(false)
 
 	# Set Frost Guardian specific properties with FIXED damage values
-	attack_damage = 10.0  # Base attack damage
-	back_damage = 5.0    # Back damage
+	attack_damage = 5.0  # Reduced from 10.0
+	back_damage = 2.5    # Reduced from 5.0
 	attack_cooldown = 1.5  # Attack cooldown
 	back_damage_cooldown = 1.5  # Back damage cooldown
 

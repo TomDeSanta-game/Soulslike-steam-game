@@ -111,13 +111,3 @@ signal boss_attack_started(boss: Node, attack_name: String)
 signal boss_spawned(boss: Node)
 @warning_ignore("unused_signal")
 signal boss_died(boss: Node)
-
-# Elevator Signals
-@warning_ignore("unused_signal")
-signal elevator_started_moving(elevator: Node)
-@warning_ignore("unused_signal")
-signal elevator_stopped_moving(elevator: Node)
-@warning_ignore("unused_signal")
-signal elevator_reached_top(elevator: Node)
-@warning_ignore("unused_signal")
-signal elevator_reached_bottom(elevator: Node) 

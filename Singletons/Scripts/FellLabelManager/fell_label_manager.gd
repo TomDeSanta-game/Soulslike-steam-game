@@ -48,8 +48,11 @@ func _setup_label() -> void:
 	container.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	container.offset_top = 0
 	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	container.size = Vector2(get_viewport().get_visible_rect().size.x, 300)
+	container.custom_minimum_size = Vector2(0, 300)  # Only set the minimum height
 	canvas_layer.add_child(container)
+	
+	# Set the size in _ready or after adding to scene tree
+	container.set_deferred("size", Vector2(get_viewport().get_visible_rect().size.x, 300))
 	
 	background = ColorRect.new()
 	background.custom_minimum_size = Vector2(1920, 300)
